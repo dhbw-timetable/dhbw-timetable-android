@@ -1,0 +1,54 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Sync"
+        android:key="pref_key_sync_settings">
+        <Preference
+            android:title="Manage timetables"
+            android:key="manage_timetables_button"
+            />
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/pref_sync_frequency_titles"
+            android:entryValues="@array/pref_sync_frequency_values"
+            android:key="sync_frequency_list"
+            android:summary="%s"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Sync frequency" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="sync_range_future"
+            android:title="Sync range future"/>
+        <EditTextPreference
+            android:inputType="number"
+            android:key="sync_range_past"
+            android:title="Sync range past"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Design"
+        android:key="pref_key_design_settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="dark_theme_switch"
+            android:id="@+id/darkThemeSwitch"
+            android:title="Dark Theme" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Sync"
+        android:key="pref_key_more_settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="reset_switch"
+            android:title="Really reset all application data" />
+        <Preference
+            android:title="Reset all application data"
+            android:enabled="false"
+            android:key="reset_button" />
+        <Preference
+            android:title="Start tutorial again"
+            android:key="tutorial_button" />
+        <Preference
+            android:title="Info"
+            android:key="info_button" />
+    </PreferenceCategory>
+</PreferenceScreen>

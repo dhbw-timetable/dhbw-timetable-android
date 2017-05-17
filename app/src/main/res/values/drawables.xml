@@ -1,0 +1,8 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <item name="ic_menu_today" type="drawable">@drawable/ic_today_black_24dp</item>
+    <item name="ic_menu_week" type="drawable">@drawable/ic_view_week_black_24dp</item>
+    <item name="ic_menu_notifications" type="drawable">@drawable/ic_access_alarm_black_24dp</item>
+    <item name="ic_menu_settings" type="drawable">@drawable/ic_settings_black_24dp</item>
+    <item name="ic_action_refresh" type="drawable">@drawable/ic_refresh_white_24dp</item>
+    <item name="ic_action_search" type="drawable">@drawable/ic_search_white_24dp</item>
+</resources>

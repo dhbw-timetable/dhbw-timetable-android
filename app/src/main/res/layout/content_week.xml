@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/week_layout"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
+        android:id="@+id/week_layout_times"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </RelativeLayout>
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/week_layout_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/defGrey"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/week_head_mo"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginStart="60dp"
+                    android:gravity="center_horizontal"
+                    android:text="Mo"
+                    android:textAppearance="@style/AgendaTimeMain" />
+
+                <TextView
+                    android:id="@+id/week_head_di"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginStart="60dp"
+                    android:gravity="center_horizontal"
+                    android:text="Di"
+                    android:textAppearance="@style/AgendaTimeMain" />
+
+                <TextView
+                    android:id="@+id/week_head_mi"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginStart="60dp"
+                    android:gravity="center_horizontal"
+                    android:text="Mi"
+                    android:textAppearance="@style/AgendaTimeMain" />
+
+                <TextView
+                    android:id="@+id/week_head_do"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginStart="60dp"
+                    android:gravity="center_horizontal"
+                    android:text="Do"
+                    android:textAppearance="@style/AgendaTimeMain" />
+
+                <TextView
+                    android:id="@+id/week_head_fr"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginStart="60dp"
+                    android:gravity="center_horizontal"
+                    android:text="Fr"
+                    android:textAppearance="@style/AgendaTimeMain" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/week_layout_body"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F0F0F0"
+                android:orientation="horizontal"></LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>
