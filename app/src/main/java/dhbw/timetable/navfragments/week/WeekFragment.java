@@ -49,7 +49,16 @@ public class WeekFragment extends Fragment {
         return false;
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        TimetableManager.LoadOfflineGlobals(getActivity(), new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Successfully loaded offline globals for week fragment.");
+            }
+        });
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +76,7 @@ public class WeekFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_week, container, false);
+
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 

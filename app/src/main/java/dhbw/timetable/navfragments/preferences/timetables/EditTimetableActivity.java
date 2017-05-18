@@ -6,9 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import dhbw.timetable.R;
 
 public class EditTimetableActivity extends AppCompatActivity {
@@ -28,6 +32,32 @@ public class EditTimetableActivity extends AppCompatActivity {
         // Load this timetable
         nameView.setText(getIntent().getExtras().getString("name"));
         urlView.setText(getIntent().getExtras().getString("url"));
+
+        urlView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.toString().startsWith("https://rapla.dhbw-stuttgart.de/rapla?key=")) {
+                    String trimmed = s.toString()
+                            .substring("https://rapla.dhbw-stuttgart.de/rapla?key=".length());
+                    int end = trimmed.indexOf("&");
+                    if(end != -1) {
+                        trimmed = trimmed.substring(0, end);
+                    }
+                    urlView.setText(trimmed);
+                    Toast.makeText(EditTimetableActivity.this, "Magically trimmed your url ;)", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         nameBefore = nameView.getText().toString();
     }
 

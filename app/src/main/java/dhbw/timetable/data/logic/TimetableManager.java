@@ -69,10 +69,7 @@ public final class TimetableManager {
                     return null;
                 }
 
-                System.out.println(timetable);
-
                 // Get sync range from Preferences
-
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myActivity);
 
                 GregorianCalendar startDate = (GregorianCalendar) Calendar.getInstance();

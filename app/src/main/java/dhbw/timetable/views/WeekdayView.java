@@ -104,10 +104,7 @@ public class WeekdayView extends View {
 
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
-
-        System.out.println("WeekdayView: " + width + "x" + height);
         final float k = (Y_GRID_SPACE * height) / (max - min);
-        System.out.println("WeekdayViewK: " + k);
         for(int i = 0; i * k < height; i++) {
             canvas.drawLine(0, i * k, (width / 5), i * k, paint);
         }

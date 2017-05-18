@@ -44,11 +44,7 @@ public class SideTimesView extends View {
         paint.setTextSize(25);
 
         final float height = sLayout.getMeasuredHeight();
-        final float width = pLayout.getMeasuredWidth();
-
-        System.out.println("SideTimesView: " + width + "x" + height);
         final float k = (WeekdayView.Y_GRID_SPACE * height) / (max - min);
-        System.out.println("SideTimeViewK: " + k);
         for(int i = 0; i * k < height; i++) {
             if(i%2 == 0) {
                 int iM = min%60;

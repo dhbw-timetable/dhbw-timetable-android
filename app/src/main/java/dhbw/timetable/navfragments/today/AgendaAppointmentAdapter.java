@@ -40,17 +40,15 @@ public class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppoint
         holder.time.setText(a.getStartTime());
         holder.course.setText(a.getCourse());
 
-        if (position == 0 || position == appointments.size() - 1) {
-            holder.time.setTextAppearance(holder.time.getContext(), R.style.AgendaTimeMain);
-        }
+        holder.time.setTextAppearance(holder.time.getContext(),
+                (position == 0 || position == (appointments.size()-1)) ?
+                        R.style.AgendaTimeMain : R.style.AgendaTime);
 
-        if (a.isBreak()) {
-            // Changing the background needs padding update
-            holder.course.setBackgroundResource(R.drawable.break_background);
-            float scale = holder.course.getResources().getDisplayMetrics().density;
-            int dpAsPixels = (int) (10 * scale + 0.5f);
-            holder.course.setPadding(dpAsPixels, 0, dpAsPixels, 0);
-        }
+        float scale = holder.course.getResources().getDisplayMetrics().density;
+        int dpAsPixels = (int) (10 * scale + 0.5f);
+        holder.course.setBackgroundResource(a.isBreak() ?
+                R.drawable.break_background : R.drawable.course_background);
+        holder.course.setPadding(dpAsPixels, 0, dpAsPixels, 0);
     }
 
     @Override

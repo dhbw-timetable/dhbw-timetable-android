@@ -19,7 +19,7 @@
         <item>Manual</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
-        <item>0.016666</item>
+        <item>0.166666</item>
         <item>0.833333</item>
         <item>0.25</item>
         <item>0.5</item>
@@ -28,4 +28,13 @@
         <item>24</item>
         <item>-1</item>
     </string-array>
+    <string-array name="pref_standard_view">
+        <item>Today</item>
+        <item>Week</item>
+    </string-array>
+    <string-array name="pref_standard_view_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

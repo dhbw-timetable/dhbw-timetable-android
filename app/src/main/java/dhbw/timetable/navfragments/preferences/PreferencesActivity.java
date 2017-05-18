@@ -4,16 +4,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
+import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
+import dhbw.timetable.services.TimetableSyncService;
 
 
 public class PreferencesActivity extends AppCompatPreferenceActivity {
@@ -102,7 +106,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     // TODO Start a tutorial
-                    InfoDialog.newInstance("Tutorial", "Currently there is no tutorial avaiable. Comming soon.").show(getFragmentManager(), "tutorial");
+                    InfoDialog.newInstance("Tutorial", "Currently there is no tutorial available. Coming soon.").show(getFragmentManager(), "tutorial");
                     return true;
                 }
             });

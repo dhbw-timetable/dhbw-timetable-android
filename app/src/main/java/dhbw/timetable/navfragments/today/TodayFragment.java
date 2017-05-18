@@ -110,7 +110,6 @@ public class TodayFragment extends Fragment {
         applyWeekSummary(view);
     }
 
-    // TODO Add break as new appointment
     private void applyAgenda(View view) {
         agendaAppointmentsList.clear();
         String currDate = DateHelper.GetCurrentDate();
@@ -123,7 +122,6 @@ public class TodayFragment extends Fragment {
         TextView placeholder = (TextView) view.findViewById(R.id.agendaEmptyPlaceholder);
         if(size > 0) {
             placeholder.setText("");
-
             Map<Integer, AgendaAppointment> breaks = new HashMap<>();
             for(int i = 0; i < size; i++) {
                 if(i != (agendaAppointmentsList.size() - 1)) {

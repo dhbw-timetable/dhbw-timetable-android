@@ -34,8 +34,17 @@
             android:title="Dark Theme" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Sync"
+        android:title="App"
         android:key="pref_key_more_settings">
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/pref_standard_view"
+            android:entryValues="@array/pref_standard_view_values"
+            android:key="standardView"
+            android:summary="%s"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Standard view" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="reset_switch"
