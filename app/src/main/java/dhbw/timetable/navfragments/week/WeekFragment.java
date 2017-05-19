@@ -34,10 +34,9 @@ public class WeekFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_week) {
-            TimetableManager.UpdateGlobals(getActivity(), new Runnable() {
+            TimetableManager.UpdateGlobals(getActivity().getApplication(), new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getActivity(), "Refreshed!", Toast.LENGTH_SHORT).show();
                 }
             });
             return true;
@@ -52,7 +51,7 @@ public class WeekFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        TimetableManager.LoadOfflineGlobals(getActivity(), new Runnable() {
+        TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
                 System.out.println("Successfully loaded offline globals for week fragment.");
@@ -70,6 +69,7 @@ public class WeekFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Week");
+
     }
 
     @Nullable
@@ -90,6 +90,7 @@ public class WeekFragment extends Fragment {
         times.removeAllViews();
         SideTimesView sideTimesView = new SideTimesView(borders.first, borders.second, times, body);
         sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
+        // FIXME: App stucks when adding view (on week nav fragment as default).
         times.addView(sideTimesView);
 
         // Initialize body content

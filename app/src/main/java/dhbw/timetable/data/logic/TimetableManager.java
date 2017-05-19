@@ -1,6 +1,7 @@
 package dhbw.timetable.data.logic;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +33,7 @@ public final class TimetableManager {
 
     private TimetableManager() {}
 
-    private static String getTimetable(Activity a) {
+    private static String getTimetable(Application a) {
         SharedPreferences sharedPref = a.getSharedPreferences(
                 a.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         for(String key : sharedPref.getAll().keySet()) {
@@ -47,30 +48,29 @@ public final class TimetableManager {
     /**
      * Downloads timetable contents into GLOBAL_TIMETABLES and writes data to file system
      */
-    public static void UpdateGlobals(final Activity activity, final Runnable updater) {
+    public static void UpdateGlobals(final Application application, final Runnable updater) {
         GLOBAL_TIMETABLES.clear();
 
         System.out.print("Loading online globals for ");
-        new AsyncTask<Activity, Void, Void>() {
-            Activity myActivity;
+        new AsyncTask<Application, Void, Void>() {
+            Application myApp;
 
             boolean success = false;
 
             @Override
-            protected Void doInBackground(Activity... activities) {
-                myActivity = activities[0];
+            protected Void doInBackground(Application... apps) {
+                myApp = apps[0];
 
                 // Get the first timetable
-                String timetable = getTimetable(myActivity);
+                String timetable = getTimetable(myApp);
                 if(timetable.equals("undefined")) {
-                    Intent i = new Intent(myActivity, NewTimetableActivity.class);
-                    myActivity.startActivity(i);
-                    myActivity.overridePendingTransition(0, 0);
+                    Intent i = new Intent(myApp, NewTimetableActivity.class);
+                    myApp.startActivity(i);
                     return null;
                 }
 
                 // Get sync range from Preferences
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myActivity);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myApp);
 
                 GregorianCalendar startDate = (GregorianCalendar) Calendar.getInstance();
                 DateHelper.SubtractDays(startDate, Integer.parseInt(prefs.getString("sync_range_past", "0")) * 7);
@@ -108,30 +108,30 @@ public final class TimetableManager {
                 System.out.println("Updating UI...");
                 updater.run();
                 System.out.println("Done.");
-                Toast.makeText(myActivity, "Finished!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(myApp, "Finished!", Toast.LENGTH_SHORT).show();
                 // Update offline globals
                 try {
-                    FileOutputStream outputStream = myActivity.openFileOutput(
-                            myActivity.getResources().getString(R.string.TIMETABLES_FILE), Context.MODE_PRIVATE);
+                    FileOutputStream outputStream = myApp.openFileOutput(
+                            application.getResources().getString(R.string.TIMETABLES_FILE), Context.MODE_PRIVATE);
                     outputStream.write(SerialRepresentation().getBytes());
                     outputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        }.execute(activity);
+        }.execute(application);
     }
 
     /**
      * Loads the last downloaded timetables into GLOBAL_TIMETABLES
      */
-    public static void LoadOfflineGlobals(Activity activity , Runnable updater) {
+    public static void LoadOfflineGlobals(Application application , Runnable updater) {
         // TODO If no OfflineGlobals were found, try to load them from online
         System.out.println("Loading offline globals...");
         GLOBAL_TIMETABLES.clear();
         try {
-            FileInputStream fis = activity.openFileInput(
-                    activity.getResources().getString(R.string.TIMETABLES_FILE));
+            FileInputStream fis = application.openFileInput(
+                    application.getResources().getString(R.string.TIMETABLES_FILE));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
 
             String line;

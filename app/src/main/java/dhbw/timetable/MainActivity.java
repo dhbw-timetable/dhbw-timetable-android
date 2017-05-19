@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("Resumed from preferences. Restarting background sync...");
+        System.out.println("Restarting background sync...");
         System.out.println("Stopping...");
         stopSyncService();
         System.out.println("Starting...");
@@ -77,13 +77,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        // TODO Make nav_week possible when standardView is 1
-        final int item = sharedPref.getString("standardView", "0").equals("0") ?
-                R.id.nav_today : R.id.nav_today;
+        // TODO: Make nav_week possible when standardView is 1
+        // FIXME: on nav_week as default -> one cpu core run into endless loop
+        final int defaultSelectedItem = PreferenceManager.getDefaultSharedPreferences(this).
+                getString("standardView", "0").equals("0") ?
+                R.id.nav_today : R.id.nav_week;
 
-        navigationView.setCheckedItem(item);
-        displayFragment(item);
+        navigationView.setCheckedItem(R.id.nav_today);
+        displayFragment(R.id.nav_today);
 
         getSupportActionBar().setElevation(0);
     }

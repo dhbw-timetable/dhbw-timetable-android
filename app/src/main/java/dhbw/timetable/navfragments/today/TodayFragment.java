@@ -72,7 +72,7 @@ public class TodayFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        TimetableManager.LoadOfflineGlobals(getActivity(), new Runnable() {
+        TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
                 applyGlobalContent(getView());
@@ -92,7 +92,7 @@ public class TodayFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
-            TimetableManager.UpdateGlobals(getActivity(), new Runnable() {
+            TimetableManager.UpdateGlobals(getActivity().getApplication(), new Runnable() {
                 @Override
                 public void run() {
                     applyGlobalContent(getView());
