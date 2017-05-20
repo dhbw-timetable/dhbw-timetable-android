@@ -108,7 +108,6 @@ public final class TimetableManager {
                 System.out.println("Updating UI...");
                 updater.run();
                 System.out.println("Done.");
-                Toast.makeText(myApp, "Finished!", Toast.LENGTH_SHORT).show();
                 // Update offline globals
                 try {
                     FileOutputStream outputStream = myApp.openFileOutput(

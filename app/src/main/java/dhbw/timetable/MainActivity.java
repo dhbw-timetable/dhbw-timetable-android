@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity
                 getString("standardView", "0").equals("0") ?
                 R.id.nav_today : R.id.nav_week;
 
-        navigationView.setCheckedItem(R.id.nav_today);
-        displayFragment(R.id.nav_today);
+        navigationView.setCheckedItem(defaultSelectedItem);
+        displayFragment(defaultSelectedItem);
 
         getSupportActionBar().setElevation(0);
     }

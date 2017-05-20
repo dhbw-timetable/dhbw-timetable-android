@@ -1,5 +1,6 @@
 package dhbw.timetable.navfragments.week;
 
+import android.app.Application;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.logic.DateHelper;
 import dhbw.timetable.data.logic.TimetableManager;
+import dhbw.timetable.navfragments.today.TodayFragment;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
 
@@ -31,52 +33,27 @@ public class WeekFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        final Application application = getActivity().getApplication();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_week) {
-            TimetableManager.UpdateGlobals(getActivity().getApplication(), new Runnable() {
+            TimetableManager.UpdateGlobals(application, new Runnable() {
                 @Override
                 public void run() {
+                    applyGlobalContent();
+                    Toast.makeText(application, "Finished!", Toast.LENGTH_SHORT).show();
                 }
             });
             return true;
         } else if (id == R.id.action_search_week) {
-            Toast.makeText(getActivity(), "Not implemented yet.", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getActivity(), "Not implemented yet.", Toast.LENGTH_SHORT).show();
             return true;
         }
 
         return false;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Successfully loaded offline globals for week fragment.");
-            }
-        });
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Week");
-
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_week, container, false);
-
+    private void applyGlobalContent() {
+        View view = this.getView();
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
@@ -104,7 +81,36 @@ public class WeekFragment extends Fragment {
 
             DateHelper.AddDays(day, 1);
         }
-        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Successfully loaded offline globals for week fragment.");
+            }
+        });
+        applyGlobalContent();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Week");
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.content_week, container, false);
     }
 
     @Override

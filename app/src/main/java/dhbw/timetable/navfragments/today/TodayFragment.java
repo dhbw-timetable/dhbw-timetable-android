@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -96,6 +97,7 @@ public class TodayFragment extends Fragment {
                 @Override
                 public void run() {
                     applyGlobalContent(getView());
+                    Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Finished!", Toast.LENGTH_SHORT).show();
                 }
             });
             return true;
