@@ -3,7 +3,6 @@ package dhbw.timetable;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -51,11 +50,8 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         System.out.println("Restarting background sync...");
-        System.out.println("Stopping...");
         stopSyncService();
-        System.out.println("Starting...");
         startSyncService();
-        System.out.println("Done.");
     }
 
     @Override
@@ -77,8 +73,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // TODO: Make nav_week possible when standardView is 1
-        // FIXME: on nav_week as default -> one cpu core run into endless loop
         final int defaultSelectedItem = PreferenceManager.getDefaultSharedPreferences(this).
                 getString("standardView", "0").equals("0") ?
                 R.id.nav_today : R.id.nav_week;

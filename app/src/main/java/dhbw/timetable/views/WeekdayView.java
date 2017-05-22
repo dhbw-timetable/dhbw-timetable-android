@@ -28,14 +28,16 @@ public class WeekdayView extends View {
     private ArrayList<Appointment> dayAppointments;
     private float scale;
     private int min, max;
+    private boolean isFriday;
 
-    public WeekdayView(int min, int max, View parentLayout, ArrayList<Appointment> appointments) {
+    public WeekdayView(int min, int max, View parentLayout, ArrayList<Appointment> appointments, boolean isFriday) {
         super(parentLayout.getContext());
         this.min = min;
         this.max = max;
+        this.isFriday = isFriday;
         this.parentLayout = parentLayout;
         this.dayAppointments= appointments;
-        scale = getResources().getDisplayMetrics().density;
+        this.scale = getResources().getDisplayMetrics().density;
     }
 
     // TODO: Extract memory allocations where possible
@@ -88,7 +90,7 @@ public class WeekdayView extends View {
     // For auto layout
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH), parentLayout.getMeasuredHeight());
+        setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET : 0)), parentLayout.getMeasuredHeight());
     }
 
     private int dp(int px) {
@@ -100,13 +102,13 @@ public class WeekdayView extends View {
     }
 
     private void drawGrid(Canvas canvas) {
-        paint.setColor(Color.parseColor("#E0E0E0"));
+        paint.setColor(Color.parseColor(isFriday ? "#000000" : "#E0E0E0"));
 
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for(int i = 0; i * k < height; i++) {
-            canvas.drawLine(0, i * k, (width / 5), i * k, paint);
+            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
         }
     }
 }

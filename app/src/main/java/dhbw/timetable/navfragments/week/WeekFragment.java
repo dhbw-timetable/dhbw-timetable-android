@@ -24,7 +24,6 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.logic.DateHelper;
 import dhbw.timetable.data.logic.TimetableManager;
-import dhbw.timetable.navfragments.today.TodayFragment;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
 
@@ -63,19 +62,20 @@ public class WeekFragment extends Fragment {
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.GLOBAL_TIMETABLES);
         Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
 
+        int fExtensionFirst = borders.first >= 30 ? borders.first - 30 : borders.first;
+        int fExtensionSecond = borders.second <= 1410 ? borders.second + 30 : borders.second;
+
         // Initialize side time view
         times.removeAllViews();
-        SideTimesView sideTimesView = new SideTimesView(borders.first, borders.second, times, body);
+        SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
         sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
-        // FIXME: App stucks when adding view (on week nav fragment as default).
         times.addView(sideTimesView);
-
         // Initialize body content
         body.removeAllViews();
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
-            dayElement = new WeekdayView(borders.first, borders.second, body,
-                    DateHelper.GetAppointmentsOfDay(day, weekAppointments));
+            dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
+                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4);
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
             body.addView(dayElement);
 

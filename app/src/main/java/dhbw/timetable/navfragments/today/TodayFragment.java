@@ -130,7 +130,7 @@ public class TodayFragment extends Fragment {
                     AgendaAppointment aa = agendaAppointmentsList.get(i);
                     AgendaAppointment following = agendaAppointmentsList.get(i+1);
                     // If break is present
-                    if (!aa.getStartTime().equals(following.getEndTime())) {
+                    if (!aa.getEndTime().equals(following.getStartTime())) {
                         breaks.put(i, new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "PAUSE", true));
                     }
                 }
@@ -178,37 +178,40 @@ public class TodayFragment extends Fragment {
         Appointment startA, endA;
         ArrayList<ArrayList<Appointment>> wData = new ArrayList<>();
         for(int d = 0; d < 5; d++) {
+            startA = endA = null;
             ArrayList<Appointment> dayAppointments = DateHelper.GetAppointmentsOfDay(day, weekAppointments);
             wData.add(dayAppointments);
-            startA = dayAppointments.get(0);
-            endA = dayAppointments.get(dayAppointments.size() - 1);
+            if (dayAppointments.size() > 0){
+                startA = dayAppointments.get(0);
+                endA = dayAppointments.get(dayAppointments.size() - 1);
+            }
+            switch (d) {
+                case 0:
+                    startID = R.id.moStart;
+                    endID = R.id.moEnd;
+                    break;
+                case 1:
+                    startID = R.id.diStart;
+                    endID = R.id.diEnd;
+                    break;
+                case 2:
+                    startID = R.id.miStart;
+                    endID = R.id.miEnd;
+                    break;
+                case 3:
+                    startID = R.id.doStart;
+                    endID = R.id.doEnd;
+                    break;
+                case 4:
+                    startID = R.id.frStart;
+                    endID = R.id.frEnd;
+                    break;
+            }
             if (startA != null) {
                 startTime = startA.getStartTime();
                 endTime = endA.getEndTime();
-                switch (d) {
-                    case 0:
-                        startID = R.id.moStart;
-                        endID = R.id.moEnd;
-                        break;
-                    case 1:
-                        startID = R.id.diStart;
-                        endID = R.id.diEnd;
-                        break;
-                    case 2:
-                        startID = R.id.miStart;
-                        endID = R.id.miEnd;
-                        break;
-                    case 3:
-                        startID = R.id.doStart;
-                        endID = R.id.doEnd;
-                        break;
-                    case 4:
-                        startID = R.id.frStart;
-                        endID = R.id.frEnd;
-                        break;
-                }
             } else {
-                startTime = endTime = "";
+                startTime = endTime = "00:00";
             }
             ((TextView) view.findViewById(startID)).setText(startTime);
             ((TextView) view.findViewById(endID)).setText(endTime);

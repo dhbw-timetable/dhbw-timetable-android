@@ -25,7 +25,6 @@ public class SideTimesView extends View {
         this.min = min;
         this.max = max;
         scale = getResources().getDisplayMetrics().density;
-        System.out.println("Created side times view...");
     }
 
     // For auto layout
@@ -40,7 +39,6 @@ public class SideTimesView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        System.out.println("Draw Side times view...");
         paint.setColor(getResources().getColor(R.color.textColorSecondary));
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setTextSize(25);

@@ -41,7 +41,7 @@ public class TimetableSyncService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("EXIT", "Destroyed sync service!");
+        Log.i("SYNC", "Destroyed sync service!");
         sendBroadcast(new Intent(".services.TimetableRestarterBroadcastReceiver"));
         stopTimer();
     }
@@ -58,18 +58,20 @@ public class TimetableSyncService extends Service {
 
         // Schedule the timer, to wake up every x MILI seconds
         if (freq > -1) {
-            System.out.println("Background sync started. Sync every " + freq + "ms...");
+            Log.i("SYNC", "Background sync started. Sync every " + freq + "ms.");
             timer.schedule(timerTask, 1000, freq);
         }
     }
 
     public void stopTimer() {
-        System.out.println("Background sync service stop requested...");
+        Log.i("SYNC", "Background sync stop requested.");
         // Stop the timer, if it's not already null
         if (timer != null) {
             timer.cancel();
-            System.out.println("Stopped");
+            Log.i("SYNC", "Successfully stopped");
             timer = null;
+        } else {
+            Log.i("SYNC", "Service already stopped!");
         }
     }
 
@@ -79,7 +81,7 @@ public class TimetableSyncService extends Service {
                 TimetableManager.UpdateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("Background sync finished.");
+                        Log.i("SYNC", "Background sync finished.");
                         // TODO Refresh activities
                         // TODO Check onChange preference and possibly fire notifications
                     }
