@@ -3,6 +3,7 @@ package dhbw.timetable.navfragments.today;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -125,7 +126,7 @@ public class TodayFragment extends Fragment {
         if(size > 0) {
             placeholder.setText("");
             Map<Integer, AgendaAppointment> breaks = new HashMap<>();
-            for(int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++) {
                 if(i != (agendaAppointmentsList.size() - 1)) {
                     AgendaAppointment aa = agendaAppointmentsList.get(i);
                     AgendaAppointment following = agendaAppointmentsList.get(i+1);
@@ -136,7 +137,7 @@ public class TodayFragment extends Fragment {
                 }
             }
 
-            for(int i : breaks.keySet()) agendaAppointmentsList.add(i + 1, breaks.get(i));
+            for (int i : breaks.keySet()) agendaAppointmentsList.add(i + 1, breaks.get(i));
 
             String endTime = agendaAppointmentsList.get(agendaAppointmentsList.size() - 1).getEndTime();
             agendaAppointmentsList.add(new AgendaAppointment(endTime, "", "FEIERABEND", true));
@@ -166,7 +167,7 @@ public class TodayFragment extends Fragment {
     }
 
     // Apply
-    private void applyWeekSummary(View view) {
+    private void applyWeekSummary(final View view) {
         GregorianCalendar day = (GregorianCalendar) Calendar.getInstance();
         DateHelper.Normalize(day);
 
@@ -227,6 +228,8 @@ public class TodayFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity) getActivity()).displayFragment(R.id.nav_week);
+                NavigationView navigationView = (NavigationView) TodayFragment.this.getActivity().findViewById(R.id.nav_view);
+                navigationView.setCheckedItem(R.id.nav_week);
             }
         });
         gl.addView(ra);

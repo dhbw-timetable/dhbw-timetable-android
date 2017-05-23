@@ -28,10 +28,6 @@ public class TimetableSyncService extends Service {
     // NEEDED
     public TimetableSyncService() {}
 
-    public static TimetableSyncService GetInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);

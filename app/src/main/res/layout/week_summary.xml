@@ -27,7 +27,6 @@
         android:layout_toStartOf="@+id/diStart"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -38,7 +37,6 @@
         android:layout_toStartOf="@+id/miStart"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="09:00"
         android:textAlignment="center" />
 
     <TextView
@@ -49,7 +47,6 @@
         android:layout_centerHorizontal="true"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -61,7 +58,6 @@
         android:layout_toEndOf="@+id/miStart"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -73,7 +69,6 @@
         android:layout_toEndOf="@+id/doStart"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -85,7 +80,6 @@
         android:layout_marginTop="100dp"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -97,7 +91,6 @@
         android:layout_toEndOf="@+id/moEnd"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -108,7 +101,6 @@
         android:layout_toEndOf="@+id/diEnd"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -120,7 +112,6 @@
         android:layout_toEndOf="@+id/miEnd"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <TextView
@@ -131,7 +122,6 @@
         android:layout_toEndOf="@+id/doEnd"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:text="XX:XX"
         android:textAlignment="center" />
 
     <GridLayout

@@ -18,10 +18,12 @@
         <EditTextPreference
             android:inputType="number"
             android:key="sync_range_future"
+            android:defaultValue="1"
             android:title="Sync range future"/>
         <EditTextPreference
             android:inputType="number"
             android:key="sync_range_past"
+            android:defaultValue="1"
             android:title="Sync range past"/>
     </PreferenceCategory>
     <PreferenceCategory
@@ -37,7 +39,7 @@
         android:title="App"
         android:key="pref_key_more_settings">
         <ListPreference
-            android:defaultValue="-1"
+            android:defaultValue="0"
             android:entries="@array/pref_standard_view"
             android:entryValues="@array/pref_standard_view_values"
             android:key="standardView"

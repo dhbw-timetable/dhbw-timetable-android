@@ -1,13 +1,11 @@
 package dhbw.timetable.data.logic;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -16,13 +14,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
-import dhbw.timetable.navfragments.preferences.timetables.NewTimetableActivity;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -33,7 +29,7 @@ public final class TimetableManager {
 
     private TimetableManager() {}
 
-    private static String getTimetable(Application a) {
+    private static String getActiveTimetable(Application a) {
         SharedPreferences sharedPref = a.getSharedPreferences(
                 a.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         for(String key : sharedPref.getAll().keySet()) {
@@ -50,27 +46,21 @@ public final class TimetableManager {
      */
     public static void UpdateGlobals(final Application application, final Runnable updater) {
         GLOBAL_TIMETABLES.clear();
-
-        System.out.print("Loading online globals for ");
-        new AsyncTask<Application, Void, Void>() {
-            Application myApp;
-
+        new AsyncTask<Void, Void, Void>() {
             boolean success = false;
 
             @Override
-            protected Void doInBackground(Application... apps) {
-                myApp = apps[0];
-
+            protected Void doInBackground(Void... noArgs) {
                 // Get the first timetable
-                String timetable = getTimetable(myApp);
-                if(timetable.equals("undefined")) {
-                    Intent i = new Intent(myApp, NewTimetableActivity.class);
-                    myApp.startActivity(i);
+                String timetable = getActiveTimetable(application);
+                if (timetable.equals("undefined")) {
+                    Log.i("TTM", "There is currently no timetable specified.");
                     return null;
                 }
+                System.out.println("Loading online globals for " + timetable);
 
                 // Get sync range from Preferences
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myApp);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(application);
 
                 GregorianCalendar startDate = (GregorianCalendar) Calendar.getInstance();
                 DateHelper.SubtractDays(startDate, Integer.parseInt(prefs.getString("sync_range_past", "0")) * 7);
@@ -97,7 +87,7 @@ public final class TimetableManager {
             @Override
             protected void onPostExecute(Void result) {
                 if(!success) {
-                    System.out.println("ERROR on receiving online Information");
+                    Log.w("TTM", "Unable to receive online data");
                     // TODO Let the user know about this error
                     return;
                 }
@@ -110,7 +100,7 @@ public final class TimetableManager {
                 System.out.println("Done.");
                 // Update offline globals
                 try {
-                    FileOutputStream outputStream = myApp.openFileOutput(
+                    FileOutputStream outputStream = application.openFileOutput(
                             application.getResources().getString(R.string.TIMETABLES_FILE), Context.MODE_PRIVATE);
                     outputStream.write(SerialRepresentation().getBytes());
                     outputStream.close();
@@ -118,7 +108,17 @@ public final class TimetableManager {
                     e.printStackTrace();
                 }
             }
-        }.execute(application);
+        }.execute();
+    }
+
+    private static boolean secureFile(Application application) {
+        try {
+            FileInputStream fis = application.openFileInput(application.getResources().getString(R.string.TIMETABLES_FILE));
+            fis.close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     /**
@@ -126,6 +126,10 @@ public final class TimetableManager {
      */
     public static void LoadOfflineGlobals(Application application , Runnable updater) {
         // TODO If no OfflineGlobals were found, try to load them from online
+        if(!secureFile(application)) {
+            UpdateGlobals(application, updater);
+            return;
+        }
         System.out.println("Loading offline globals...");
         GLOBAL_TIMETABLES.clear();
         try {
@@ -148,6 +152,7 @@ public final class TimetableManager {
                 GLOBAL_TIMETABLES.add(a);
             }
             System.out.println("Success!");
+            bufferedReader.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("FAILED!");

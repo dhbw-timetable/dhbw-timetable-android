@@ -73,7 +73,7 @@
                     android:id="@+id/week_head_fr"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="60dp"
+                    android:layout_marginEnd="73dp"
                     android:layout_marginStart="60dp"
                     android:gravity="center_horizontal"
                     android:text="Fr"

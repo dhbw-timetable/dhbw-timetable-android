@@ -90,7 +90,7 @@ public class WeekdayView extends View {
     // For auto layout
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET : 0)), parentLayout.getMeasuredHeight());
+        setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
     }
 
     private int dp(int px) {
@@ -102,13 +102,13 @@ public class WeekdayView extends View {
     }
 
     private void drawGrid(Canvas canvas) {
-        paint.setColor(Color.parseColor(isFriday ? "#000000" : "#E0E0E0"));
+        paint.setColor(Color.parseColor("#E0E0E0"));
 
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for(int i = 0; i * k < height; i++) {
-            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
+            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET / 4 : 0), i * k, paint);
         }
     }
 }

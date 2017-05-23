@@ -49,7 +49,7 @@ public class EditTimetableActivity extends AppCompatActivity {
                         trimmed = trimmed.substring(0, end);
                     }
                     urlView.setText(trimmed);
-                    Toast.makeText(EditTimetableActivity.this, "Magically trimmed your url ;)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditTimetableActivity.this, "Some magic happened!", Toast.LENGTH_SHORT).show();
                 }
             }
 
