@@ -1,10 +1,14 @@
 package dhbw.timetable.navfragments.week;
 
 import android.app.Application;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,13 +16,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
@@ -28,6 +35,8 @@ import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
 
 public class WeekFragment extends Fragment {
+
+    private GregorianCalendar weekToDisplay;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -43,8 +52,23 @@ public class WeekFragment extends Fragment {
                 }
             });
             return true;
-        } else if (id == R.id.action_search_week) {
-            // Toast.makeText(getActivity(), "Not implemented yet.", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.action_pick_week) {
+            DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int day) {
+                    weekToDisplay.set(Calendar.YEAR, year);
+                    weekToDisplay.set(Calendar.MONTH, month);
+                    weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
+                    Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
+                    applyGlobalContent();
+                }
+            };
+
+            DatePickerDialog dpd = new DatePickerDialog(getContext(), handler,
+                    weekToDisplay.get(Calendar.YEAR),
+                    weekToDisplay.get(Calendar.MONTH),
+                    weekToDisplay.get(Calendar.DAY_OF_MONTH));
+            dpd.show();
             return true;
         }
 
@@ -57,18 +81,24 @@ public class WeekFragment extends Fragment {
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
         // Prepare appointment data
-        GregorianCalendar day = (GregorianCalendar) Calendar.getInstance();
+        GregorianCalendar day = (GregorianCalendar) weekToDisplay.clone();
         DateHelper.Normalize(day);
+        String formattedDate = new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
+        getActivity().setTitle(formattedDate);
+
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.GLOBAL_TIMETABLES);
+        Log.i("TTM", "Week appointments for :" + formattedDate);
+        for(Appointment a : weekAppointments) Log.i("TTM", a.toString());
         Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
 
+        // If margin is possible
         int fExtensionFirst = borders.first >= 30 ? borders.first - 30 : borders.first;
         int fExtensionSecond = borders.second <= 1410 ? borders.second + 30 : borders.second;
 
         // Initialize side time view
         times.removeAllViews();
         SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
-        sideTimesView.setBackgroundColor(Color.parseColor("#CCF0F0F0"));
+        sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
         times.addView(sideTimesView);
         // Initialize body content
         body.removeAllViews();
@@ -86,13 +116,17 @@ public class WeekFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        // Reset to today
+        weekToDisplay = (GregorianCalendar) Calendar.getInstance();
+        DateHelper.Normalize(weekToDisplay);
+        getActivity().setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
-                System.out.println("Successfully loaded offline globals for week fragment.");
+                Log.i("TTM", "Successfully loaded offline globals for week fragment.");
+                applyGlobalContent();
             }
         });
-        applyGlobalContent();
     }
 
     @Override
@@ -104,7 +138,6 @@ public class WeekFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Week");
     }
 
     @Nullable

@@ -3,6 +3,7 @@ package dhbw.timetable.data;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class Appointment {
     private GregorianCalendar startDate, endDate;
@@ -32,19 +33,19 @@ public class Appointment {
     }
 
     public String getStartTime() {
-       SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+       SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
        sdf.setCalendar(startDate);
        return sdf.format(startDate.getTime());
     }
 
     public String getEndTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.GERMANY);
         sdf.setCalendar(endDate);
         return sdf.format(endDate.getTime());
     }
 
     public String getDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
         sdf.setCalendar(startDate);
         return sdf.format(startDate.getTime());
     }

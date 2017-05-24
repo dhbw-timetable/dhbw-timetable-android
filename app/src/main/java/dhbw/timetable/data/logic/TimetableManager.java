@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
@@ -70,7 +71,7 @@ public final class TimetableManager {
                 DateHelper.AddDays(endDate, Integer.parseInt(prefs.getString("sync_range_future", "0")) * 7);
                 DateHelper.Normalize(endDate);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
                 System.out.println("Running algorithm for args: START=" + sdf.format(startDate.getTime()) + "; END=" + sdf.format(endDate.getTime()));
 
                 // Run download algorithm for ArrayList GLOBAL_TIMETABLES

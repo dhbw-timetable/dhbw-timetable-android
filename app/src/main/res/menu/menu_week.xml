@@ -8,9 +8,9 @@
         android:orderInCategory="9999"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_search_week"
-        android:icon="@drawable/ic_search_white_24dp"
-        android:title="Search"
+        android:id="@+id/action_pick_week"
+        android:icon="@drawable/ic_insert_invitation_white_24dp"
+        android:title="Pick"
         android:orderInCategory="10"
         app:showAsAction="always" />
 </menu>

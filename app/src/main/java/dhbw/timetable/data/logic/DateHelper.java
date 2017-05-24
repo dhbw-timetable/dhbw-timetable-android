@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import dhbw.timetable.data.Appointment;
 
@@ -38,7 +39,7 @@ public final class DateHelper {
     }
 
     public static String GetCurrentDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
         Calendar c = Calendar.getInstance();
         return sdf.format(c.getTime());
     }
@@ -51,8 +52,18 @@ public final class DateHelper {
     /**
      * Normalizes the day to a week starting with monday
      */
-    public static void Normalize(GregorianCalendar g) {
+    @Deprecated
+    public static void Normalize_Native(GregorianCalendar g) {
         g.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+    }
+
+    /**
+     * Sets the week day to last monday before. If it already is monday it does nothing.
+     */
+    public static void Normalize(GregorianCalendar g) {
+        while(!new SimpleDateFormat("EEEE", Locale.GERMANY).format(g.getTime()).equals("Montag")){
+            DateHelper.SubtractDays(g, 1);
+        }
     }
 
     public static void AddDays(GregorianCalendar g, int i) {
@@ -64,7 +75,7 @@ public final class DateHelper {
     }
 
     public static Appointment GetFirstAppointmentOfDay(ArrayList<Appointment> appointments, GregorianCalendar day) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
         for(Appointment a : appointments) {
             // If same day
             if(sdf.format(a.getStartDate().getTime()).equals(sdf.format(day.getTime()))) {
@@ -76,7 +87,7 @@ public final class DateHelper {
     }
 
     public static Appointment GetLastAppointmentOfDay(ArrayList<Appointment> appointments, GregorianCalendar day) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
         Appointment result = null;
         for(Appointment a : appointments) {
             // If same day
@@ -119,7 +130,7 @@ public final class DateHelper {
 
     public static ArrayList<Appointment> GetAppointmentsOfDay(GregorianCalendar day, ArrayList<Appointment> list) {
         ArrayList<Appointment> dayAppointments = new ArrayList<>();
-        String currDate = new SimpleDateFormat("dd.MM.yyyy").format(day.getTime());
+        String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
         for(Appointment a : list) {
             if(a.getDate().equals(currDate)) {
                 dayAppointments.add(a);
