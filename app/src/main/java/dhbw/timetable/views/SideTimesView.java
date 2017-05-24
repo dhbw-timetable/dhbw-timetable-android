@@ -43,7 +43,8 @@ public class SideTimesView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextSize(25);
+        paint.setTextSize(dp(13));
+        paint.setStrokeWidth(dp(1));
 
         final float height = sLayout.getMeasuredHeight();
         final float k = (WeekdayView.Y_GRID_SPACE * height) / (max - min);

@@ -68,7 +68,7 @@ public class WeekFragment extends Fragment {
         // Initialize side time view
         times.removeAllViews();
         SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
-        sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
+        sideTimesView.setBackgroundColor(Color.parseColor("#CCF0F0F0"));
         times.addView(sideTimesView);
         // Initialize body content
         body.removeAllViews();

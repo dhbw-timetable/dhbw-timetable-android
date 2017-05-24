@@ -31,50 +31,50 @@
 
                 <TextView
                     android:id="@+id/week_head_mo"
-                    android:layout_width="30dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="60dp"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginStart="6.5dp"
                     android:gravity="center_horizontal"
                     android:text="Mo"
                     android:textAppearance="@style/AgendaTimeMain" />
 
                 <TextView
                     android:id="@+id/week_head_di"
-                    android:layout_width="30dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="60dp"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginStart="0dp"
                     android:gravity="center_horizontal"
                     android:text="Di"
                     android:textAppearance="@style/AgendaTimeMain" />
 
                 <TextView
                     android:id="@+id/week_head_mi"
-                    android:layout_width="30dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="60dp"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginStart="0dp"
                     android:gravity="center_horizontal"
                     android:text="Mi"
                     android:textAppearance="@style/AgendaTimeMain" />
 
                 <TextView
                     android:id="@+id/week_head_do"
-                    android:layout_width="30dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="60dp"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginStart="0dp"
                     android:gravity="center_horizontal"
                     android:text="Do"
                     android:textAppearance="@style/AgendaTimeMain" />
 
                 <TextView
                     android:id="@+id/week_head_fr"
-                    android:layout_width="30dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="73dp"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="6.5dp"
+                    android:layout_marginStart="0dp"
                     android:gravity="center_horizontal"
                     android:text="Fr"
                     android:textAppearance="@style/AgendaTimeMain" />

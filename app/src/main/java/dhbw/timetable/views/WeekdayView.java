@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -43,8 +44,6 @@ public class WeekdayView extends View {
     // TODO: Extract memory allocations where possible
     @Override
     public void onDraw(Canvas canvas) {
-        textPaint.setStrokeWidth(0);
-
         drawGrid(canvas);
 
         for(Appointment a : dayAppointments) {
@@ -65,11 +64,11 @@ public class WeekdayView extends View {
 
             // Draw the appointment rectangle
             canvas.drawRoundRect(new RectF(new Rect(x1, y1, x2, y2)),
-                    10f, 10f, textPaint);
+                    dp(7), dp(7), textPaint);
 
             // Draw the course title
             textPaint.setColor(Color.WHITE);
-            textPaint.setTextSize(25);
+            textPaint.setTextSize(dp(14));
             StaticLayout textLayout = new StaticLayout(
                     a.getCourse(),
                     textPaint,
@@ -91,6 +90,8 @@ public class WeekdayView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
+        // Log.i("LAYOUT", dp(getMeasuredWidth()) + " x " + dp(getMeasuredHeight()));
+        // Log.i("LAYOUT", getMeasuredWidth() + " x " + getMeasuredHeight());
     }
 
     private int dp(int px) {
@@ -102,13 +103,14 @@ public class WeekdayView extends View {
     }
 
     private void drawGrid(Canvas canvas) {
+        paint.setStrokeWidth(dp(1));
         paint.setColor(Color.parseColor("#E0E0E0"));
 
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for(int i = 0; i * k < height; i++) {
-            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET / 4 : 0), i * k, paint);
+            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
         }
     }
 }

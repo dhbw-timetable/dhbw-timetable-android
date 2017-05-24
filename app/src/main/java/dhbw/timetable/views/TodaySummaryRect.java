@@ -33,6 +33,10 @@ public class TodaySummaryRect extends View {
         drawWeek(canvas);
     }
 
+    private int dp(int px) {
+        return (int) (px * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
     private void drawWeek(Canvas canvas) {
 
         float aWidth = pLayout.getMeasuredWidth() / 5;
@@ -51,7 +55,7 @@ public class TodaySummaryRect extends View {
                         (int) startY,
                         (int) (startX + aWidth),
                         (int) aHeight)),
-                        3,3, paint);
+                        dp(3),dp(3), paint);
             }
         }
     }
