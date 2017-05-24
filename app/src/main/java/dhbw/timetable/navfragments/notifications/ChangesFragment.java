@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import dhbw.timetable.R;
@@ -28,7 +27,8 @@ public class ChangesFragment extends Fragment {
         final SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        final Switch nOCSwitch = (Switch) view.findViewById(R.id.NotifyOnChangeSwitch);
+        final TextView notCritView = (TextView) view.findViewById(R.id.NotCritText);
+        final TextView notCritValueView = (TextView) view.findViewById(R.id.NotCritValue);
 
         final TextView formView = (TextView) view.findViewById(R.id.FormText);
         final TextView formValueView = (TextView) view.findViewById(R.id.FormValue);
@@ -36,20 +36,38 @@ public class ChangesFragment extends Fragment {
         final TextView toneView = (TextView) view.findViewById(R.id.ToneText);
         final TextView toneValueView = (TextView) view.findViewById(R.id.ToneValue);
 
-        nOCSwitch.setChecked(sharedPref.getBoolean("notifyOnChange", false));
-        nOCSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        View.OnClickListener onCritClick = new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("notifyOnChange", isChecked);
-                editor.apply();
+            public void onClick(View v) {
+                ListDialog.newInstance("Select a form", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which >= 0) {
+                            ListView lw = ((AlertDialog)dialog).getListView();
+                            String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("onChangeCritIndex", which);
+                            editor.putString("onChangeCrit", checkedItem);
+                            editor.apply();
+                            notCritValueView.setText(checkedItem);
 
-                formView.setEnabled(isChecked);
-                formValueView.setEnabled(isChecked);
-                toneView.setEnabled(isChecked);
-                toneValueView.setEnabled(isChecked);
+                            boolean crit = !checkedItem.equals("None");
+                            formView.setEnabled(crit);
+                            formValueView.setEnabled(crit);
+                            toneView.setEnabled(crit);
+                            toneValueView.setEnabled(crit);
+                        }
+                    }
+                }, sharedPref.getInt("onChangeCritIndex", 0), "None", "One week ahead", "Every change")
+                        .show(getActivity().getFragmentManager(), "changes_crit");
             }
-        });
+        };
+
+        notCritValueView.setText(sharedPref.getString("onChangeCrit", "None"));
+        notCritValueView.setOnClickListener(onCritClick);
+        boolean checked = !notCritValueView.getText().equals("None");
+
+        notCritView.setOnClickListener(onCritClick);
 
         View.OnClickListener onFormClick = new View.OnClickListener() {
             @Override
@@ -72,10 +90,10 @@ public class ChangesFragment extends Fragment {
             }
         };
 
-        formView.setEnabled(nOCSwitch.isChecked());
+        formView.setEnabled(checked);
         formView.setOnClickListener(onFormClick);
 
-        formValueView.setEnabled(nOCSwitch.isChecked());
+        formValueView.setEnabled(checked);
         formValueView.setText(sharedPref.getString("onChangeForm", "Banner"));
         formValueView.setOnClickListener(onFormClick);
 
@@ -101,10 +119,10 @@ public class ChangesFragment extends Fragment {
             }
         };
 
-        toneView.setEnabled(nOCSwitch.isChecked());
+        toneView.setEnabled(checked);
         toneView.setOnClickListener(onToneClick);
 
-        toneValueView.setEnabled(nOCSwitch.isChecked());
+        toneValueView.setEnabled(checked);
         toneValueView.setText(sharedPref.getString("onChangeTone", "Blub"));
         toneValueView.setOnClickListener(onToneClick);
         return view;
