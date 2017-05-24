@@ -48,7 +48,7 @@ public class WeekFragment extends Fragment {
                 @Override
                 public void run() {
                     applyGlobalContent();
-                    Toast.makeText(application, "Finished!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(application, "Updated!", Toast.LENGTH_SHORT).show();
                 }
             });
             return true;
@@ -60,7 +60,7 @@ public class WeekFragment extends Fragment {
                     weekToDisplay.set(Calendar.MONTH, month);
                     weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
                     Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
-                    applyGlobalContent();
+                    displayWeek();
                 }
             };
 
@@ -74,6 +74,18 @@ public class WeekFragment extends Fragment {
 
         return false;
     }
+
+    private void displayWeek() {
+        applyGlobalContent();
+        TimetableManager.UpdateGlobals(this.getActivity().getApplication(), new Runnable() {
+            @Override
+            public void run() {
+                applyGlobalContent();
+                Toast.makeText(WeekFragment.this.getActivity(), "Updated!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void applyGlobalContent() {
         View view = this.getView();
