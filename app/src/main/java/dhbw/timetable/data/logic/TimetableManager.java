@@ -92,13 +92,47 @@ public final class TimetableManager {
                     // TODO Let the user know about this error
                     return;
                 }
-                System.out.println("Successfully imported globals:");
-                // DEBUG
-                System.out.println(TimetableManager.SerialRepresentation());
+                SharedPreferences sharedPref = application.getSharedPreferences(
+                        application.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+                Log.i("TTM", "Successfully updated global timetables: ");
+                Log.i("TTM", TimetableManager.SerialRepresentation());
                 // Update UI
                 System.out.println("Updating UI...");
                 updater.run();
                 System.out.println("Done.");
+
+                String changeCrit = sharedPref.getString("onChangeCrit", "None");
+                Log.i("TTM", "Searching for changes. Criteria: " + changeCrit);
+                switch (changeCrit) {
+                    case "None":
+                        break;
+                    case "Every change":
+                        try {
+                            FileInputStream fis = application.openFileInput(
+                                    application.getResources().getString(R.string.TIMETABLES_FILE));
+                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+
+                            StringBuilder sb = new StringBuilder();
+                            String line;
+                            while ((line = bufferedReader.readLine()) != null) {
+                                sb.append(line + "\n");
+                            }
+                            String comp1 = sb.toString();
+                            String comp2 = SerialRepresentation();
+                            if(comp1.contains(comp2) || comp2.contains(comp1) || comp1.equals(comp2)) {
+                                Log.i("RESULT", "EQUAL");
+                            } else {
+                                Log.i("RESULT", "UNEQUAL");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "One week ahead":
+                        // TODO Check one week ahead
+                        break;
+                }
                 // Update offline globals
                 try {
                     FileOutputStream outputStream = application.openFileOutput(
@@ -110,6 +144,10 @@ public final class TimetableManager {
                 }
             }
         }.execute();
+    }
+
+    private static void checkForChanges() {
+
     }
 
     private static boolean secureFile(Application application) {
