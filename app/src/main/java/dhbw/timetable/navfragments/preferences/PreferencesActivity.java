@@ -1,5 +1,6 @@
 package dhbw.timetable.navfragments.preferences;
 
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +11,11 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MenuItem;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
@@ -129,6 +134,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     syncRangeFuture.setSummary(newValue + " weeks");
+                    onSyncRangeChange();
                     return true;
                 }
             });
@@ -138,11 +144,21 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     syncRangePast.setSummary(newValue + " weeks");
+                    onSyncRangeChange();
                     return true;
                 }
             });
 
             setHasOptionsMenu(true);
+        }
+
+        private void onSyncRangeChange() {
+            Application application = this.getActivity().getApplication();
+            if(application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
+                Log.i("FILE", "Successfully deleted timetables file.");
+            } else {
+                Log.w("FILE", "Unable to delete timetables file! Do you have one?");
+            }
         }
 
         /** Enable the back button */

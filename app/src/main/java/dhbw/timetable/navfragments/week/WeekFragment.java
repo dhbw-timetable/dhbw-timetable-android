@@ -99,7 +99,7 @@ public class WeekFragment extends Fragment {
         getActivity().setTitle(formattedDate);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.GLOBAL_TIMETABLES);
-        Log.i("TTM", "Week appointments for :" + formattedDate);
+        Log.i("TTM", "Week appointments for: " + formattedDate);
         for(Appointment a : weekAppointments) Log.i("TTM", a.toString());
         Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
 

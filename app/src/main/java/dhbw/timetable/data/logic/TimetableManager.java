@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -58,7 +59,7 @@ public final class TimetableManager {
                     Log.i("TTM", "There is currently no timetable specified.");
                     return null;
                 }
-                System.out.println("Loading online globals for " + timetable);
+                Log.i("TTM", "Loading online globals for " + timetable);
 
                 // Get sync range from Preferences
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(application);
@@ -72,7 +73,7 @@ public final class TimetableManager {
                 DateHelper.Normalize(endDate);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-                System.out.println("Running algorithm for args: START=" + sdf.format(startDate.getTime()) + "; END=" + sdf.format(endDate.getTime()));
+                Log.i("TTM", "Running algorithm for args: START=" + sdf.format(startDate.getTime()) + "; END=" + sdf.format(endDate.getTime()));
 
                 // Run download algorithm for ArrayList GLOBAL_TIMETABLES
                 DataImporter importer = new DataImporter(timetable);
@@ -92,47 +93,16 @@ public final class TimetableManager {
                     // TODO Let the user know about this error
                     return;
                 }
-                SharedPreferences sharedPref = application.getSharedPreferences(
-                        application.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-                Log.i("TTM", "Successfully updated global timetables: ");
-                Log.i("TTM", TimetableManager.SerialRepresentation());
+                Log.i("TTM", "Successfully updated global timetables");
+                Log.d("TTM", TimetableManager.SerialRepresentation());
                 // Update UI
-                System.out.println("Updating UI...");
+                Log.i("TTM", "Updating UI...");
                 updater.run();
-                System.out.println("Done.");
+                Log.i("TTM", "Updated UI!");
 
-                String changeCrit = sharedPref.getString("onChangeCrit", "None");
-                Log.i("TTM", "Searching for changes. Criteria: " + changeCrit);
-                switch (changeCrit) {
-                    case "None":
-                        break;
-                    case "Every change":
-                        try {
-                            FileInputStream fis = application.openFileInput(
-                                    application.getResources().getString(R.string.TIMETABLES_FILE));
-                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+                handleChangePolicies(application);
 
-                            StringBuilder sb = new StringBuilder();
-                            String line;
-                            while ((line = bufferedReader.readLine()) != null) {
-                                sb.append(line + "\n");
-                            }
-                            String comp1 = sb.toString();
-                            String comp2 = SerialRepresentation();
-                            if(comp1.contains(comp2) || comp2.contains(comp1) || comp1.equals(comp2)) {
-                                Log.i("RESULT", "EQUAL");
-                            } else {
-                                Log.i("RESULT", "UNEQUAL");
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "One week ahead":
-                        // TODO Check one week ahead
-                        break;
-                }
                 // Update offline globals
                 try {
                     FileOutputStream outputStream = application.openFileOutput(
@@ -146,8 +116,50 @@ public final class TimetableManager {
         }.execute();
     }
 
-    private static void checkForChanges() {
+    private static boolean notificationNeeded(Application application, SharedPreferences sharedPref) {
+        if(!secureFile(application)) {
+            Log.i("TTM", "No offline globals to compare.");
+            return false;
+        }
+        String changeCrit = sharedPref.getString("onChangeCrit", "None");
+        Log.i("TTM", "Searching for changes. Criteria: " + changeCrit);
+        switch (changeCrit) {
+            case "None":
+                return false;
+            case "Every change":
+                // Simply check if serial representation of globals and offline globals would match
+                try {
+                    FileInputStream fis = application.openFileInput(
+                            application.getResources().getString(R.string.TIMETABLES_FILE));
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) sb.append(line + "\n");
+                    return !sb.toString().equals(SerialRepresentation());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            case "One week ahead":
+                GregorianCalendar thisWeek = (GregorianCalendar) Calendar.getInstance();
+                GregorianCalendar nextWeek = (GregorianCalendar) thisWeek.clone();
+                DateHelper.NextWeek(nextWeek);
+                return !getPartialRepresentation(application, thisWeek, nextWeek)
+                        .equals(WeekRepresentation(thisWeek) + WeekRepresentation(nextWeek));
+        }
+        Log.e("TTM", "Error! Wrong change crit: " + changeCrit);
+        return false;
+    }
 
+    private static void handleChangePolicies(Application application) {
+        SharedPreferences sharedPref = application.getSharedPreferences(
+                application.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        if(notificationNeeded(application, sharedPref)) {
+            Log.i("TTM", "Changes found. Would fire!");
+            // TODO Fire notifications
+        } else {
+            Log.i("TTM", "No relevant changes found. Won't fire any notification for change.");
+        }
     }
 
     private static boolean secureFile(Application application) {
@@ -164,8 +176,9 @@ public final class TimetableManager {
      * Loads the last downloaded timetables into GLOBAL_TIMETABLES
      */
     public static void LoadOfflineGlobals(Application application , Runnable updater) {
-        // TODO If no OfflineGlobals were found, try to load them from online
+        // If no OfflineGlobals were found, try to load them from online
         if(!secureFile(application)) {
+            Log.i("TTM", "No offline globals were found, checking online.");
             UpdateGlobals(application, updater);
             return;
         }
@@ -179,6 +192,7 @@ public final class TimetableManager {
             String line;
             Appointment a;
             while ((line = bufferedReader.readLine()) != null) {
+                if(line.isEmpty()) continue;
                 String[] aData = line.split("\t");
                 String[] date = aData[0].split("\\.");
                 GregorianCalendar g = new GregorianCalendar();
@@ -200,10 +214,53 @@ public final class TimetableManager {
         updater.run();
         System.out.println("Done");
     }
-
+    public static String WeekRepresentation(GregorianCalendar g) {
+        StringBuilder sb = new StringBuilder();
+        for (Appointment a : DateHelper.GetWeekAppointments(g, GLOBAL_TIMETABLES))
+            sb.append(a.toString()).append("\n");
+        return sb.toString();
+    }
     public static String SerialRepresentation() {
         StringBuilder sb = new StringBuilder();
-        for (Appointment a : GLOBAL_TIMETABLES) sb.append(a.toString() + "\n");
+        Appointment before = null;
+        for (Appointment a : GLOBAL_TIMETABLES) {
+            sb.append(a.toString()).append("\n");
+            if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
+                sb.append("\n");
+            }
+            before = a;
+        }
         return sb.toString();
+    }
+    /**
+     * Get partial representation within two weeks
+     */
+    private static String getPartialRepresentation(Application application, GregorianCalendar startG, GregorianCalendar endG) {
+        if(!DateHelper.IsSameWeek(startG, endG)) {
+            try {
+                FileInputStream fis = application.openFileInput(
+                        application.getResources().getString(R.string.TIMETABLES_FILE));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+
+                StringBuilder partialBuilder = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if(line.isEmpty()) continue;
+                    String[] date = line.split("\t")[0].split("\\.");
+                    GregorianCalendar g = new GregorianCalendar();
+                    g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
+                    g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
+                    g.set(Calendar.YEAR, Integer.parseInt(date[2]));
+                    if(DateHelper.IsSameWeek(g, startG) || DateHelper.IsSameWeek(g, endG)) {
+                        partialBuilder.append(line).append("\n");
+                    }
+                }
+                bufferedReader.close();
+                return partialBuilder.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 }

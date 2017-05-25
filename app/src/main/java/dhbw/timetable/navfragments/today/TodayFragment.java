@@ -98,7 +98,7 @@ public class TodayFragment extends Fragment {
                 @Override
                 public void run() {
                     applyGlobalContent(getView());
-                    Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Finished!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
                 }
             });
             return true;
