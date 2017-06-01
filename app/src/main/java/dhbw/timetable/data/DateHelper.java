@@ -1,4 +1,4 @@
-package dhbw.timetable.data.logic;
+package dhbw.timetable.data;
 
 import android.util.Pair;
 
@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-
-import dhbw.timetable.data.Appointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -99,6 +97,8 @@ public final class DateHelper {
         return result;
     }
 
+
+    // FIXME Borders are not properly set on a FREE week
     public static Pair<Integer, Integer> GetBorders(ArrayList<Appointment> weekAppointments) {
         int startOnMin, endOnMin, max = 0, min = 1440;
         for(Appointment a : weekAppointments) {

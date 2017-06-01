@@ -1,4 +1,4 @@
-package dhbw.timetable.data.logic;
+package dhbw.timetable.data;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -22,22 +23,22 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import dhbw.timetable.data.Appointment;
-
-public class DataImporter {
+class DataImporter {
 
     private final static String baseURL = "https://rapla.dhbw-stuttgart.de/rapla";
     private String pageContent, key;
+    private ArrayList<Appointment> appointments;
 
-    public DataImporter(String key) {
+    DataImporter(String key, boolean global) {
         this.key = key;
+        appointments = global ? TimetableManager.getInstance().getGlobals() : TimetableManager.getInstance().getLocals();
     }
 
     /**
      * Downloads a html site and imports the content to Appointment DataStructure
      * @throws Exception
      */
-    public void importAll(GregorianCalendar startDate, GregorianCalendar endDate) throws Exception {
+    void importAll(GregorianCalendar startDate, GregorianCalendar endDate) throws Exception {
         GregorianCalendar tempDate = (GregorianCalendar) startDate.clone();
         do {
             URLConnection webConnection = new URL(baseURL
@@ -61,7 +62,7 @@ public class DataImporter {
         } while (!DateHelper.IsDateOver(tempDate, endDate));
     }
 
-    public void evaluateTableBody(GregorianCalendar currDate) throws SAXException, IOException, ParserConfigurationException {
+    private void evaluateTableBody(GregorianCalendar currDate) throws SAXException, IOException, ParserConfigurationException {
         // trim and filter to correct tbody inner HTML
         pageContent = ("<?xml version=\"1.0\"?>\n" + pageContent.substring(pageContent.indexOf("<tbody>"), pageContent.lastIndexOf("</tbody>") + 8)).replaceAll("&nbsp;", "&#160;").replaceAll("<br>", "<br/>");
 
@@ -112,8 +113,9 @@ public class DataImporter {
             info = importInfoFromSpan(aChildren.item(3).getChildNodes().item(4).getChildNodes());
         }
 
-        Appointment a = new Appointment(time, date,	course,	info);
-        TimetableManager.GLOBAL_TIMETABLES.add(a);
+        Appointment a = new Appointment(time, date, course, info);
+
+        appointments.add(a);
     }
 
     private String importInfoFromSpan(NodeList spanTableRows) {

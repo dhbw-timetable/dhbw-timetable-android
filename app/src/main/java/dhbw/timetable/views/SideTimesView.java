@@ -57,10 +57,10 @@ public class SideTimesView extends View {
                 String sH = iH < 10 ? "0" + iH : "" + iH;
                 String time = sH + ":" + sM;
                 canvas.drawText(time, 0, time.length(), dp(2), (int) (i * k) + dp(Y_TEXT_LAYOUT), paint);
-            } else {
-                paint.setColor(Color.parseColor("#E0E0E0"));
-                canvas.drawLine(0, (int) (i * k) + dp(Y_LINE_LAYOUT), dp(TIME_WIDTH), (int) (i * k) + dp(Y_LINE_LAYOUT), paint);
-            }
+            } /*else {
+               paint.setColor(Color.parseColor("#E0E0E0"));
+               canvas.drawLine(0, (int) (i * k) + dp(Y_LINE_LAYOUT), dp(TIME_WIDTH), (int) (i * k) + dp(Y_LINE_LAYOUT), paint);
+            } */
         }
     }
 }

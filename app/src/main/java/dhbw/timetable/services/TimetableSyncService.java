@@ -10,7 +10,7 @@ import android.util.Log;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import dhbw.timetable.data.logic.TimetableManager;
+import dhbw.timetable.data.TimetableManager;
 
 public class TimetableSyncService extends Service {
 
@@ -52,7 +52,7 @@ public class TimetableSyncService extends Service {
         timer = new Timer();
         initializeTimerTask();
 
-        // Schedule the timer, to wake up every x MILI seconds
+        // Schedule the timer, to wake up every x MILLI seconds
         if (freq > -1) {
             Log.i("SYNC", "Background sync started. Sync every " + freq + "ms.");
             timer.schedule(timerTask, 1000, freq);
@@ -74,15 +74,19 @@ public class TimetableSyncService extends Service {
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-                TimetableManager.UpdateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.i("SYNC", "Background sync finished.");
-                        // TODO Refresh activities
-                        // TODO Check onChange preference and possibly fire notifications
-                    }
-                });
-                Log.i("SYNC", "Would like to sync now. Please implement me! :-)");
+                if(!TimetableManager.getInstance().isBusy()) {
+                    TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i("SYNC", "Background sync finished.");
+                            // TODO Refresh activities ?
+                            // Check onChange preference and possibly fire notifications done
+                        }
+                    });
+                    Log.i("SYNC", "Background sync now.)");
+                } else {
+                    Log.w("SYNC", "Tried asynchronous sync");
+                }
             }
         };
     }

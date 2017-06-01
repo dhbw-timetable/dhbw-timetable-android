@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,8 +31,8 @@ import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.Appointment;
-import dhbw.timetable.data.logic.DateHelper;
-import dhbw.timetable.data.logic.TimetableManager;
+import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.views.TodaySummaryRect;
 
 public class TodayFragment extends Fragment {
@@ -74,7 +75,7 @@ public class TodayFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        TimetableManager.LoadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+        TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
                 applyGlobalContent(getView());
@@ -94,14 +95,18 @@ public class TodayFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
-            TimetableManager.UpdateGlobals(getActivity().getApplication(), new Runnable() {
-                @Override
-                public void run() {
-                    applyGlobalContent(getView());
-                    Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
-                }
-            });
-            return true;
+            if(!TimetableManager.getInstance().isBusy()) {
+                TimetableManager.getInstance().updateGlobals(getActivity().getApplication(), new Runnable() {
+                    @Override
+                    public void run() {
+                        applyGlobalContent(getView());
+                        Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return true;
+            } else {
+                Log.w("ASYNC", "Tried to sync while manager was busy");
+            }
         }
 
         return false;
@@ -116,7 +121,7 @@ public class TodayFragment extends Fragment {
     private void applyAgenda(View view) {
         agendaAppointmentsList.clear();
         String currDate = DateHelper.GetCurrentDate();
-        for(Appointment a : TimetableManager.GLOBAL_TIMETABLES) {
+        for(Appointment a : TimetableManager.getInstance().getGlobals()) {
             if(a.getDate().equals(currDate)) {
                 agendaAppointmentsList.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), false));
             }
@@ -150,7 +155,7 @@ public class TodayFragment extends Fragment {
     private void applyTomorrow(View view) {
         GregorianCalendar tomorrow = (GregorianCalendar) Calendar.getInstance();
         DateHelper.AddDays(tomorrow, 1);
-        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow, TimetableManager.GLOBAL_TIMETABLES);
+        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow, TimetableManager.getInstance().getGlobals());
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if(tomorrowAppointments.size() > 0) {
@@ -172,7 +177,7 @@ public class TodayFragment extends Fragment {
         DateHelper.Normalize(day);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day,
-                TimetableManager.GLOBAL_TIMETABLES);
+                TimetableManager.getInstance().getGlobals());
 
         String startTime, endTime;
         int startID = -1, endID = -1;

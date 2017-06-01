@@ -3,6 +3,9 @@ package dhbw.timetable.navfragments.notifications;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -65,7 +68,7 @@ public class ChangesFragment extends Fragment {
 
         notCritValueView.setText(sharedPref.getString("onChangeCrit", "None"));
         notCritValueView.setOnClickListener(onCritClick);
-        boolean checked = !notCritValueView.getText().equals("None");
+        final boolean checked = !notCritValueView.getText().equals("None");
 
         notCritView.setOnClickListener(onCritClick);
 
@@ -85,7 +88,7 @@ public class ChangesFragment extends Fragment {
                             formValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("onChangeFormIndex", 0),"Banner", "Pop-Up", "None")
+                }, sharedPref.getInt("onChangeFormIndex", 0),"Banner", "None")
                         .show(getActivity().getFragmentManager(), "changes_form");
             }
         };
@@ -94,7 +97,7 @@ public class ChangesFragment extends Fragment {
         formView.setOnClickListener(onFormClick);
 
         formValueView.setEnabled(checked);
-        formValueView.setText(sharedPref.getString("onChangeForm", "Banner"));
+        formValueView.setText(sharedPref.getString("onChangeForm", "None"));
         formValueView.setOnClickListener(onFormClick);
 
         View.OnClickListener onToneClick = new View.OnClickListener() {
@@ -106,7 +109,13 @@ public class ChangesFragment extends Fragment {
                         if (which >= 0) {
                             ListView lw = ((AlertDialog)dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
-                            // TODO Play the tone
+                            // Play the tone
+                            if(checkedItem.equals("Default")) {
+                                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                                Ringtone r = RingtoneManager.getRingtone(ChangesFragment.this.getActivity()
+                                        .getApplication().getApplicationContext(), notification);
+                                r.play();
+                            }
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("onChangeToneIndex", which);
                             editor.putString("onChangeTone", checkedItem);
@@ -114,7 +123,7 @@ public class ChangesFragment extends Fragment {
                             toneValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("onChangeToneIndex", 0),"Blub", "Pieps", "Tzz", "None")
+                }, sharedPref.getInt("onChangeToneIndex", 0), "Default", "None")
                         .show(getActivity().getFragmentManager(), "changes_tone");
             }
         };
@@ -123,7 +132,7 @@ public class ChangesFragment extends Fragment {
         toneView.setOnClickListener(onToneClick);
 
         toneValueView.setEnabled(checked);
-        toneValueView.setText(sharedPref.getString("onChangeTone", "Blub"));
+        toneValueView.setText(sharedPref.getString("onChangeTone", "None"));
         toneValueView.setOnClickListener(onToneClick);
         return view;
     }
