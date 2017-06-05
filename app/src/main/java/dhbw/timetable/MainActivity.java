@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
 import dhbw.timetable.navfragments.today.TodayFragment;
@@ -70,6 +71,13 @@ public class MainActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("onboardingDone", true);
                 editor.apply();
+                TimetableManager.getInstance().updateGlobals(this.getApplication(), new Runnable() {
+                    @Override
+                    public void run() {
+                        applyGlobalContent();
+                        Log.i("ONBOARD", "Onboarding timetable loaded.");
+                    }
+                });
             }
         }
     }
@@ -138,6 +146,15 @@ public class MainActivity extends AppCompatActivity
         stopService(mServiceIntent);
         Log.i("MAINACT", "onDestroy!");
         super.onDestroy();
+    }
+
+    private void applyGlobalContent() {
+        if(currFragment instanceof WeekFragment) {
+            ((WeekFragment)currFragment).applyGlobalContent(false);
+        } else if(currFragment instanceof TodayFragment) {
+            TodayFragment frag = ((TodayFragment)currFragment);
+            frag.applyGlobalContent(frag.getView());
+        }
     }
 
     public boolean displayFragment(int id) {

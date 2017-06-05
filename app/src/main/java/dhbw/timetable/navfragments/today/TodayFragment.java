@@ -112,7 +112,7 @@ public class TodayFragment extends Fragment {
         return false;
     }
 
-    private void applyGlobalContent(View view) {
+    public void applyGlobalContent(View view) {
         applyAgenda(view);
         applyTomorrow(view);
         applyWeekSummary(view);

@@ -29,6 +29,7 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
 
@@ -104,7 +105,7 @@ public class WeekFragment extends Fragment {
     /** Applies timetables to UI. Return true if successful
     and false if the date requested from the UI would not
     match the loaded globals*/
-    private boolean applyGlobalContent(boolean firstTry) {
+    public boolean applyGlobalContent(boolean firstTry) {
         View view = this.getView();
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
@@ -117,7 +118,14 @@ public class WeekFragment extends Fragment {
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobals());
         Log.i("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
-        if(weekAppointments.size() == 0 && firstTry) return false;
+        if(weekAppointments.size() == 0 && firstTry) {
+            return false;
+        } else if (weekAppointments.size() == 0) {
+            body.removeAllViews();
+            times.removeAllViews();
+            InfoDialog.newInstance("Error", "No appointments found.").show(getActivity().getFragmentManager(), "Empty");
+            return true;
+        }
 
         for(Appointment a : weekAppointments) Log.i("TTM", a.toString());
         Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
