@@ -63,21 +63,14 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == 1) {
             boolean on = data.getBooleanExtra("onboardingSuccess", false);
             if (on) {
-                this.setVisible(false);
                 Log.i("ONBOARD", "Saving onboarding as done");
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("onboardingDone", true);
                 editor.apply();
-                TimetableManager.getInstance().updateGlobals(this.getApplication(), new Runnable() {
-                    @Override
-                    public void run() {
-                        applyGlobalContent();
-                        MainActivity.this.setVisible(true);
-                        Log.i("ONBOARD", "Onboarding timetable loaded.");
-                    }
-                });
+
+                applyGlobalContent();
             }
         }
     }

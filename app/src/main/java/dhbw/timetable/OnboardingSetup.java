@@ -35,12 +35,19 @@ public class OnboardingSetup extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
-            String result = data.getStringExtra("tt");
-            Intent returnIntent = new Intent();
-            returnIntent.putExtra("onboardingSuccess", !result.isEmpty());
-            setResult(Activity.RESULT_OK, returnIntent);
+                String result = data.getStringExtra("tt");
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("onboardingSuccess", !result.isEmpty());
+                setResult(Activity.RESULT_OK, returnIntent);
 
-            finish();
+                TimetableManager.getInstance().updateGlobals(this.getApplication(), new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i("ONBOARD", "Onboarding timetable loaded.");
+                        finish();
+                    }
+                });
+                setContentView(R.layout.loading);
         }
     }
 
