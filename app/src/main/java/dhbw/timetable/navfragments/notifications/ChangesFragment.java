@@ -88,7 +88,7 @@ public class ChangesFragment extends Fragment {
                             formValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("onChangeFormIndex", 0),"Banner", "None")
+                }, sharedPref.getInt("onChangeFormIndex", 0), "None", "Banner")
                         .show(getActivity().getFragmentManager(), "changes_form");
             }
         };
@@ -123,7 +123,7 @@ public class ChangesFragment extends Fragment {
                             toneValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("onChangeToneIndex", 0), "Default", "None")
+                }, sharedPref.getInt("onChangeToneIndex", 0), "None", "Default")
                         .show(getActivity().getFragmentManager(), "changes_tone");
             }
         };

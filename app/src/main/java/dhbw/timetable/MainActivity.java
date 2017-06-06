@@ -18,9 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
@@ -66,6 +63,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == 1) {
             boolean on = data.getBooleanExtra("onboardingSuccess", false);
             if (on) {
+                this.setVisible(false);
                 Log.i("ONBOARD", "Saving onboarding as done");
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -76,6 +74,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         applyGlobalContent();
+                        MainActivity.this.setVisible(true);
                         Log.i("ONBOARD", "Onboarding timetable loaded.");
                     }
                 });
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    private void applyGlobalContent() {
+    void applyGlobalContent() {
         if(currFragment instanceof WeekFragment) {
             ((WeekFragment)currFragment).applyGlobalContent(false);
         } else if(currFragment instanceof TodayFragment) {

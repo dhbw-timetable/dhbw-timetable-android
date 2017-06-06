@@ -62,6 +62,18 @@ public final class TimetableManager {
         return "undefined";
     }
 
+    private boolean areAppointmentsEqual(ArrayList<Appointment> l1, ArrayList<Appointment> l2) {
+        if(l1.size() == l2.size()) {
+            Appointment a1, a2;
+            for (int i = 0; i < l1.size(); i++) {
+                a1 = l1.get(i);
+                a2 = l2.get(i);
+                if (!a1.equals(a2)) return false;
+            }
+        }
+        return true;
+    }
+
     private boolean notificationNeeded(Application application, SharedPreferences sharedPref) {
         if(!secureFile(application)) {
             Log.i("TTM", "No offline globals to compare.");
@@ -69,29 +81,44 @@ public final class TimetableManager {
         }
         String changeCrit = sharedPref.getString("onChangeCrit", "None");
         Log.i("TTM", "Searching for changes. Criteria: " + changeCrit);
+        Map<TimelessDate, ArrayList<Appointment>> offlineTimetables;
         switch (changeCrit) {
             case "None":
                 return false;
             case "Every change":
-                // Simply check if serial representation of globals and offline globals would match
-                try {
-                    FileInputStream fis = application.openFileInput(
-                            application.getResources().getString(R.string.TIMETABLES_FILE));
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) sb.append(line + "\n");
-                    return !sb.toString().equals(serialRepresentation());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                offlineTimetables = loadOfflineGlobalsIntoList(application);
+
+                for(TimelessDate date : offlineTimetables.keySet()) {
+                    // Can only compare if available
+                    if(globalTimetables.containsKey(date)) {
+                        Log.i("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime()));
+                        if(!areAppointmentsEqual(offlineTimetables.get(date),
+                                globalTimetables.get(date))) {
+                            return true;
+                        }
+                    }
                 }
                 return false;
             case "One week ahead":
                 TimelessDate thisWeek = new TimelessDate();
                 TimelessDate nextWeek = new TimelessDate();
                 DateHelper.NextWeek(nextWeek);
-                return !getPartialRepresentation(application, thisWeek, nextWeek)
-                        .equals(weekRepresentation(thisWeek) + weekRepresentation(nextWeek));
+
+                offlineTimetables = loadOfflineGlobalsIntoList(application);
+
+                if(offlineTimetables.containsKey(thisWeek)) {
+                    if(!areAppointmentsEqual(offlineTimetables.get(thisWeek),
+                            globalTimetables.get(thisWeek))) {
+                        return true;
+                    }
+                }
+                if(offlineTimetables.containsKey(nextWeek)) {
+                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek),
+                            globalTimetables.get(nextWeek))) {
+                        return true;
+                    }
+                }
+                return false;
         }
         Log.e("TTM", "Error! Wrong change crit: " + changeCrit);
         return false;
@@ -197,7 +224,7 @@ public final class TimetableManager {
         return localTimetables;
     }
 
-    public ArrayList<Appointment> getLocalsAsList() {
+    private ArrayList<Appointment> getLocalsAsList() {
         ArrayList<Appointment> weeks = new ArrayList<>();
         for(ArrayList<Appointment> week : localTimetables.values()) weeks.addAll(week);
         return weeks;
@@ -375,7 +402,7 @@ public final class TimetableManager {
             }
             return;
         }
-        System.out.println("Loading offline globals...");
+        Log.i("TTM", "Loading offline globals...");
         globalTimetables.clear();
         try {
             FileInputStream fis = application.openFileInput(
@@ -394,20 +421,53 @@ public final class TimetableManager {
                 g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                 g.set(Calendar.YEAR, Integer.parseInt(date[2]));
 
-
                 a = new Appointment(aData[1], g, aData[2], aData[3]);
 
                 TimetableManager.getInstance().insertAppointment(globalTimetables, (TimelessDate) g.clone(), a);
             }
-            System.out.println("Success!");
+            Log.i("TTM", "Success!");
             bufferedReader.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("FAILED!");
+            Log.e("TTM", "FAILED!");
         }
-        System.out.println("Updating UI...");
+        Log.i("TTM", "Updating UI...");
         updater.run();
-        System.out.println("Done");
+        Log.i("TTM", "Done");
+    }
+
+    public Map<TimelessDate, ArrayList<Appointment>> loadOfflineGlobalsIntoList(
+            Application application) {
+        Log.i("TTM", "Accessing offline globals...");
+        Map<TimelessDate, ArrayList<Appointment>> offlineAppointments = new HashMap<>();
+        try {
+            FileInputStream fis = application.openFileInput(
+                    application.getResources().getString(R.string.TIMETABLES_FILE));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+
+            String line;
+            Appointment a;
+            while ((line = bufferedReader.readLine()) != null) {
+                if(line.isEmpty()) continue;
+
+                String[] aData = line.split("\t");
+                String[] date = aData[0].split("\\.");
+                TimelessDate g = new TimelessDate();
+                g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
+                g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
+                g.set(Calendar.YEAR, Integer.parseInt(date[2]));
+
+                a = new Appointment(aData[1], g, aData[2], aData[3]);
+
+                TimetableManager.getInstance().insertAppointment(offlineAppointments, (TimelessDate) g.clone(), a);
+            }
+            Log.i("TTM", "Success!");
+            bufferedReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("TTM", "FAILED!");
+        }
+        return offlineAppointments;
     }
 
     void insertAppointment(Map<TimelessDate, ArrayList<Appointment>> globals, GregorianCalendar date, Appointment a) {
@@ -426,6 +486,21 @@ public final class TimetableManager {
         ArrayList<Appointment> list = globalTimetables.get(week);
         for (Appointment a : list)
             sb.append(a.toString()).append("\n");
+        return sb.toString();
+    }
+
+    private String serialRepresentation(Map<TimelessDate, ArrayList<Appointment>> map) {
+        StringBuilder sb = new StringBuilder();
+        Appointment before = null;
+        for (ArrayList<Appointment> aList : map.values()) {
+            for(Appointment a : aList) {
+                sb.append(a.toString()).append("\n");
+                if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
+                    sb.append("\n");
+                }
+                before = a;
+            }
+        }
         return sb.toString();
     }
 

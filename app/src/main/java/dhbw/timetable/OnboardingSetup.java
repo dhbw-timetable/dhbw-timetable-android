@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.navfragments.preferences.timetables.NewTimetableActivity;
 
 public class OnboardingSetup extends AppCompatActivity {
@@ -33,17 +34,13 @@ public class OnboardingSetup extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 2) {
-            if(resultCode == Activity.RESULT_OK){
-                String result = data.getStringExtra("tt");
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("onboardingSuccess", !result.isEmpty());
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
+        if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
+            String result = data.getStringExtra("tt");
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("onboardingSuccess", !result.isEmpty());
+            setResult(Activity.RESULT_OK, returnIntent);
+
+            finish();
         }
     }
 
