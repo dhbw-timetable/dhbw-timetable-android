@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,7 +99,8 @@ public class TodayFragment extends Fragment {
                     @Override
                     public void run() {
                         applyGlobalContent(getView());
-                        Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(TodayFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
                 return true;

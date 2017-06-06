@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
@@ -17,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +49,8 @@ public class WeekFragment extends Fragment {
                     @Override
                     public void run() {
                         applyGlobalContent(true);
-                        Toast.makeText(application, "Updated!", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(application, "Updated!", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(WeekFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -83,7 +84,8 @@ public class WeekFragment extends Fragment {
                     @Override
                     public void run() {
                         applyGlobalContent(false);
-                        Toast.makeText(WeekFragment.this.getActivity(), "Updated!", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(WeekFragment.this.getActivity(), "Updated!", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(WeekFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
             } else {
@@ -92,7 +94,8 @@ public class WeekFragment extends Fragment {
                         @Override
                         public void run() {
                             applyGlobalContent(false);
-                            Toast.makeText(WeekFragment.this.getActivity(), "Updated special date!", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(WeekFragment.this.getActivity(), "Updated special date!", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(WeekFragment.this.getView(), "Updated special date!!", Snackbar.LENGTH_SHORT).show();
                         }
                     }, weekToDisplay);
                 } else {
