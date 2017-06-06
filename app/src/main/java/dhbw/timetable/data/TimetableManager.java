@@ -26,7 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
@@ -38,8 +40,8 @@ public final class TimetableManager {
 
     private final static TimetableManager INSTANCE = new TimetableManager();
 
-    private final ArrayList<Appointment> globalTimetables = new ArrayList<>();
-    private final ArrayList<Appointment> localTimetables  = new ArrayList<>();
+    private final Map<TimelessDate, ArrayList<Appointment>> globalTimetables = new HashMap<>();
+    private final Map<TimelessDate, ArrayList<Appointment>> localTimetables  = new HashMap<>();
     private boolean busy = false;
 
     private TimetableManager() {}
@@ -85,8 +87,8 @@ public final class TimetableManager {
                 }
                 return false;
             case "One week ahead":
-                GregorianCalendar thisWeek = (GregorianCalendar) Calendar.getInstance();
-                GregorianCalendar nextWeek = (GregorianCalendar) thisWeek.clone();
+                TimelessDate thisWeek = new TimelessDate();
+                TimelessDate nextWeek = new TimelessDate();
                 DateHelper.NextWeek(nextWeek);
                 return !getPartialRepresentation(application, thisWeek, nextWeek)
                         .equals(weekRepresentation(thisWeek) + weekRepresentation(nextWeek));
@@ -126,7 +128,7 @@ public final class TimetableManager {
             }
 
         } else {
-            Log.i("TTM", "No relevant changes found. Won't fire any notification for change.");
+            Log.i("TTM", "Change check negative -> Won't fire any notification for change.");
         }
     }
 
@@ -181,21 +183,33 @@ public final class TimetableManager {
         return busy;
     }
 
-    public ArrayList<Appointment> getGlobals() {
+    public Map<TimelessDate, ArrayList<Appointment>> getGlobals() {
         return globalTimetables;
     }
 
-    public ArrayList<Appointment> getLocals() {
+    public ArrayList<Appointment> getGlobalsAsList() {
+        ArrayList<Appointment> weeks = new ArrayList<>();
+        for(ArrayList<Appointment> week : globalTimetables.values()) weeks.addAll(week);
+        return weeks;
+    }
+
+    public Map<TimelessDate, ArrayList<Appointment>> getLocals() {
         return localTimetables;
+    }
+
+    public ArrayList<Appointment> getLocalsAsList() {
+        ArrayList<Appointment> weeks = new ArrayList<>();
+        for(ArrayList<Appointment> week : localTimetables.values()) weeks.addAll(week);
+        return weeks;
     }
 
     /**
      * Downloads timetable contents from only on day into existing GLOBAL_TIMETABLES and writes
      * complete global data to file system
      */
-    public void reorderSpecialGlobals(final Application application, final Runnable updater, final GregorianCalendar date) {
+    public void reorderSpecialGlobals(final Application application, final Runnable updater, final TimelessDate date) {
         // DO NOT CLEAR GLOBALS ONLY LOCALS
-        globalTimetables.removeAll(localTimetables);
+        globalTimetables.keySet().removeAll(localTimetables.keySet());
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
             boolean success = false;
@@ -216,10 +230,10 @@ public final class TimetableManager {
                 Log.i("TTM", "Loading SPECIAL online globals for " + timetable);
 
                 // Same start and end date
-                GregorianCalendar startDate = (GregorianCalendar) date.clone();
+                TimelessDate startDate = (TimelessDate) date.clone();
                 DateHelper.Normalize(startDate);
 
-                GregorianCalendar endDate = (GregorianCalendar) startDate.clone();
+                TimelessDate endDate = (TimelessDate) startDate.clone();
 
                 Log.i("TTM", "REORDER algorithm for " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(startDate.getTime()));
 
@@ -228,7 +242,7 @@ public final class TimetableManager {
                 try {
                     importer.importAll(startDate, endDate);
                     success = true;
-                    globalTimetables.addAll(localTimetables);
+                    globalTimetables.putAll(localTimetables);
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
@@ -293,12 +307,12 @@ public final class TimetableManager {
                 // Get sync range from Preferences
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(application);
 
-                GregorianCalendar startDate = (GregorianCalendar) Calendar.getInstance();
-                DateHelper.SubtractDays(startDate, Integer.parseInt(prefs.getString("sync_range_past", "0")) * 7);
+                TimelessDate startDate = new TimelessDate();
+                DateHelper.SubtractDays(startDate, Integer.parseInt(prefs.getString("sync_range_past", "1")) * 7);
                 DateHelper.Normalize(startDate);
 
-                GregorianCalendar endDate = (GregorianCalendar) Calendar.getInstance();
-                DateHelper.AddDays(endDate, Integer.parseInt(prefs.getString("sync_range_future", "0")) * 7);
+                TimelessDate endDate = new TimelessDate();
+                DateHelper.AddDays(endDate, Integer.parseInt(prefs.getString("sync_range_future", "1")) * 7);
                 DateHelper.Normalize(endDate);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
@@ -323,7 +337,7 @@ public final class TimetableManager {
                     return;
                 }
 
-                Log.i("TTM", "Successfully updated global timetables");
+                Log.i("TTM", "Successfully updated global timetables [" + globalTimetables.size() + "][" + getGlobalsAsList().size() + "]:");
                 Log.d("TTM", serialRepresentation());
                 // Update UI
                 Log.i("TTM", "Updating UI...");
@@ -372,16 +386,18 @@ public final class TimetableManager {
             Appointment a;
             while ((line = bufferedReader.readLine()) != null) {
                 if(line.isEmpty()) continue;
+
                 String[] aData = line.split("\t");
                 String[] date = aData[0].split("\\.");
-                GregorianCalendar g = new GregorianCalendar();
+                TimelessDate g = new TimelessDate();
                 g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
                 g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                 g.set(Calendar.YEAR, Integer.parseInt(date[2]));
 
+
                 a = new Appointment(aData[1], g, aData[2], aData[3]);
 
-                globalTimetables.add(a);
+                TimetableManager.getInstance().insertAppointment(globalTimetables, (TimelessDate) g.clone(), a);
             }
             System.out.println("Success!");
             bufferedReader.close();
@@ -394,9 +410,21 @@ public final class TimetableManager {
         System.out.println("Done");
     }
 
-    private String weekRepresentation(GregorianCalendar g) {
+    void insertAppointment(Map<TimelessDate, ArrayList<Appointment>> globals, GregorianCalendar date, Appointment a) {
+        TimelessDate week = new TimelessDate(date);
+        DateHelper.Normalize(week);
+
+        if(!globals.containsKey(week))
+            globals.put(week, new ArrayList<Appointment>());
+        globals.get(week).add(a);
+    }
+
+    private String weekRepresentation(TimelessDate g) {
         StringBuilder sb = new StringBuilder();
-        for (Appointment a : DateHelper.GetWeekAppointments(g, globalTimetables))
+        TimelessDate week = (TimelessDate) g.clone();
+        DateHelper.Normalize(week);
+        ArrayList<Appointment> list = globalTimetables.get(week);
+        for (Appointment a : list)
             sb.append(a.toString()).append("\n");
         return sb.toString();
     }
@@ -404,12 +432,14 @@ public final class TimetableManager {
     private String serialRepresentation() {
         StringBuilder sb = new StringBuilder();
         Appointment before = null;
-        for (Appointment a : globalTimetables) {
-            sb.append(a.toString()).append("\n");
-            if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
-                sb.append("\n");
+        for (ArrayList<Appointment> aList : globalTimetables.values()) {
+            for(Appointment a : aList) {
+                sb.append(a.toString()).append("\n");
+                if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
+                    sb.append("\n");
+                }
+                before = a;
             }
-            before = a;
         }
         return sb.toString();
     }
@@ -417,7 +447,7 @@ public final class TimetableManager {
     /**
      * Get partial representation within two weeks
      */
-    private String getPartialRepresentation(Application application, GregorianCalendar startG, GregorianCalendar endG) {
+    private String getPartialRepresentation(Application application, TimelessDate startG, TimelessDate endG) {
         if(!DateHelper.IsSameWeek(startG, endG)) {
             try {
                 FileInputStream fis = application.openFileInput(
@@ -429,7 +459,7 @@ public final class TimetableManager {
                 while ((line = bufferedReader.readLine()) != null) {
                     if(line.isEmpty()) continue;
                     String[] date = line.split("\t")[0].split("\\.");
-                    GregorianCalendar g = new GregorianCalendar();
+                    TimelessDate g = new TimelessDate();
                     g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
                     g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                     g.set(Calendar.YEAR, Integer.parseInt(date[2]));

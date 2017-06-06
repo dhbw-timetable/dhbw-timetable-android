@@ -21,7 +21,7 @@ public class TimetableSyncService extends Service {
 
     public TimetableSyncService(Context context) {
         super();
-        Log.i("SYNC", "Sync service created.");
+        Log.d("SYNC", "Sync service obj created.");
         INSTANCE = this;
     }
 
@@ -83,7 +83,7 @@ public class TimetableSyncService extends Service {
                             // Check onChange preference and possibly fire notifications done
                         }
                     });
-                    Log.i("SYNC", "Background sync now.)");
+                    Log.i("SYNC", "Background sync now running");
                 } else {
                     Log.w("SYNC", "Tried asynchronous sync");
                 }

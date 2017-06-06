@@ -1,152 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingLeft="20dp"
     android:paddingRight="20dp">
 
-        <TextView
-            android:id="@+id/Alarm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Alarm"
-            android:paddingTop="20dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/colorPrimary" />
+    <TextView
+        android:id="@+id/Alarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:paddingTop="20dp"
+        android:text="Alarm"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/colorPrimary" />
 
-        <TextView
-            android:id="@+id/AlarmOnFirstEvent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/Alarm"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:text="Alarm on first event"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/AlarmOnFirstEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Alarm"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:text="Alarm on first event"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <Switch
-            android:id="@+id/AlarmOnFirstEventSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:layout_alignBaseline="@+id/AlarmOnFirstEvent"
-            android:layout_alignBottom="@+id/AlarmOnFirstEvent" />
+    <Switch
+        android:id="@+id/AlarmOnFirstEventSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:layout_below="@+id/Alarm"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/AlarmTone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:text="Tone"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:layout_below="@+id/AlarmOnFirstEventSwitch"
-            android:layout_alignParentStart="true" />
+    <TextView
+        android:id="@+id/AlarmTone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/AlarmOnFirstEventSwitch"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:text="Tone"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <TextView
-            android:id="@+id/AlarmToneValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/AlarmTone"
-            android:layout_alignBottom="@+id/AlarmTone"
-            android:paddingBottom="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="15dp"
-            android:text="Beep Beep"
-            android:textAlignment="viewEnd"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/AlarmToneValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="15dp"
+        android:text="Beep Beep"
+        android:textAlignment="viewEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:layout_alignBaseline="@+id/AlarmTone"
+        android:layout_alignBottom="@+id/AlarmTone"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/Shift"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/AlarmTone"
-            android:paddingTop="20dp"
-            android:text="Shift"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/colorPrimary" />
+    <TextView
+        android:id="@+id/Shift"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/AlarmTone"
+        android:paddingTop="20dp"
+        android:text="Shift"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/colorPrimary" />
 
-        <TextView
-            android:id="@+id/ShiftTextField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/Shift"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:text="Shift"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/ShiftTextField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Shift"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:text="Shift"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-       <Switch
-            android:id="@+id/ShiftSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:layout_alignBaseline="@+id/ShiftTextField"
-            android:layout_alignBottom="@+id/ShiftTextField" />
+    <Switch
+        android:id="@+id/ShiftSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:layout_below="@+id/Shift"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/FirstShiftTextField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/ShiftTextField"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:text="1. Shift"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/FirstShiftTextField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ShiftTextField"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:text="1. Shift"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <TextView
-            android:id="@+id/FirstShiftValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/FirstShiftTextField"
-            android:layout_alignBottom="@+id/FirstShiftTextField"
-            android:paddingBottom="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="15dp"
-            android:text="Immediately"
-            android:textAlignment="viewEnd"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/FirstShiftValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="15dp"
+        android:text="Immediately"
+        android:textAlignment="viewEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:layout_above="@+id/SecondShiftTextField"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/SecondShiftTextField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/FirstShiftTextField"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:text="2. Shift"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/SecondShiftTextField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/FirstShiftTextField"
+        android:paddingBottom="5dp"
+        android:paddingTop="15dp"
+        android:text="2. Shift"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <TextView
-            android:id="@+id/SecondShiftValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/SecondShiftTextField"
-            android:layout_alignBottom="@+id/SecondShiftTextField"
-            android:paddingBottom="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="15dp"
-            android:text="10min"
-            android:textAlignment="viewEnd"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/SecondShiftValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="15dp"
+        android:text="10min"
+        android:textAlignment="viewEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:layout_alignBaseline="@+id/SecondShiftTextField"
+        android:layout_alignBottom="@+id/SecondShiftTextField"
+        android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/Warning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/SecondShiftTextField"
-            android:paddingTop="20dp"
-            android:text="As we can't make sure that the data will always be correct, we strongly recommend you to secure your alarms for critical events (e.g. exams) also externally."
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/textColorSecondary" />
+    <TextView
+        android:id="@+id/Warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SecondShiftTextField"
+        android:paddingTop="20dp"
+        android:text="As we can't make sure that the data will always be correct, we strongly recommend you to secure your alarms for critical events (e.g. exams) also externally."
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/textColorSecondary" />
 
 </RelativeLayout>

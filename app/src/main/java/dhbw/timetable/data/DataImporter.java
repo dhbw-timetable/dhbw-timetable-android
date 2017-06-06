@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,11 +28,11 @@ class DataImporter {
 
     private final static String baseURL = "https://rapla.dhbw-stuttgart.de/rapla";
     private String pageContent, key;
-    private ArrayList<Appointment> appointments;
+    private Map<TimelessDate, ArrayList<Appointment>> globals;
 
     DataImporter(String key, boolean global) {
         this.key = key;
-        appointments = global ? TimetableManager.getInstance().getGlobals() : TimetableManager.getInstance().getLocals();
+        globals = global ? TimetableManager.getInstance().getGlobals() : TimetableManager.getInstance().getLocals();
     }
 
     /**
@@ -115,7 +116,7 @@ class DataImporter {
 
         Appointment a = new Appointment(time, date, course, info);
 
-        appointments.add(a);
+        TimetableManager.getInstance().insertAppointment(globals, date, a);
     }
 
     private String importInfoFromSpan(NodeList spanTableRows) {

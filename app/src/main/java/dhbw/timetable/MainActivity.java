@@ -1,6 +1,5 @@
 package dhbw.timetable;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -41,10 +40,12 @@ public class MainActivity extends AppCompatActivity
         mServiceIntent = new Intent(this, mService.getClass());
         String syncFreq = PreferenceManager.
                 getDefaultSharedPreferences(this).getString("sync_frequency_list", "-1");
-        int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
-        mServiceIntent.putExtra("freq", msFreq);
-        if (!isMyServiceRunning(mService.getClass())) {
-            startService(mServiceIntent);
+        if(!syncFreq.equals("-1")) {
+            int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
+            mServiceIntent.putExtra("freq", msFreq);
+            if (!isMyServiceRunning(mService.getClass())) {
+                startService(mServiceIntent);
+            }
         }
     }
 
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("Restarting background sync...");
+        System.out.println("Reconfiguring background sync...");
         stopSyncService();
         startSyncService();
     }
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         stopService(mServiceIntent);
-        Log.i("MAINACT", "onDestroy!");
+        Log.i("MAIN", "onDestroy!");
         super.onDestroy();
     }
 

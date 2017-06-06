@@ -21,8 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +30,7 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.views.TodaySummaryRect;
 
@@ -121,7 +120,7 @@ public class TodayFragment extends Fragment {
     private void applyAgenda(View view) {
         agendaAppointmentsList.clear();
         String currDate = DateHelper.GetCurrentDate();
-        for(Appointment a : TimetableManager.getInstance().getGlobals()) {
+        for(Appointment a : TimetableManager.getInstance().getGlobalsAsList()) {
             if(a.getDate().equals(currDate)) {
                 agendaAppointmentsList.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), false));
             }
@@ -153,9 +152,9 @@ public class TodayFragment extends Fragment {
     }
 
     private void applyTomorrow(View view) {
-        GregorianCalendar tomorrow = (GregorianCalendar) Calendar.getInstance();
+        TimelessDate tomorrow = new TimelessDate();
         DateHelper.AddDays(tomorrow, 1);
-        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow, TimetableManager.getInstance().getGlobals());
+        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow, TimetableManager.getInstance().getGlobalsAsList());
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if(tomorrowAppointments.size() > 0) {
@@ -173,11 +172,11 @@ public class TodayFragment extends Fragment {
 
     // Apply
     private void applyWeekSummary(final View view) {
-        GregorianCalendar day = (GregorianCalendar) Calendar.getInstance();
+        TimelessDate day = new TimelessDate();
         DateHelper.Normalize(day);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day,
-                TimetableManager.getInstance().getGlobals());
+                TimetableManager.getInstance().getGlobalsAsList());
 
         String startTime, endTime;
         int startID = -1, endID = -1;

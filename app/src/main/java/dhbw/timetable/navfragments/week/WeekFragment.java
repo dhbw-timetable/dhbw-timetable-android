@@ -22,12 +22,12 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.views.SideTimesView;
@@ -35,7 +35,7 @@ import dhbw.timetable.views.WeekdayView;
 
 public class WeekFragment extends Fragment {
 
-    private GregorianCalendar weekToDisplay;
+    private TimelessDate weekToDisplay;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -111,13 +111,13 @@ public class WeekFragment extends Fragment {
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
         // Prepare appointment data
-        GregorianCalendar day = (GregorianCalendar) weekToDisplay.clone();
+        TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateHelper.Normalize(day);
         String formattedDate = new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
         getActivity().setTitle(formattedDate);
 
-        ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobals());
-        Log.i("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
+        ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
+        Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
         if(weekAppointments.size() == 0 && firstTry) {
             return false;
         } else if (weekAppointments.size() == 0) {
@@ -127,7 +127,7 @@ public class WeekFragment extends Fragment {
             return true;
         }
 
-        for(Appointment a : weekAppointments) Log.i("TTM", a.toString());
+        for(Appointment a : weekAppointments) Log.d("TTM", a.toString());
         Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
 
         // If margin is possible
@@ -157,7 +157,7 @@ public class WeekFragment extends Fragment {
     public void onStart() {
         super.onStart();
         // Reset to today
-        weekToDisplay = (GregorianCalendar) Calendar.getInstance();
+        weekToDisplay = new TimelessDate();
         DateHelper.Normalize(weekToDisplay);
         getActivity().setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {

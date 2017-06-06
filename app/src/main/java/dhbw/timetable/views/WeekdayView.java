@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -69,6 +70,9 @@ public class WeekdayView extends View {
             // Draw the course title
             textPaint.setColor(Color.WHITE);
             textPaint.setTextSize(dp(14));
+            Typeface currentTypeFace = textPaint.getTypeface();
+            Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
+            textPaint.setTypeface(bold);
             StaticLayout textLayout = new StaticLayout(
                     a.getCourse(),
                     textPaint,
