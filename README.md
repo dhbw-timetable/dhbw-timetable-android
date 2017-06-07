@@ -7,9 +7,9 @@ It scans the rapla based dhbw timetable from https://rapla.dhbw-stuttgart.de/ an
 
 ## Features
 - Beautiful view on day agenda and week summary
+- Be notified when calendar data changes
 
 ## Planned
-- Be notified when calendar data changes
 - Get dynamically alarmed at a time you define before your first lecture starts
 - Sync your calendar with cloud services e.g. Google, Outlook or iCloud
 - Spotify integration for alarm sounds
