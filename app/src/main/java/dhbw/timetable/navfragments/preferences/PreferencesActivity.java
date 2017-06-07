@@ -12,15 +12,10 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
-import dhbw.timetable.services.TimetableSyncService;
 
 
 public class PreferencesActivity extends AppCompatPreferenceActivity {
@@ -53,8 +48,6 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || PrefsFragment.class.getName().equals(fragmentName);
     }
-
-
 
     public static class PrefsFragment extends PreferenceFragment {
         @Override
