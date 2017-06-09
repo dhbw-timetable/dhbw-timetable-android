@@ -1,5 +1,6 @@
 package dhbw.timetable;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.navfragments.notifications.AlarmFragment;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
 import dhbw.timetable.navfragments.today.TodayFragment;
@@ -72,6 +73,18 @@ public class MainActivity extends AppCompatActivity
 
                 applyGlobalContent();
             }
+        } else if(requestCode == 7) {
+            if (resultCode == Activity.RESULT_CANCELED) { // STOP
+                AlarmFragment.deactivateAlarm(this);
+                Log.i("ALARM", "Stopped");
+            } else if (resultCode == Activity.RESULT_OK) { // SNOOZE
+                // Do nothing
+                Log.i("ALARM", "Snoozed");
+            } else {
+                Log.i("ALARM", "Unknown resultCode");
+            }
+        } else {
+            Log.w("ACT-RES", "Received unknown activity result from " + requestCode);
         }
     }
 

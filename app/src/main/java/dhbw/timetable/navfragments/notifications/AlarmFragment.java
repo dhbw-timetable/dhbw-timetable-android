@@ -7,11 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -22,8 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.Calendar;
 
 import dhbw.timetable.R;
@@ -74,7 +68,7 @@ public class AlarmFragment extends Fragment {
                 if(isChecked) {
                     activateAlarm(getActivity());
                 } else {
-                    deactivateAlarm();
+                    deactivateAlarm(getActivity());
                 }
             }
         });
@@ -194,7 +188,7 @@ public class AlarmFragment extends Fragment {
         return view;
     }
 
-    static void activateAlarm(Context context) {
+    public static void activateAlarm(Context context) {
         Log.i("ALARM", "Initializing alarm...");
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -207,8 +201,8 @@ public class AlarmFragment extends Fragment {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 15);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 34);
 
         // setRepeating() lets you specify a precise custom interval--in this case,
         // 20 minutes.
@@ -225,9 +219,9 @@ public class AlarmFragment extends Fragment {
         Log.i("ALARM", "Alarm initialized");
     }
 
-    void deactivateAlarm() {
+    public static void deactivateAlarm(Context context) {
         Log.i("ALARM", "Canceling...");
-        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         manager.cancel(pendingIntent);
         Log.i("ALARM", "Alarm canceled");
         WakeLocker.release();

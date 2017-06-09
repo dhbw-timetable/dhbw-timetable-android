@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="50dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/alarmText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingBottom="15dp"
+        android:text="Trolololo"
+        android:textAppearance="@style/AgendaTime" />
+
+    <Button
+        android:id="@+id/snoozeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Snooze" />
+
+    <Button
+        android:id="@+id/alarmStopButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop" />
+
+</LinearLayout>

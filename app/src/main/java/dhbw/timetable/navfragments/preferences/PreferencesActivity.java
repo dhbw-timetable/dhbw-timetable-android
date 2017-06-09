@@ -1,8 +1,10 @@
 package dhbw.timetable.navfragments.preferences;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -26,6 +28,12 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 new PrefsFragment()).commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("PREF-ACT-RES", "Received unkown activity result from " + requestCode + "IN PREFERENCES");
     }
 
     /**
