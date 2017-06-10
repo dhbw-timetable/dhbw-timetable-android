@@ -10,7 +10,10 @@ import java.util.List;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 
-public class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAdapter.MyViewHolder> {
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
+class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAdapter.MyViewHolder> {
 
     private List<AgendaAppointment> appointments;
 
@@ -24,7 +27,7 @@ public class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppoint
         }
     }
 
-    public AgendaAppointmentAdapter(List<AgendaAppointment> appointments) {
+    AgendaAppointmentAdapter(List<AgendaAppointment> appointments) {
         this.appointments = appointments;
     }
 

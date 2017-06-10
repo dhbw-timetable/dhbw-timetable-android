@@ -9,7 +9,7 @@ import java.util.List;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Timetable;
 
-public class TimetablesAdapter extends RecyclerView.Adapter<TimetablesAdapter.MyViewHolder> {
+class TimetablesAdapter extends RecyclerView.Adapter<TimetablesAdapter.MyViewHolder> {
 
     private List<Timetable> timetablesList;
     private View.OnClickListener onClick;
@@ -24,7 +24,7 @@ public class TimetablesAdapter extends RecyclerView.Adapter<TimetablesAdapter.My
         }
     }
 
-    public TimetablesAdapter(List<Timetable> timetables, View.OnClickListener onItemClick) {
+    TimetablesAdapter(List<Timetable> timetables, View.OnClickListener onItemClick) {
         this.timetablesList = timetables;
         this.onClick = onItemClick;
     }

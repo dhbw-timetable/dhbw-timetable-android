@@ -21,6 +21,9 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.Timetable;
 import dhbw.timetable.dialogs.InfoDialog;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class ManageTimetablesActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;

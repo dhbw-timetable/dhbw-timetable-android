@@ -19,6 +19,9 @@ import android.widget.TextView;
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.ListDialog;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class ChangesFragment extends Fragment {
 
     @Nullable

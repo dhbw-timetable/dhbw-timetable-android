@@ -18,6 +18,9 @@ import java.util.Calendar;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class WeekdayView extends View {
 
     public final static int Y_GRID_SPACE = 30;

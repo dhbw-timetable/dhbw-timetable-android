@@ -1,11 +1,8 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,14 +15,18 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.ListDialog;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class AlarmFragment extends Fragment {
-
-    static PendingIntent pendingIntent;
 
     @Nullable
     @Override
@@ -65,11 +66,16 @@ public class AlarmFragment extends Fragment {
                 secondShiftView.setEnabled(isChecked && shiftSwitch.isChecked());
                 secondShiftValueView.setEnabled(isChecked && shiftSwitch.isChecked());
 
-                // TODO Check
+                // TODO Remove test
                 if(isChecked) {
-                    activateAlarm(getActivity());
+                    GregorianCalendar soon = (GregorianCalendar) Calendar.getInstance();
+                    soon.set(Calendar.MINUTE, soon.get(Calendar.MINUTE) + 1);
+                    Log.i("ALARM", "Soon is " + new SimpleDateFormat("HH:mm").format(soon.getTime()));
+                    // AlarmSupervisor.getInstance().scheduleAlarm(soon, AlarmFragment.this.getActivity());
+                    // activateAlarm(getActivity());
                 } else {
-                    deactivateAlarm(getActivity());
+                    // AlarmSupervisor.getInstance().cancelAllAlarms();
+                    // deactivateAlarm(getActivity());
                 }
             }
         });
@@ -91,7 +97,7 @@ public class AlarmFragment extends Fragment {
                             toneValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("alarmToneIndex", 0), "Lalala", "Lululu", "Bububu")
+                }, sharedPref.getInt("alarmToneIndex", 0), "Default")
                         .show(getActivity().getFragmentManager(), "alarm_tone");
             }
         };
@@ -100,7 +106,7 @@ public class AlarmFragment extends Fragment {
         toneView.setOnClickListener(onToneClick);
 
         toneValueView.setEnabled(aOFESwitch.isChecked());
-        toneValueView.setText(sharedPref.getString("alarmTone", "Lalala"));
+        toneValueView.setText(sharedPref.getString("alarmTone", "Default"));
         toneValueView.setOnClickListener(onToneClick);
 
         shiftView.setEnabled(aOFESwitch.isChecked());
@@ -187,32 +193,5 @@ public class AlarmFragment extends Fragment {
         secondShiftValueView.setOnClickListener(onSecondShiftViewClick);
 
         return view;
-    }
-
-    public static void activateAlarm(Context context) {
-        Log.i("ALARM", "Initializing alarm...");
-        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 32);
-
-        manager.setRepeating(AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis(),
-                1000 * 60 * 5,
-                pendingIntent);
-
-        Log.i("ALARM", "Alarm ready");
-    }
-
-    public static void deactivateAlarm(Context context) {
-        Log.i("ALARM", "Canceling...");
-        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        manager.cancel(pendingIntent);
-        Log.i("ALARM", "Alarm canceled");
     }
 }

@@ -5,12 +5,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class Appointment {
     private GregorianCalendar startDate, endDate;
     private String course, info;
 
     @Deprecated
-    public Appointment(String time, GregorianCalendar date, String course, String info) {
+    Appointment(String time, GregorianCalendar date, String course, String info) {
         startDate = (GregorianCalendar) date.clone();
         endDate = (GregorianCalendar) date.clone();
 
@@ -24,7 +27,7 @@ public class Appointment {
         this.info = info;
     }
 
-    public Appointment(GregorianCalendar startDate, GregorianCalendar endDate,
+    Appointment(GregorianCalendar startDate, GregorianCalendar endDate,
                        String course, String info) {
         this.startDate = (GregorianCalendar) startDate.clone();
         this.endDate = (GregorianCalendar) endDate.clone();

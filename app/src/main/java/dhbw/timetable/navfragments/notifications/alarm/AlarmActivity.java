@@ -1,8 +1,5 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,9 +14,10 @@ import android.widget.Button;
 
 import dhbw.timetable.R;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class AlarmActivity extends AppCompatActivity {
-    private Ringtone ringRing;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,14 +30,14 @@ public class AlarmActivity extends AppCompatActivity {
         snoozeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                close(Activity.RESULT_OK);
+                finish();
             }
         });
 
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                close(Activity.RESULT_CANCELED);
+                finish();
             }
         });
 
@@ -48,26 +46,20 @@ public class AlarmActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
-    private void close(int result) {
-        // Intent returnIntent = new Intent();
-        // setResult(result, returnIntent);
-        finish();
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
         Log.i("ALARM-ACT", "Starting alarm activity!");
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        ringRing = RingtoneManager.getRingtone(this, notification);
-        ringRing.play();
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        AlarmSupervisor.getInstance().setRingtone(this, sound);
+        AlarmSupervisor.getInstance().playRingtone();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.d("ALARM-ACT", "Stopping alarm activity.");
-        ringRing.stop();
+        AlarmSupervisor.getInstance().stopRingtone();
     }
 
     @Override
@@ -89,7 +81,7 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AlarmFragment.pendingIntent.cancel();
+        AlarmSupervisor.getInstance().dispose();
         Log.i("ALARM", "Destroyed");
     }
 }

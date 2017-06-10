@@ -19,6 +19,9 @@ import org.w3c.dom.Text;
 
 import dhbw.timetable.R;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class NewTimetableActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

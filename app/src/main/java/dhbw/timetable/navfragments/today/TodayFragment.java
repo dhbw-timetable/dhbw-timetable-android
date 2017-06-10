@@ -34,6 +34,9 @@ import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.views.TodaySummaryRect;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class TodayFragment extends Fragment {
     private RecyclerView recyclerView;
     private AgendaAppointmentAdapter aAdapter;

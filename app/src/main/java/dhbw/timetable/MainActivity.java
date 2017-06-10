@@ -1,6 +1,5 @@
 package dhbw.timetable;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -19,13 +18,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import dhbw.timetable.navfragments.notifications.alarm.AlarmFragment;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
+import dhbw.timetable.navfragments.notifications.alarm.AlarmSupervisor;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
 import dhbw.timetable.navfragments.today.TodayFragment;
 import dhbw.timetable.navfragments.week.WeekFragment;
 import dhbw.timetable.services.TimetableSyncService;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -73,24 +75,15 @@ public class MainActivity extends AppCompatActivity
 
                 applyGlobalContent();
             }
-        } else if(requestCode == 7) {
-            if (resultCode == Activity.RESULT_CANCELED) { // STOP
-                AlarmFragment.deactivateAlarm(this);
-                Log.i("ALARM", "Stopped");
-            } else if (resultCode == Activity.RESULT_OK) { // SNOOZE
-                // Do nothing
-                Log.i("ALARM", "Snoozed");
-            } else {
-                Log.i("ALARM", "Unknown resultCode");
-            }
         } else {
-            Log.w("ACT-RES", "Received unknown activity result from " + requestCode);
+            Log.w("ACT-RES", "Received unknown activity result{" + resultCode + "} from " + requestCode);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AlarmSupervisor.getInstance().initialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
         // Onboarding check

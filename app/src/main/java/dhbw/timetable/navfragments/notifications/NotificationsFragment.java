@@ -16,6 +16,9 @@ import dhbw.timetable.navfragments.notifications.alarm.AlarmFragment;
 import dhbw.timetable.R;
 import dhbw.timetable.navfragments.notifications.changes.ChangesFragment;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class NotificationsFragment extends Fragment implements TabHost.OnTabChangeListener {
 
     private FragmentTabHost mTabHost;

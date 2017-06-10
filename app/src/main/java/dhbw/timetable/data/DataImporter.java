@@ -24,6 +24,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 class DataImporter {
 
     private final static String baseURL = "https://rapla.dhbw-stuttgart.de/rapla";

@@ -33,6 +33,9 @@ import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class WeekFragment extends Fragment {
 
     private TimelessDate weekToDisplay;

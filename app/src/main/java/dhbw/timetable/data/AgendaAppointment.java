@@ -1,5 +1,8 @@
 package dhbw.timetable.data;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class AgendaAppointment {
     private String startTime, endTime, course;
     private boolean isBreak;

@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.WindowManager;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class AlarmReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("ALARM-REC", "Firing alarm!");
-            if(AlarmActivity.isShowing) {
+            if(AlarmSupervisor.getInstance().isShowing()) {
                 Log.w("ALARM-REC", "Already have an alarm activity showing! Request denied.");
                 return;
             }

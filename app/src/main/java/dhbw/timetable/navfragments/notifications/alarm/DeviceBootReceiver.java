@@ -9,8 +9,8 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            // TODO Only if alarm has to be scheduled
-            AlarmFragment.activateAlarm(context);
+            // TODO Reschedule all alarms
+            // AlarmFragment.activateAlarm(context);
         }
     }
 }

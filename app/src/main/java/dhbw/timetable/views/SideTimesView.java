@@ -8,21 +8,22 @@ import android.view.View;
 
 import dhbw.timetable.R;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class SideTimesView extends View {
 
     private static final int TIME_WIDTH = 38;
     private static final int Y_TEXT_LAYOUT = 31;
-    private static final int Y_LINE_LAYOUT = 26;
 
     private TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private View pLayout, sLayout;
+    private View sLayout;
     int min, max;
     private float scale;
 
 
     public SideTimesView(int min, int max, View parentLayout, View siblingLayout) {
         super(parentLayout.getContext());
-        this.pLayout = parentLayout;
         this.sLayout = siblingLayout;
         this.min = min;
         this.max = max;

@@ -13,6 +13,9 @@ import android.widget.Button;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.navfragments.preferences.timetables.NewTimetableActivity;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class OnboardingSetup extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

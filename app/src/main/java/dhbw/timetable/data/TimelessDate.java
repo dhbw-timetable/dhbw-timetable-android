@@ -5,6 +5,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class TimelessDate extends GregorianCalendar {
 
     public TimelessDate() {

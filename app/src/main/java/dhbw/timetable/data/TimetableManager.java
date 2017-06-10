@@ -32,6 +32,10 @@ import java.util.Map;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
+import dhbw.timetable.dialogs.InfoDialog;
+import dhbw.timetable.navfragments.notifications.alarm.AlarmSupervisor;
+
+import static dhbw.timetable.ActivityHelper.getActivity;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -160,7 +164,7 @@ public final class TimetableManager {
     }
 
     private static void fireBanner(Uri sound) {
-        Activity curr = ActivityHelper.getActivity();
+        Activity curr = getActivity();
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(curr)
@@ -220,10 +224,6 @@ public final class TimetableManager {
         return weeks;
     }
 
-    public Map<TimelessDate, ArrayList<Appointment>> getLocals() {
-        return localTimetables;
-    }
-
     private ArrayList<Appointment> getLocalsAsList() {
         ArrayList<Appointment> weeks = new ArrayList<>();
         for(ArrayList<Appointment> week : localTimetables.values()) weeks.addAll(week);
@@ -280,7 +280,11 @@ public final class TimetableManager {
             protected void onPostExecute(Void result) {
                 if(!success) {
                     Log.w("TTM", "Unable to receive online data");
-                    // TODO Let the user know about this error
+                    Activity activity = ActivityHelper.getActivity();
+                    if(activity != null) {
+                        InfoDialog.newInstance("ERROR", "Unable to update timetables. Are you online?")
+                                .show(activity.getFragmentManager(), "DLERROR");
+                    }
                     return;
                 }
 
@@ -360,7 +364,12 @@ public final class TimetableManager {
             protected void onPostExecute(Void result) {
                 if(!success) {
                     Log.w("TTM", "Unable to receive online data");
-                    // TODO Let the user know about this error
+                    // Let the user know about this error
+                    Activity activity = ActivityHelper.getActivity();
+                    if(activity != null) {
+                        InfoDialog.newInstance("ERROR", "Unable to update timetables. Are you online?")
+                                .show(activity.getFragmentManager(), "DLERROR");
+                    }
                     return;
                 }
 
@@ -370,6 +379,8 @@ public final class TimetableManager {
                 Log.i("TTM", "Updating UI...");
                 updater.run();
                 Log.i("TTM", "Updated UI!");
+
+                AlarmSupervisor.getInstance().rescheduleAllAlarms(application);
 
                 handleChangePolicies(application);
 
@@ -436,7 +447,19 @@ public final class TimetableManager {
         Log.i("TTM", "Done");
     }
 
-    public Map<TimelessDate, ArrayList<Appointment>> loadOfflineGlobalsIntoList(
+    Map<TimelessDate, ArrayList<Appointment>> getLocals() {
+        return localTimetables;
+    }
+
+    void insertAppointment(Map<TimelessDate, ArrayList<Appointment>> globals, GregorianCalendar date, Appointment a) {
+        TimelessDate week = new TimelessDate(date);
+        DateHelper.Normalize(week);
+
+        if(!globals.containsKey(week)) globals.put(week, new ArrayList<Appointment>());
+        globals.get(week).add(a);
+    }
+
+    private Map<TimelessDate, ArrayList<Appointment>> loadOfflineGlobalsIntoList(
             Application application) {
         Log.i("TTM", "Accessing offline globals...");
         Map<TimelessDate, ArrayList<Appointment>> offlineAppointments = new HashMap<>();
@@ -470,84 +493,14 @@ public final class TimetableManager {
         return offlineAppointments;
     }
 
-    void insertAppointment(Map<TimelessDate, ArrayList<Appointment>> globals, GregorianCalendar date, Appointment a) {
-        TimelessDate week = new TimelessDate(date);
-        DateHelper.Normalize(week);
-
-        if(!globals.containsKey(week))
-            globals.put(week, new ArrayList<Appointment>());
-        globals.get(week).add(a);
-    }
-
-    private String weekRepresentation(TimelessDate g) {
-        StringBuilder sb = new StringBuilder();
-        TimelessDate week = (TimelessDate) g.clone();
-        DateHelper.Normalize(week);
-        ArrayList<Appointment> list = globalTimetables.get(week);
-        for (Appointment a : list)
-            sb.append(a.toString()).append("\n");
-        return sb.toString();
-    }
-
-    private String serialRepresentation(Map<TimelessDate, ArrayList<Appointment>> map) {
-        StringBuilder sb = new StringBuilder();
-        Appointment before = null;
-        for (ArrayList<Appointment> aList : map.values()) {
-            for(Appointment a : aList) {
-                sb.append(a.toString()).append("\n");
-                if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
-                    sb.append("\n");
-                }
-                before = a;
-            }
-        }
-        return sb.toString();
-    }
-
     private String serialRepresentation() {
         StringBuilder sb = new StringBuilder();
-        Appointment before = null;
-        for (ArrayList<Appointment> aList : globalTimetables.values()) {
-            for(Appointment a : aList) {
+        for(TimelessDate week : globalTimetables.keySet()) {
+            for(Appointment a : globalTimetables.get(week)) {
                 sb.append(a.toString()).append("\n");
-                if(before != null && !DateHelper.IsSameWeek(a.getStartDate(), before.getStartDate())) {
-                    sb.append("\n");
-                }
-                before = a;
             }
+            sb.append("\n");
         }
         return sb.toString();
-    }
-
-    /**
-     * Get partial representation within two weeks
-     */
-    private String getPartialRepresentation(Application application, TimelessDate startG, TimelessDate endG) {
-        if(!DateHelper.IsSameWeek(startG, endG)) {
-            try {
-                FileInputStream fis = application.openFileInput(
-                        application.getResources().getString(R.string.TIMETABLES_FILE));
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
-
-                StringBuilder partialBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if(line.isEmpty()) continue;
-                    String[] date = line.split("\t")[0].split("\\.");
-                    TimelessDate g = new TimelessDate();
-                    g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
-                    g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
-                    g.set(Calendar.YEAR, Integer.parseInt(date[2]));
-                    if(DateHelper.IsSameWeek(g, startG) || DateHelper.IsSameWeek(g, endG)) {
-                        partialBuilder.append(line).append("\n");
-                    }
-                }
-                bufferedReader.close();
-                return partialBuilder.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return "";
     }
 }

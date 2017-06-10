@@ -19,7 +19,9 @@ import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
 
-
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class PreferencesActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

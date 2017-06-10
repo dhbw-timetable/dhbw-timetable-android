@@ -12,6 +12,9 @@ import java.util.Calendar;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class TodaySummaryRect extends View {
     private Paint paint = new Paint();
     private View pLayout;

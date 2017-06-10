@@ -15,6 +15,9 @@ import android.widget.Toast;
 
 import dhbw.timetable.R;
 
+/**
+ * Created by Hendrik Ulbrich (C) 2017
+ */
 public class EditTimetableActivity extends AppCompatActivity {
     private String nameBefore;
     private TextView nameView;
