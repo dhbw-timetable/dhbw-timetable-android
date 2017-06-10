@@ -27,15 +27,6 @@
             android:title="Sync range past"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Design"
-        android:key="pref_key_design_settings">
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="dark_theme_switch"
-            android:id="@+id/darkThemeSwitch"
-            android:title="Dark Theme" />
-    </PreferenceCategory>
-    <PreferenceCategory
         android:title="App"
         android:key="pref_key_more_settings">
         <ListPreference
@@ -47,17 +38,6 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="Standard view" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="reset_switch"
-            android:title="Really reset all application data" />
-        <Preference
-            android:title="Reset all application data"
-            android:enabled="false"
-            android:key="reset_button" />
-        <Preference
-            android:title="Start tutorial again"
-            android:key="tutorial_button" />
         <Preference
             android:title="Info"
             android:key="info_button" />

@@ -19,6 +19,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="41dp" />
 
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alarmText"
+        android:layout_centerHorizontal="true"
+        android:text="defaultCourseName at 12:00"
+        android:textAppearance="@style/CourseText" />
+
     <Button
         android:id="@+id/snoozeButton"
         android:layout_width="match_parent"

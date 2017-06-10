@@ -18,6 +18,8 @@ import dhbw.timetable.R;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
+    private boolean dispose = false; // false means snooze
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +32,7 @@ public class AlarmActivity extends AppCompatActivity {
         snoozeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dispose = false;
                 finish();
             }
         });
@@ -37,6 +40,7 @@ public class AlarmActivity extends AppCompatActivity {
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dispose = true;
                 finish();
             }
         });
@@ -81,7 +85,11 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AlarmSupervisor.getInstance().dispose();
-        Log.i("ALARM", "Destroyed");
+        if(dispose) {
+            AlarmSupervisor.getInstance().dispose();
+        } else {
+            AlarmSupervisor.getInstance().snooze(this.getApplicationContext());
+        }
+        Log.i("ALARM", "Destroyed activity");
     }
 }

@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +19,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.io.IOException;
 
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.ListDialog;
@@ -56,6 +57,9 @@ public class AlarmFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("alarmOnFirstEvent", isChecked);
                 editor.apply();
+
+                AlarmSupervisor.getInstance().rescheduleAllAlarms(
+                        AlarmFragment.this.getActivity().getApplicationContext());
                 toneView.setEnabled(isChecked);
                 toneValueView.setEnabled(isChecked);
                 shiftView.setEnabled(isChecked);
@@ -65,36 +69,45 @@ public class AlarmFragment extends Fragment {
                 firstShiftValueView.setEnabled(isChecked && shiftSwitch.isChecked());
                 secondShiftView.setEnabled(isChecked && shiftSwitch.isChecked());
                 secondShiftValueView.setEnabled(isChecked && shiftSwitch.isChecked());
-
-                // TODO Remove test
-                if(isChecked) {
-                    GregorianCalendar soon = (GregorianCalendar) Calendar.getInstance();
-                    soon.set(Calendar.MINUTE, soon.get(Calendar.MINUTE) + 1);
-                    Log.i("ALARM", "Soon is " + new SimpleDateFormat("HH:mm").format(soon.getTime()));
-                    // AlarmSupervisor.getInstance().scheduleAlarm(soon, AlarmFragment.this.getActivity());
-                    // activateAlarm(getActivity());
-                } else {
-                    // AlarmSupervisor.getInstance().cancelAllAlarms();
-                    // deactivateAlarm(getActivity());
-                }
             }
         });
 
         View.OnClickListener onToneClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final MediaPlayer mMediaPlayer = new MediaPlayer();
+                final Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 ListDialog.newInstance("Select a tone", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
                             ListView lw = ((AlertDialog)dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
-                            // TODO Play the tone
+
+                            // TODO handle checked Item
+
+                            if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
+
+                            try {
+                                mMediaPlayer.setDataSource(AlarmFragment.this.getActivity(), sound);
+                                final AudioManager audioManager = (AudioManager) AlarmFragment.this
+                                        .getActivity().getSystemService(Context.AUDIO_SERVICE);
+                                if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+                                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                                    mMediaPlayer.prepare();
+                                    mMediaPlayer.start();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("alarmToneIndex", which);
                             editor.putString("alarmTone", checkedItem);
                             editor.apply();
                             toneValueView.setText(checkedItem);
+                        } else {
+                            mMediaPlayer.stop();
                         }
                     }
                 }, sharedPref.getInt("alarmToneIndex", 0), "Default")
@@ -116,6 +129,10 @@ public class AlarmFragment extends Fragment {
         shiftSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Update because shift has changed
+                AlarmSupervisor.getInstance().rescheduleAllAlarms(
+                     AlarmFragment.this.getActivity().getApplicationContext());
+
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("shift", isChecked);
                 firstShiftView.setEnabled(isChecked);
@@ -139,10 +156,11 @@ public class AlarmFragment extends Fragment {
                             editor.putInt("alarmFirstShiftIndex", which);
                             editor.putString("alarmFirstShift", checkedItem);
                             editor.apply();
-                            if(which > 0) {
-                                checkedItem += " before";
-                            }
                             firstShiftValueView.setText(checkedItem);
+                        } else {
+                            // Update because shift has changed
+                            AlarmSupervisor.getInstance().rescheduleAllAlarms(
+                                    AlarmFragment.this.getActivity().getApplicationContext());
                         }
                     }
                 }, sharedPref.getInt("alarmFirstShiftIndex", 0),
@@ -155,8 +173,8 @@ public class AlarmFragment extends Fragment {
         firstShiftView.setOnClickListener(onFirstShiftViewClick);
 
         firstShiftValueView.setEnabled(shiftSwitch.isChecked() && shiftSwitch.isEnabled());
-        String fShift = sharedPref.getString("alarmFirstShift", "Immediately");
-        firstShiftValueView.setText(fShift.equals("Immediately") || fShift.equals("None") ? fShift : fShift + " before" );
+        String fShift = sharedPref.getString("alarmFirstShift", "15min");
+        firstShiftValueView.setText(fShift.concat(" before"));
         firstShiftValueView.setOnClickListener(onFirstShiftViewClick);
 
         View.OnClickListener onSecondShiftViewClick = new View.OnClickListener() {
@@ -176,6 +194,10 @@ public class AlarmFragment extends Fragment {
                                         checkedItem += " before";
                                     }
                                     secondShiftValueView.setText(checkedItem);
+                                } else {
+                                    // Update because shift has changed
+                                    AlarmSupervisor.getInstance().rescheduleAllAlarms(
+                                            AlarmFragment.this.getActivity().getApplicationContext());
                                 }
                             }
                         }, sharedPref.getInt("alarmSecondShiftIndex", 1), "None",
@@ -189,7 +211,7 @@ public class AlarmFragment extends Fragment {
 
         secondShiftValueView.setEnabled(shiftSwitch.isChecked() && shiftSwitch.isEnabled());
         String sShift = sharedPref.getString("alarmSecondShift", "None");
-        secondShiftValueView.setText(sShift.equals("Immediately") || sShift.equals("None") ? sShift : sShift + " before" );
+        secondShiftValueView.setText(sShift.equals("None") ? sShift : sShift + " before" );
         secondShiftValueView.setOnClickListener(onSecondShiftViewClick);
 
         return view;
