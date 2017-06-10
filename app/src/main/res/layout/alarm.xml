@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="50dp"
-    android:orientation="vertical">
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="50dp">
 
     <TextView
         android:id="@+id/alarmText"
@@ -11,19 +12,27 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:paddingBottom="15dp"
-        android:text="Trolololo"
-        android:textAppearance="@style/AgendaTime" />
+        android:text="WAKE UP"
+        android:textAppearance="@style/CourseText"
+        android:textSize="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="41dp" />
 
     <Button
         android:id="@+id/snoozeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Snooze" />
+        android:text="Snooze"
+        android:layout_above="@+id/alarmStopButton"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:id="@+id/alarmStopButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop" />
+        android:text="Stop"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
-</LinearLayout>
+</RelativeLayout>

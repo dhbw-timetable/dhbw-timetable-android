@@ -12,9 +12,9 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-import dhbw.timetable.navfragments.notifications.AlarmFragment;
-import dhbw.timetable.navfragments.notifications.ChangesFragment;
+import dhbw.timetable.navfragments.notifications.alarm.AlarmFragment;
 import dhbw.timetable.R;
+import dhbw.timetable.navfragments.notifications.changes.ChangesFragment;
 
 public class NotificationsFragment extends Fragment implements TabHost.OnTabChangeListener {
 

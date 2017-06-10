@@ -1,4 +1,4 @@
-package dhbw.timetable.navfragments.notifications;
+package dhbw.timetable.navfragments.notifications.changes;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 

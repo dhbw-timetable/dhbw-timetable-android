@@ -1,4 +1,4 @@
-package dhbw.timetable.navfragments.notifications;
+package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,18 +9,18 @@ import android.view.WindowManager;
 public class AlarmReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("ALARM", "Firing alarm on receiver");
+            Log.i("ALARM-REC", "Firing alarm!");
+            if(AlarmActivity.isShowing) {
+                Log.w("ALARM-REC", "Already have an alarm activity showing! Request denied.");
+                return;
+            }
 
-            // TODO Does not trigger on locked screen
+            // Does trigger on locked screen
             Intent i = new Intent(context, AlarmActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             i.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            /*context.getApplicationContext().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                + WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
-                + WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|
-                + WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);*/
+
             context.startActivity(i);
-            // activity.startActivityForResult(i, 7);
         }
 }

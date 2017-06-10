@@ -19,7 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import dhbw.timetable.navfragments.notifications.AlarmFragment;
+import dhbw.timetable.navfragments.notifications.alarm.AlarmFragment;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
 import dhbw.timetable.navfragments.today.TodayFragment;

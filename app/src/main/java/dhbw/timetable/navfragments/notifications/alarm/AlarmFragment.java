@@ -1,4 +1,4 @@
-package dhbw.timetable.navfragments.notifications;
+package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -65,6 +65,7 @@ public class AlarmFragment extends Fragment {
                 secondShiftView.setEnabled(isChecked && shiftSwitch.isChecked());
                 secondShiftValueView.setEnabled(isChecked && shiftSwitch.isChecked());
 
+                // TODO Check
                 if(isChecked) {
                     activateAlarm(getActivity());
                 } else {
@@ -195,28 +196,17 @@ public class AlarmFragment extends Fragment {
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
 
-        /*manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() +
-                        60 * 1000, pendingIntent);*/
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 34);
+        calendar.set(Calendar.HOUR_OF_DAY, 22);
+        calendar.set(Calendar.MINUTE, 32);
 
-        // setRepeating() lets you specify a precise custom interval--in this case,
-        // 20 minutes.
         manager.setRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(),
                 1000 * 60 * 5,
                 pendingIntent);
 
-        /* manager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(),
-                8000,
-                pendingIntent); */
-        WakeLocker.acquire(context);
-        Log.i("ALARM", "Alarm initialized");
+        Log.i("ALARM", "Alarm ready");
     }
 
     public static void deactivateAlarm(Context context) {
@@ -224,6 +214,5 @@ public class AlarmFragment extends Fragment {
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         manager.cancel(pendingIntent);
         Log.i("ALARM", "Alarm canceled");
-        WakeLocker.release();
     }
 }

@@ -1,4 +1,4 @@
-package dhbw.timetable.navfragments.notifications;
+package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
