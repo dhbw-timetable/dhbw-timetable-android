@@ -11,6 +11,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,6 +66,14 @@ public final class AlarmSupervisor {
         ringtone.stop();
     }
 
+    public Appointment getCurrentAppointment() {
+        TimelessDate today = new TimelessDate();
+        TimelessDate monday = new TimelessDate(today);
+        DateHelper.Normalize(monday);
+        ArrayList<Appointment> week = TimetableManager.getInstance().getGlobals().get(monday);
+        return DateHelper.GetFirstAppointmentOfDay(week, today);
+    }
+
     public void rescheduleAllAlarms(Context context) {
         if(rescheduling) {
             Log.i("ALARM", "Request denied. Already rescheduling...");
@@ -115,7 +124,11 @@ public final class AlarmSupervisor {
                         }
                         GregorianCalendar afterShift = (GregorianCalendar) firstAppointment.getStartDate().clone();
                         afterShift.setTimeInMillis(afterShift.getTimeInMillis() + shifter);
-                        scheduleAlarm(firstAppointment.getStartDate(), context);
+                        // If is not over
+                        GregorianCalendar today = (GregorianCalendar) Calendar.getInstance();
+                        if (today.getTimeInMillis() < afterShift.getTimeInMillis()) {
+                            scheduleAlarm(afterShift, context);
+                        }
                     }
                 }
             }
@@ -128,8 +141,10 @@ public final class AlarmSupervisor {
 
     private void scheduleAlarm(GregorianCalendar date, Context context) {
         Log.d("ALARM", "Scheduling alarm...");
+        TimelessDate td = new TimelessDate(date);
+        Intent i = new Intent(context, AlarmReceiver.class);
         PendingIntent p = PendingIntent.getBroadcast(context,
-                0, new Intent(context, AlarmReceiver.class), 0);
+                td.hashCode(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         alarms.put(new TimelessDate(date), p);
         manager.setExact(AlarmManager.RTC_WAKEUP,
                 date.getTimeInMillis(),

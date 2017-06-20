@@ -11,14 +11,20 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import dhbw.timetable.R;
+import dhbw.timetable.data.Appointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
-    private boolean dispose = false; // false means snooze
+    private boolean destroy = false; // false means snooze
+    private String course, time;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,7 +38,7 @@ public class AlarmActivity extends AppCompatActivity {
         snoozeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispose = false;
+                destroy = false;
                 finish();
             }
         });
@@ -40,7 +46,7 @@ public class AlarmActivity extends AppCompatActivity {
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispose = true;
+                destroy = true;
                 finish();
             }
         });
@@ -48,6 +54,14 @@ public class AlarmActivity extends AppCompatActivity {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        Appointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment();
+
+        course = appointment.getCourse();
+        time = appointment.getStartTime();
+
+        TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
+        alarmTextInfo.setText(course + " at " + time);
     }
 
     @Override
@@ -85,7 +99,7 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(dispose) {
+        if(destroy) {
             AlarmSupervisor.getInstance().dispose();
         } else {
             AlarmSupervisor.getInstance().snooze(this.getApplicationContext());

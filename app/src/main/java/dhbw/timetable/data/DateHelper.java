@@ -77,7 +77,7 @@ public final class DateHelper {
         for(Appointment a : appointments) {
             // If same day
             if(sdf.format(a.getStartDate().getTime()).equals(sdf.format(day.getTime()))) {
-                // Since appointments are sorted -> first element is a match
+                // Since appointments are partially sorted -> first element is a match
                 return a;
             }
         }

@@ -140,7 +140,7 @@ public class TodayFragment extends Fragment {
                     AgendaAppointment following = agendaAppointmentsList.get(i+1);
                     // If break is present
                     if (!aa.getEndTime().equals(following.getStartTime())) {
-                        breaks.put(i, new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "PAUSE", true));
+                        breaks.put(i, new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", true));
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class TodayFragment extends Fragment {
             for (int i : breaks.keySet()) agendaAppointmentsList.add(i + 1, breaks.get(i));
 
             String endTime = agendaAppointmentsList.get(agendaAppointmentsList.size() - 1).getEndTime();
-            agendaAppointmentsList.add(new AgendaAppointment(endTime, "", "FEIERABEND", true));
+            agendaAppointmentsList.add(new AgendaAppointment(endTime, "", "END", true));
             aAdapter.notifyDataSetChanged();
         } else {
             placeholder.setText("Keine Vorlesungen");
@@ -169,7 +169,7 @@ public class TodayFragment extends Fragment {
             sb.deleteCharAt(sb.length() - 2);
             tomorrowSummaryView.setText(sb.toString());
         } else {
-            beginView.setText("Keine Vorlesungen");
+            beginView.setText("No appointments");
             tomorrowSummaryView.setText("");
         }
     }

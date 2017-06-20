@@ -21,9 +21,9 @@ public class ActivityHelper {
 
             for (Object activityRecord : activities.values()) {
                 Class activityRecordClass = activityRecord.getClass();
-                Field pausedField = activityRecordClass.getDeclaredField("paused");
-                pausedField.setAccessible(true);
-                if (!pausedField.getBoolean(activityRecord)) {
+                Field breakField = activityRecordClass.getDeclaredField("paused");
+                breakField.setAccessible(true);
+                if (!breakField.getBoolean(activityRecord)) {
                     Field activityField = activityRecordClass.getDeclaredField("activity");
                     activityField.setAccessible(true);
                     Activity activity = (Activity) activityField.get(activityRecord);
