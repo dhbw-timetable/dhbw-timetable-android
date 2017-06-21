@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,17 +130,18 @@ public class AlarmFragment extends Fragment {
         shiftSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("shift", isChecked);
+                editor.apply();
+
                 // Update because shift has changed
                 AlarmSupervisor.getInstance().rescheduleAllAlarms(
                      AlarmFragment.this.getActivity().getApplicationContext());
 
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("shift", isChecked);
                 firstShiftView.setEnabled(isChecked);
                 firstShiftValueView.setEnabled(isChecked);
                 secondShiftView.setEnabled(isChecked);
                 secondShiftValueView.setEnabled(isChecked);
-                editor.apply();
             }
         });
 

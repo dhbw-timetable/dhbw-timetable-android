@@ -123,7 +123,7 @@ public final class AlarmSupervisor {
                             }
                         }
                         GregorianCalendar afterShift = (GregorianCalendar) firstAppointment.getStartDate().clone();
-                        afterShift.setTimeInMillis(afterShift.getTimeInMillis() + shifter);
+                        afterShift.setTimeInMillis(afterShift.getTimeInMillis() - shifter);
                         // If is not over
                         GregorianCalendar today = (GregorianCalendar) Calendar.getInstance();
                         if (today.getTimeInMillis() < afterShift.getTimeInMillis()) {
