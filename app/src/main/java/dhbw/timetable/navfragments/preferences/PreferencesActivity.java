@@ -85,7 +85,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             infoButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich (C) 2017").show(getFragmentManager(), "info");
+                    InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich, Malte Bartels (C) 2017").show(getFragmentManager(), "info");
                     return true;
                 }
             });

@@ -54,6 +54,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("INFO", "onStart MAIN ACT");
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        final int defaultSelectedItem = PreferenceManager.getDefaultSharedPreferences(this).
+                getString("standardView", "0").equals("0") ?
+                R.id.nav_today : R.id.nav_week;
+
+        navigationView.setCheckedItem(defaultSelectedItem);
+        displayFragment(defaultSelectedItem);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         System.out.println("Reconfiguring background sync...");
@@ -104,16 +119,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        final int defaultSelectedItem = PreferenceManager.getDefaultSharedPreferences(this).
-                getString("standardView", "0").equals("0") ?
-                R.id.nav_today : R.id.nav_week;
-
-        navigationView.setCheckedItem(defaultSelectedItem);
-        displayFragment(defaultSelectedItem);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
