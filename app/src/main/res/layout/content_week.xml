@@ -47,7 +47,7 @@
                         android:layout_marginEnd="0dp"
                         android:layout_marginStart="0dp"
                         android:gravity="center_horizontal"
-                        android:text="Di"
+                        android:text="Tu"
                         android:textAppearance="@style/AgendaTimeMain" />
                     <TextView
                         android:id="@+id/week_head_mi"
@@ -56,7 +56,7 @@
                         android:layout_marginEnd="0dp"
                         android:layout_marginStart="0dp"
                         android:gravity="center_horizontal"
-                        android:text="Mi"
+                        android:text="We"
                         android:textAppearance="@style/AgendaTimeMain" />
                     <TextView
                         android:id="@+id/week_head_do"
@@ -65,7 +65,7 @@
                         android:layout_marginEnd="0dp"
                         android:layout_marginStart="0dp"
                         android:gravity="center_horizontal"
-                        android:text="Do"
+                        android:text="Th"
                         android:textAppearance="@style/AgendaTimeMain" />
                     <TextView
                         android:id="@+id/week_head_fr"
