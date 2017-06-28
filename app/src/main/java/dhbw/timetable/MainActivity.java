@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("Reconfiguring background sync...");
+        Log.i("SYNC", "Reconfiguring background sync...");
         stopSyncService();
         startSyncService();
     }

@@ -1,5 +1,7 @@
 package dhbw.timetable.data;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -144,11 +146,11 @@ class DataImporter {
                         } else if (type.contains("value")) {
                             // ignore
                         } else {
-                            // TODO Remove warnings after intense testing
-                            System.out.println("[WARN] Unidentified classname of row found in span table: " + type);
-                            System.out.println("row nodeName " + row.getNodeName());
-                            System.out.println("cell nodeName " + cell.getNodeName());
-                            System.out.println("element nodeName " + element.getNodeName());
+                            // TODO Remove warnings after intense (release) testing
+                            Log.w("RAPLA", "Unidentified classname of row found in span table: " + type);
+                            Log.w("RAPLA", "row nodeName " + row.getNodeName());
+                            Log.w("RAPLA", "cell nodeName " + cell.getNodeName());
+                            Log.w("RAPLA", "element nodeName " + element.getNodeName());
                         }
                     }
                 }
