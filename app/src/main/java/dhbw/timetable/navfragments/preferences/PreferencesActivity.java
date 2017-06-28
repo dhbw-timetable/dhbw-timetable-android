@@ -46,7 +46,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setElevation(0);
+            // actionBar.setElevation(0);
         }
     }
 

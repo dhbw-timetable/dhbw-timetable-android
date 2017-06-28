@@ -53,6 +53,7 @@ public class NotificationsFragment extends Fragment implements TabHost.OnTabChan
 
         applyTextColor();
 
+
         return rootView;
     }
 

@@ -114,8 +114,6 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setCheckedItem(defaultSelectedItem);
         displayFragment(defaultSelectedItem);
-
-        getSupportActionBar().setElevation(0);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

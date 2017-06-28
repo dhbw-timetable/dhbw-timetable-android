@@ -116,7 +116,7 @@ public class EditTimetableActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
             // Disable shadow
-            actionBar.setElevation(0);
+            // actionBar.setElevation(0);
         }
     }
 }
