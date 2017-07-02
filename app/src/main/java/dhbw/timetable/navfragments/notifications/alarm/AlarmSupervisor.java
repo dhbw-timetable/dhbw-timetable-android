@@ -66,12 +66,12 @@ public final class AlarmSupervisor {
         ringtone.stop();
     }
 
-    public Appointment getCurrentAppointment() {
+     Appointment getCurrentAppointment() {
         TimelessDate today = new TimelessDate();
         TimelessDate monday = new TimelessDate(today);
         DateHelper.Normalize(monday);
         ArrayList<Appointment> week = TimetableManager.getInstance().getGlobals().get(monday);
-        return DateHelper.GetFirstAppointmentOfDay(week, today);
+        return week != null ? DateHelper.GetFirstAppointmentOfDay(week, today) : null;
     }
 
     public void rescheduleAllAlarms(Context context) {

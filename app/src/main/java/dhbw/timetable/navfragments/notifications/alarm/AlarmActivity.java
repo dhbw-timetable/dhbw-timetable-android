@@ -56,12 +56,16 @@ public class AlarmActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         Appointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment();
+        if(appointment != null) {
+            course = appointment.getCourse();
+            time = appointment.getStartTime();
 
-        course = appointment.getCourse();
-        time = appointment.getStartTime();
-
-        TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
-        alarmTextInfo.setText(course + " at " + time);
+            TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
+            alarmTextInfo.setText(course + " at " + time);
+        } else {
+            Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
+            finish();
+        }
     }
 
     @Override
