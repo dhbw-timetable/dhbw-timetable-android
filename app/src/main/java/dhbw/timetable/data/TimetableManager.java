@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -319,7 +321,8 @@ public final class TimetableManager {
         globalTimetables.clear();
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
-            boolean success = false;
+            boolean success = false, timetablePresent = true;
+            String errMSG = "Unable to receive online data" + "\n";
 
             @Override
             protected Void doInBackground(Void... noArgs) {
@@ -331,6 +334,7 @@ public final class TimetableManager {
                 String timetable = getActiveTimetable(application);
                 if (timetable.equals("undefined")) {
                     Log.w("TTM", "There is currently no timetable specified.");
+                    timetablePresent = false;
                     return null;
                 }
                 Log.i("TTM", "Loading online globals for " + timetable);
@@ -355,6 +359,11 @@ public final class TimetableManager {
                     importer.importAll(startDate, endDate);
                     success = true;
                 } catch(Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+
+                    errMSG += e.getMessage() + "\n" + sw.toString();
                     e.printStackTrace();
                 }
                 return null;
@@ -364,11 +373,14 @@ public final class TimetableManager {
             protected void onPostExecute(Void result) {
                 if(!success) {
                     Log.w("TTM", "Unable to receive online data");
-                    // Let the user know about this error
-                    Activity activity = ActivityHelper.getActivity();
-                    if(activity != null) {
-                        InfoDialog.newInstance("ERROR", "Unable to update timetables. Are you online?")
-                                .show(activity.getFragmentManager(), "DLERROR");
+                    // If user is on board
+                    if(timetablePresent) {
+                        // let him know about this error
+                        Activity activity = ActivityHelper.getActivity();
+                        if (activity != null) {
+                            InfoDialog.newInstance("ERROR", errMSG)
+                                    .show(activity.getFragmentManager(), "DLERROR");
+                        }
                     }
                     return;
                 }
