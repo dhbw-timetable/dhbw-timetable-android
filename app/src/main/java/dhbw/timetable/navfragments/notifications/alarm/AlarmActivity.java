@@ -64,6 +64,7 @@ public class AlarmActivity extends AppCompatActivity {
             alarmTextInfo.setText(course + " at " + time);
         } else {
             Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
+            destroy = true;
             finish();
         }
     }
