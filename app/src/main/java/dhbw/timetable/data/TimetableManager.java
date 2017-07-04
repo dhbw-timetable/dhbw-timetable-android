@@ -146,11 +146,11 @@ public final class TimetableManager {
         SharedPreferences sharedPref = application.getSharedPreferences(
                 application.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         Uri sound = getTone(sharedPref);
-        if(notificationNeeded(application, sharedPref)) {
+        if (notificationNeeded(application, sharedPref)) {
             Log.i("TTM", "Changes found. Would fire!");
-            switch(sharedPref.getString("onChangeForm", "None")) {
+            switch (sharedPref.getString("onChangeForm", "Banner")) {
                 case "None":
-                    if(sound != null) {
+                    if (sound != null) {
                         Ringtone r = RingtoneManager.getRingtone(application.getApplicationContext(), sound);
                         r.play();
                     }

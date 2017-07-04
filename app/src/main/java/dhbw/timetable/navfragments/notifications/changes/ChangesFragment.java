@@ -44,7 +44,7 @@ public class ChangesFragment extends Fragment {
         View.OnClickListener onCritClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListDialog.newInstance("Select a form", new DialogInterface.OnClickListener() {
+                ListDialog.newInstance("Select a criterion", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
@@ -86,11 +86,19 @@ public class ChangesFragment extends Fragment {
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("onChangeFormIndex", which);
                             editor.putString("onChangeForm", checkedItem);
+
+                            // Force one dimension enabled
+                            if(checkedItem.equals("None")) {
+                                editor.putInt("onChangeToneIndex", 1);
+                                editor.putString("onChangeTone", "Default");
+                                toneValueView.setText("Default");
+                            }
+
                             editor.apply();
                             formValueView.setText(checkedItem);
                         }
                     }
-                }, sharedPref.getInt("onChangeFormIndex", 0), "None", "Banner")
+                }, sharedPref.getInt("onChangeFormIndex", 0), "Banner", "None")
                         .show(getActivity().getFragmentManager(), "changes_form");
             }
         };
@@ -99,7 +107,7 @@ public class ChangesFragment extends Fragment {
         formView.setOnClickListener(onFormClick);
 
         formValueView.setEnabled(checked);
-        formValueView.setText(sharedPref.getString("onChangeForm", "None"));
+        formValueView.setText(sharedPref.getString("onChangeForm", "Banner"));
         formValueView.setOnClickListener(onFormClick);
 
         View.OnClickListener onToneClick = new View.OnClickListener() {
@@ -121,6 +129,14 @@ public class ChangesFragment extends Fragment {
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("onChangeToneIndex", which);
                             editor.putString("onChangeTone", checkedItem);
+
+                            // Force one dimension enabled
+                            if(checkedItem.equals("None")) {
+                                editor.putInt("onChangeFormIndex", 1);
+                                editor.putString("onChangeForm", "Banner");
+                                formValueView.setText("Banner");
+                            }
+
                             editor.apply();
                             toneValueView.setText(checkedItem);
                         }
