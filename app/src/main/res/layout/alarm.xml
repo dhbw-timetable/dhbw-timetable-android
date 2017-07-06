@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/alarmText"
         android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
         android:text="defaultCourseName at 12:00"
         android:textAppearance="@style/CourseText" />
 

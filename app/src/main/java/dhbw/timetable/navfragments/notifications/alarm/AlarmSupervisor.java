@@ -100,27 +100,25 @@ public final class AlarmSupervisor {
                     if (firstAppointment != null) {
                         // apply shifting
                         int shifter = 0;
-                        if (sharedPref.getBoolean("shift", false)) {
-                            switch (sharedPref.getString("alarmFirstShift", "15min")) {
-                                case "15min":
-                                    shifter = 1000 * 60 * 15;
-                                    break;
-                                case "30min":
-                                    shifter = 1000 * 60 * 30;
-                                    break;
-                                case "45min":
-                                    shifter = 1000 * 60 * 45;
-                                    break;
-                                case "1h":
-                                    shifter = 1000 * 60 * 60;
-                                    break;
-                                case "1,5h":
-                                    shifter = 1000 * 60 * 90;
-                                    break;
-                                case "2h":
-                                    shifter = 1000 * 60 * 120;
-                                    break;
-                            }
+                        switch (sharedPref.getString("alarmFirstShift", "15min")) {
+                            case "15min":
+                                shifter = 1000 * 60 * 15;
+                                break;
+                            case "30min":
+                                shifter = 1000 * 60 * 30;
+                                break;
+                            case "45min":
+                                shifter = 1000 * 60 * 45;
+                                break;
+                            case "1h":
+                                shifter = 1000 * 60 * 60;
+                                break;
+                            case "1,5h":
+                                shifter = 1000 * 60 * 90;
+                                break;
+                            case "2h":
+                                shifter = 1000 * 60 * 120;
+                                break;
                         }
                         GregorianCalendar afterShift = (GregorianCalendar) firstAppointment.getStartDate().clone();
                         afterShift.setTimeInMillis(afterShift.getTimeInMillis() - shifter);
@@ -146,12 +144,13 @@ public final class AlarmSupervisor {
         PendingIntent p = PendingIntent.getBroadcast(context,
                 td.hashCode(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         alarms.put(new TimelessDate(date), p);
-        manager.setExact(AlarmManager.RTC_WAKEUP,
+
+        manager.setWindow(AlarmManager.RTC_WAKEUP,
                 date.getTimeInMillis(),
+                1,
                 p);
 
-        Log.d("ALARM", "Alarm ready for "
-                + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
+        Log.d("ALARM", "Alarm ready for " + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
     }
 
     public void cancelAlarm(GregorianCalendar date) {

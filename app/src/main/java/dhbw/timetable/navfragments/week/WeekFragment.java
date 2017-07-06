@@ -194,7 +194,7 @@ public class WeekFragment extends Fragment {
 
         // Handle the tabs from navigation fragment
         if (appBarLayout.getChildCount() != 1) appBarLayout.removeViewAt(1);
-        
+
         return inflater.inflate(R.layout.content_week, container, false);
     }
 
