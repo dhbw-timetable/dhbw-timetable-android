@@ -3,8 +3,10 @@ package dhbw.timetable.navfragments.today;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -57,6 +59,12 @@ public class TodayFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+
+        if (appBarLayout.getChildCount() != 1) {
+            appBarLayout.removeViewAt(1);
+        }
+
         View view = inflater.inflate(R.layout.content_today, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclingAgenda);
 
