@@ -51,6 +51,7 @@ public class NotificationsFragment extends Fragment {
                     getResources().getColor(R.color.disabledGrey),
                     getResources().getColor(R.color.white)
             );
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
             tabLayout.setupWithViewPager(mViewPager);
 
             appBarLayout.addView(tabLayout);
@@ -58,6 +59,8 @@ public class NotificationsFragment extends Fragment {
 
         return rootView;
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

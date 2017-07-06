@@ -1,16 +1,25 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+
+import dhbw.timetable.data.TimetableManager;
 
 public class DeviceBootReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            // TODO Reschedule all alarms
-            // AlarmFragment.activateAlarm(context);
+            Log.i("BOOT", "Boot completed. Loading offline globals and resetup alarms");
+            TimetableManager.getInstance().loadOfflineGlobals((Application) context.getApplicationContext(), new Runnable() {
+                @Override
+                public void run() {
+                    AlarmSupervisor.getInstance().rescheduleAllAlarms(context);
+                }
+            });
         }
     }
 }
