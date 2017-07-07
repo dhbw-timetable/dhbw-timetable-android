@@ -100,26 +100,9 @@ public final class AlarmSupervisor {
                     if (firstAppointment != null) {
                         // apply shifting
                         int shifter = 0;
-                        switch (sharedPref.getString("alarmFirstShift", "15min")) {
-                            case "15min":
-                                shifter = 1000 * 60 * 15;
-                                break;
-                            case "30min":
-                                shifter = 1000 * 60 * 30;
-                                break;
-                            case "45min":
-                                shifter = 1000 * 60 * 45;
-                                break;
-                            case "1h":
-                                shifter = 1000 * 60 * 60;
-                                break;
-                            case "1,5h":
-                                shifter = 1000 * 60 * 90;
-                                break;
-                            case "2h":
-                                shifter = 1000 * 60 * 120;
-                                break;
-                        }
+                        shifter += sharedPref.getInt("alarmFirstShiftHour", 0) * 60 * 60 * 1000;
+                        shifter += sharedPref.getInt("alarmFirstShiftMinute", 0) * 60 * 1000;
+
                         GregorianCalendar afterShift = (GregorianCalendar) firstAppointment.getStartDate().clone();
                         afterShift.setTimeInMillis(afterShift.getTimeInMillis() - shifter);
                         // If is not over

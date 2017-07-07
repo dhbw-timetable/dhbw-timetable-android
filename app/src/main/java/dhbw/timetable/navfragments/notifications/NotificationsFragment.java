@@ -24,6 +24,7 @@ public class NotificationsFragment extends Fragment {
 
     private SectionsPagerAdapter mSectionsPagerAdapter = null;
     private ViewPager mViewPager = null;
+    private TabLayout mTabLayout = null;
 
     // Mandatory Constructor
     public NotificationsFragment() {}
@@ -46,19 +47,21 @@ public class NotificationsFragment extends Fragment {
             mViewPager = (ViewPager) rootView.findViewById(R.id.tab_container);
             mViewPager.setAdapter(mSectionsPagerAdapter);
 
-            TabLayout tabLayout = new TabLayout(getActivity());
-            tabLayout.setTabTextColors(
+            mTabLayout = new TabLayout(getActivity());
+            mTabLayout.setTabTextColors(
                     getResources().getColor(R.color.disabledGrey),
                     getResources().getColor(R.color.white)
             );
-            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-            tabLayout.setupWithViewPager(mViewPager);
+            mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            mTabLayout.setupWithViewPager(mViewPager);
 
-            appBarLayout.addView(tabLayout);
+            appBarLayout.addView(mTabLayout);
         }
 
         return rootView;
     }
+
+
 
 
 

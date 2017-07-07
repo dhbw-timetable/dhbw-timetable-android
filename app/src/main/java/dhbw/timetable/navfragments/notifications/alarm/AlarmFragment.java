@@ -1,6 +1,7 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.app.AlertDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.io.IOException;
 
@@ -117,26 +119,33 @@ public class AlarmFragment extends Fragment {
         View.OnClickListener onFirstShiftViewClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListDialog.newInstance("Select a shift", new DialogInterface.OnClickListener() {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(AlarmFragment.this.getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
-                            String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putInt("alarmFirstShiftIndex", which);
-                            editor.putString("alarmFirstShift", checkedItem);
-                            editor.apply();
-                            firstShiftValueView.setText(checkedItem.equals("Immediately") ? checkedItem : checkedItem.concat(" before"));
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putInt("alarmFirstShiftHour", hourOfDay);
+                        editor.putInt("alarmFirstShiftMinute", minute);
+
+                        String time;
+                        if (hourOfDay == 0 && minute == 0) {
+                            time = "None";
                         } else {
-                            // Update because shift has changed
-                            AlarmSupervisor.getInstance().rescheduleAllAlarms(
-                                    AlarmFragment.this.getActivity().getApplicationContext());
+                            time = hourOfDay + "h " + minute + "m";
                         }
+                        editor.putString("alarmFirstShift", time);
+
+                        editor.apply();
+
+                        firstShiftValueView.setText(time);
+
+                        AlarmSupervisor.getInstance().rescheduleAllAlarms(AlarmFragment.this.getContext());
                     }
-                }, sharedPref.getInt("alarmFirstShiftIndex", 0),
-                        "Immediately", "15min", "30min", "45min", "1h", "1,5h", "2h")
-                        .show(getActivity().getFragmentManager(), "alarm_first_shift");
+                },
+                    sharedPref.getInt("alarmFirstShiftHour", 0),
+                    sharedPref.getInt("alarmFirstShiftMinute", 0),
+                    true
+                );
+                timePickerDialog.show();
             }
         };
 
@@ -144,8 +153,7 @@ public class AlarmFragment extends Fragment {
         firstShiftView.setOnClickListener(onFirstShiftViewClick);
 
         firstShiftValueView.setEnabled(aOFESwitch.isChecked());
-        String fShift = sharedPref.getString("alarmFirstShift", "15min");
-        firstShiftValueView.setText(fShift.concat(" before"));
+        firstShiftValueView.setText(sharedPref.getString("alarmFirstShift", "None"));
         firstShiftValueView.setOnClickListener(onFirstShiftViewClick);
 
         return view;
