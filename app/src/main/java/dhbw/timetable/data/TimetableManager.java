@@ -292,7 +292,7 @@ public final class TimetableManager {
                     Activity activity = ActivityHelper.getActivity();
                     if(activity != null) {
                         ErrorDialog.newInstance("ERROR", "Unable to receive online data", "")
-                                .show(activity.getFragmentManager(), "DLERROR");
+                                .show(activity.getFragmentManager(), "DLSERROR");
                     }
                     return;
                 }
@@ -305,18 +305,6 @@ public final class TimetableManager {
                 Log.i("TTM", "Updated UI!");
 
                 TimetableManager.this.busy = false;
-
-                // handleChangePolicies(application);
-
-                /* Update offline globals
-                try {
-                    FileOutputStream outputStream = application.openFileOutput(
-                            application.getResources().getString(R.string.TIMETABLES_FILE), Context.MODE_PRIVATE);
-                    outputStream.write(SerialRepresentation().getBytes());
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
             }
         }.execute();
     }
@@ -410,7 +398,19 @@ public final class TimetableManager {
                     outputStream.write(serialRepresentation().getBytes());
                     outputStream.close();
                 } catch (IOException e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+
+                    errMSG = e.getMessage() + "\n" + sw.toString();
                     e.printStackTrace();
+
+                    // let user know about this error
+                    Activity activity = ActivityHelper.getActivity();
+                    if (activity != null) {
+                        ErrorDialog.newInstance("ERROR", "Unable to update offline data", errMSG)
+                                .show(activity.getFragmentManager(), "OFFERROR");
+                    }
                 }
 
                 TimetableManager.this.busy = false;
@@ -459,6 +459,7 @@ public final class TimetableManager {
             bufferedReader.close();
         } catch (Exception e) {
             e.printStackTrace();
+
             Log.e("TTM", "FAILED!");
         }
         Log.i("TTM", "Updating UI...");
@@ -506,7 +507,19 @@ public final class TimetableManager {
             Log.i("TTM", "Success!");
             bufferedReader.close();
         } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+
+            String errMSG = e.getMessage() + "\n" + sw.toString();
             e.printStackTrace();
+
+            // let user know about this error
+            Activity activity = ActivityHelper.getActivity();
+            if (activity != null) {
+                ErrorDialog.newInstance("ERROR", "Unable to import offline data. Is it corrupt?", errMSG)
+                        .show(activity.getFragmentManager(), "OFFLOADERROR");
+            }
             Log.e("TTM", "FAILED!");
         }
         return offlineAppointments;
