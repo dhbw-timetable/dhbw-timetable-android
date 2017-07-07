@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +22,7 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,7 +180,16 @@ public class TodayFragment extends Fragment {
 
     // Apply
     private void applyWeekSummary(final View view) {
+        TextView weekHeadline = (TextView) view.findViewById(R.id.weekHeadline);
         TimelessDate day = new TimelessDate();
+
+        int iDay = day.get(Calendar.DAY_OF_WEEK);
+        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
+            DateHelper.NextWeek(day);
+            weekHeadline.setText("Next week");
+        } else {
+            weekHeadline.setText("Week");
+        }
         DateHelper.Normalize(day);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day,
