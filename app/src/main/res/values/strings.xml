@@ -10,22 +10,22 @@
 
     <string-array name="pref_sync_frequency_titles">
         <item>1 minutes</item>
-        <item>5 minutes</item>
         <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hours</item>
+        <item>45 minutes</item>
         <item>2 hours</item>
         <item>1 day</item>
+        <item>1 week</item>
+        <item>1 month</item>
         <item>Manual</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
         <item>0.166666</item>
-        <item>0.833333</item>
         <item>0.25</item>
-        <item>0.5</item>
-        <item>1</item>
+        <item>0.75</item>
         <item>2</item>
         <item>24</item>
+        <item>168</item>
+        <item>720</item>
         <item>-1</item>
     </string-array>
     <string-array name="pref_standard_view">

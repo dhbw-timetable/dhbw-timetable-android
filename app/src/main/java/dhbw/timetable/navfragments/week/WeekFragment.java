@@ -46,15 +46,16 @@ public class WeekFragment extends Fragment {
         int id = item.getItemId();
         final Application application = getActivity().getApplication();
         //noinspection SimplifiableIfStatement
+        final View view = WeekFragment.this.getView();
         if (id == R.id.action_refresh_week) {
 
             if(!TimetableManager.getInstance().isBusy()) {
                 TimetableManager.getInstance().updateGlobals(application, new Runnable() {
                     @Override
                     public void run() {
-                        applyGlobalContent(true);
+                        applyGlobalContent(true, view);
                         // Toast.makeText(application, "Updated!", Toast.LENGTH_SHORT).show();
-                        Snackbar.make(WeekFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -62,12 +63,12 @@ public class WeekFragment extends Fragment {
         } else if (id == R.id.action_pick_week) {
             DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
                 @Override
-                public void onDateSet(DatePicker view, int year, int month, int day) {
+                public void onDateSet(DatePicker dpView, int year, int month, int day) {
                     weekToDisplay.set(Calendar.YEAR, year);
                     weekToDisplay.set(Calendar.MONTH, month);
                     weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
                     Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
-                    displayWeek();
+                    displayWeek(view);
                 }
             };
 
@@ -82,14 +83,14 @@ public class WeekFragment extends Fragment {
         return false;
     }
 
-    private void displayWeek() {
-            if (applyGlobalContent(true)) {
+    private void displayWeek(final View view) {
+            if (applyGlobalContent(true, view)) {
                 TimetableManager.getInstance().updateGlobals(this.getActivity().getApplication(), new Runnable() {
                     @Override
                     public void run() {
-                        applyGlobalContent(false);
+                        applyGlobalContent(false, view);
                         // Toast.makeText(WeekFragment.this.getActivity(), "Updated!", Toast.LENGTH_SHORT).show();
-                        Snackbar.make(WeekFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
             } else {
@@ -97,9 +98,9 @@ public class WeekFragment extends Fragment {
                     TimetableManager.getInstance().reorderSpecialGlobals(this.getActivity().getApplication(), new Runnable() {
                         @Override
                         public void run() {
-                            applyGlobalContent(false);
+                            applyGlobalContent(false, view);
                             // Toast.makeText(WeekFragment.this.getActivity(), "Updated special date!", Toast.LENGTH_SHORT).show();
-                            Snackbar.make(WeekFragment.this.getView(), "Updated special date!!", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
                         }
                     }, weekToDisplay);
                 } else {
@@ -108,12 +109,10 @@ public class WeekFragment extends Fragment {
             }
     }
 
-
     /** Applies timetables to UI. Return true if successful
     and false if the date requested from the UI would not
     match the loaded globals*/
-    public boolean applyGlobalContent(boolean firstTry) {
-        View view = this.getView();
+    public boolean applyGlobalContent(boolean firstTry, View view) {
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
@@ -167,13 +166,17 @@ public class WeekFragment extends Fragment {
         weekToDisplay = new TimelessDate();
         DateHelper.Normalize(weekToDisplay);
         getActivity().setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
-        TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
-            @Override
-            public void run() {
-                Log.i("TTM", "Successfully loaded offline globals for week fragment.");
-                applyGlobalContent(true);
-            }
-        });
+
+        final View view = getView();
+        if (view != null) {
+            TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+                @Override
+                public void run() {
+                    Log.i("TTM", "Successfully loaded offline globals for week fragment.");
+                    applyGlobalContent(true, view);
+                }
+            });
+        }
     }
 
     @Override
@@ -195,7 +198,21 @@ public class WeekFragment extends Fragment {
         // Handle the tabs from navigation fragment
         if (appBarLayout.getChildCount() != 1) appBarLayout.removeViewAt(1);
 
-        return inflater.inflate(R.layout.content_week, container, false);
+        final View rootView = inflater.inflate(R.layout.content_week, container, false);
+
+        // Reset to today
+        weekToDisplay = new TimelessDate();
+        DateHelper.Normalize(weekToDisplay);
+        getActivity().setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+            @Override
+            public void run() {
+                Log.i("TTM", "Successfully loaded offline globals for week fragment.");
+                applyGlobalContent(true, rootView);
+            }
+        });
+
+        return rootView;
     }
 
     @Override

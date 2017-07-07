@@ -28,8 +28,7 @@ import dhbw.timetable.services.TimetableSyncService;
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Fragment currFragment;
     private Intent mServiceIntent;
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
+            Log.i("ACT-RES", "Onboarding activity has a result");
             boolean on = data.getBooleanExtra("onboardingSuccess", false);
             if (on) {
                 Log.i("ONBOARD", "Saving onboarding as done");
@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity
 
                 applyGlobalContent();
             }
+        } else if (requestCode == 2) {
+            Log.i("ACT-RES", "Settings activity has a result");
         } else {
             Log.w("ACT-RES", "Received unknown activity result{" + resultCode + "} from " + requestCode);
         }
@@ -151,9 +153,10 @@ public class MainActivity extends AppCompatActivity
 
     void applyGlobalContent() {
         if(currFragment instanceof WeekFragment) {
-            ((WeekFragment)currFragment).applyGlobalContent(false);
+            WeekFragment frag = ((WeekFragment) currFragment);
+            frag.applyGlobalContent(false, frag.getView());
         } else if(currFragment instanceof TodayFragment) {
-            TodayFragment frag = ((TodayFragment)currFragment);
+            TodayFragment frag = ((TodayFragment) currFragment);
             frag.applyGlobalContent(frag.getView());
         }
     }
@@ -173,7 +176,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_settings:
                 Intent i = new Intent(this, PreferencesActivity.class);
-                startActivity(i);
+                startActivityForResult(i, 2);
                 overridePendingTransition(0, 0);
                 changeNeeded = false;
         }

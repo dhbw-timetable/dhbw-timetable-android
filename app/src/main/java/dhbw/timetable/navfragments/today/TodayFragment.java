@@ -54,6 +54,7 @@ public class TodayFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Today");
+        Log.d("TODAY", "onViewCreated");
     }
 
     @Nullable
@@ -65,7 +66,7 @@ public class TodayFragment extends Fragment {
             appBarLayout.removeViewAt(1);
         }
 
-        View view = inflater.inflate(R.layout.content_today, container, false);
+        final View view = inflater.inflate(R.layout.content_today, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclingAgenda);
 
         aAdapter = new AgendaAppointmentAdapter(agendaAppointmentsList);
@@ -79,18 +80,14 @@ public class TodayFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(aAdapter);
 
-        return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
-                applyGlobalContent(getView());
+                applyGlobalContent(view);
             }
         });
+
+        return view;
     }
 
     @Override
@@ -110,7 +107,6 @@ public class TodayFragment extends Fragment {
                     @Override
                     public void run() {
                         applyGlobalContent(getView());
-                        // Toast.makeText(TodayFragment.this.getActivity().getApplication(), "Updated!", Toast.LENGTH_SHORT).show();
                         Snackbar.make(TodayFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
                     }
                 });
