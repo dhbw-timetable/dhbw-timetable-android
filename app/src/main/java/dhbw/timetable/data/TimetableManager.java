@@ -34,7 +34,7 @@ import java.util.Map;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
-import dhbw.timetable.dialogs.InfoDialog;
+import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.navfragments.notifications.alarm.AlarmSupervisor;
 
 import static dhbw.timetable.ActivityHelper.getActivity;
@@ -242,6 +242,7 @@ public final class TimetableManager {
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
             boolean success = false;
+            String errMSG;
 
             @Override
             protected Void doInBackground(Void... noArgs) {
@@ -273,8 +274,14 @@ public final class TimetableManager {
                     success = true;
                     globalTimetables.putAll(localTimetables);
                 } catch(Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+
+                    errMSG = e.getMessage() + "\n" + sw.toString();
                     e.printStackTrace();
                 }
+
                 return null;
             }
 
@@ -284,7 +291,7 @@ public final class TimetableManager {
                     Log.w("TTM", "Unable to receive online data");
                     Activity activity = ActivityHelper.getActivity();
                     if(activity != null) {
-                        InfoDialog.newInstance("ERROR", "Unable to update timetables. Are you online?")
+                        ErrorDialog.newInstance("ERROR", "Unable to receive online data", "")
                                 .show(activity.getFragmentManager(), "DLERROR");
                     }
                     return;
@@ -322,7 +329,7 @@ public final class TimetableManager {
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
             boolean success = false, timetablePresent = true;
-            String errMSG = "Unable to receive online data" + "\n";
+            String errMSG;
 
             @Override
             protected Void doInBackground(Void... noArgs) {
@@ -363,7 +370,7 @@ public final class TimetableManager {
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
 
-                    errMSG += e.getMessage() + "\n" + sw.toString();
+                    errMSG = e.getMessage() + "\n" + sw.toString();
                     e.printStackTrace();
                 }
                 return null;
@@ -378,7 +385,7 @@ public final class TimetableManager {
                         // let him know about this error
                         Activity activity = ActivityHelper.getActivity();
                         if (activity != null) {
-                            InfoDialog.newInstance("ERROR", errMSG)
+                            ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
                                     .show(activity.getFragmentManager(), "DLERROR");
                         }
                     }

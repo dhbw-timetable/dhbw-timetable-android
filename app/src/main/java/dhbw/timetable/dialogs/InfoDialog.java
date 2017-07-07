@@ -20,10 +20,10 @@ import dhbw.timetable.R;
  */
 public class InfoDialog extends DialogFragment {
 
-    private String message, title;
+    protected String message, title;
 
     /**
-     * Create a new instance of ListDialog, providing args.
+     * Create a new instance of InfoDialog, providing args.
      */
     public static InfoDialog newInstance(String title, String message) {
         InfoDialog f = new InfoDialog();
