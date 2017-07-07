@@ -4,9 +4,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import java.util.List;
+
+import java.util.LinkedHashSet;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 
@@ -15,19 +15,19 @@ import dhbw.timetable.data.AgendaAppointment;
  */
 class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAdapter.MyViewHolder> {
 
-    private List<AgendaAppointment> appointments;
+    private LinkedHashSet<AgendaAppointment> appointments;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView time, course;
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView time, course;
 
-        public MyViewHolder(View view) {
+        MyViewHolder(View view) {
             super(view);
             time = (TextView) view.findViewById(R.id.courseTime);
             course = (TextView) view.findViewById(R.id.courseTitle);
         }
     }
 
-    AgendaAppointmentAdapter(List<AgendaAppointment> appointments) {
+    AgendaAppointmentAdapter(LinkedHashSet<AgendaAppointment> appointments) {
         this.appointments = appointments;
     }
 
@@ -39,7 +39,8 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        AgendaAppointment a = appointments.get(position);
+        AgendaAppointment a = (AgendaAppointment) appointments.toArray()[position];
+        // AgendaAppointment a = appointments.get(position);
         holder.time.setText(a.getStartTime());
         holder.course.setText(a.getCourse());
 

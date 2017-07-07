@@ -242,7 +242,7 @@ public final class TimetableManager {
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
             boolean success = false;
-            String errMSG;
+            String errMSG = "";
 
             @Override
             protected Void doInBackground(Void... noArgs) {
@@ -291,7 +291,7 @@ public final class TimetableManager {
                     Log.w("TTM", "Unable to receive online data");
                     Activity activity = ActivityHelper.getActivity();
                     if(activity != null) {
-                        ErrorDialog.newInstance("ERROR", "Unable to receive online data", "")
+                        ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
                                 .show(activity.getFragmentManager(), "DLSERROR");
                     }
                     return;

@@ -28,4 +28,23 @@ public class AgendaAppointment {
         return isBreak;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj != null) {
+            if(obj instanceof AgendaAppointment) {
+                return this.toString().equals(obj.toString());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return startTime + "|" + course + "|" + endTime;
+    }
 }

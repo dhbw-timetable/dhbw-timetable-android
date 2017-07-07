@@ -11,6 +11,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.util.Log;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
 import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.dialogs.ErrorDialog;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -128,11 +131,25 @@ public final class AlarmSupervisor {
                 td.hashCode(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         alarms.put(new TimelessDate(date), p);
 
-        manager.setWindow(AlarmManager.RTC_WAKEUP,
-                date.getTimeInMillis(),
-                1,
-                p);
+        try {
+            manager.setWindow(AlarmManager.RTC_WAKEUP,
+                    date.getTimeInMillis(),
+                    1,
+                    p);
 
+        } catch(SecurityException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+
+            String errMSG = e.getMessage() + "\n" + sw.toString();
+            e.printStackTrace();
+            Activity act = ActivityHelper.getActivity();
+            if(act != null) {
+                ErrorDialog.newInstance("ERROR", "Failed to schedule alarm. Did some alarms crash?", errMSG)
+                        .show(act.getFragmentManager(), "DLSERROR");
+            }
+        }
         Log.d("ALARM", "Alarm ready for " + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
     }
 

@@ -54,8 +54,12 @@ public class WeekFragment extends Fragment {
                 TimetableManager.getInstance().updateGlobals(application, new Runnable() {
                     @Override
                     public void run() {
-                        applyGlobalContent(true, view, activity);
-                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                        try {
+                            applyGlobalContent(true, view, activity);
+                            Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                        } catch(IllegalArgumentException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
@@ -162,6 +166,10 @@ public class WeekFragment extends Fragment {
         super.onStart();
         // Reset to today
         weekToDisplay = new TimelessDate();
+        int iDay = weekToDisplay.get(Calendar.DAY_OF_WEEK);
+        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
+            DateHelper.NextWeek(weekToDisplay);
+        }
         DateHelper.Normalize(weekToDisplay);
 
         final Activity activity = getActivity();
@@ -203,6 +211,10 @@ public class WeekFragment extends Fragment {
 
         // Reset to today
         weekToDisplay = new TimelessDate();
+        int iDay = weekToDisplay.get(Calendar.DAY_OF_WEEK);
+        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
+            DateHelper.NextWeek(weekToDisplay);
+        }
         DateHelper.Normalize(weekToDisplay);
         activity.setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {

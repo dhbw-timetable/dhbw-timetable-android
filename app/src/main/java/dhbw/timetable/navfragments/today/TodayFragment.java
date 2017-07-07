@@ -23,9 +23,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashSet;
 
 import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
@@ -42,7 +40,7 @@ import dhbw.timetable.views.TodaySummaryRect;
 public class TodayFragment extends Fragment {
     private RecyclerView recyclerView;
     private AgendaAppointmentAdapter aAdapter;
-    private List<AgendaAppointment> agendaAppointmentsList = new ArrayList<>();
+    private LinkedHashSet<AgendaAppointment> agendaAppointmentSet = new LinkedHashSet<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +67,7 @@ public class TodayFragment extends Fragment {
         final View view = inflater.inflate(R.layout.content_today, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclingAgenda);
 
-        aAdapter = new AgendaAppointmentAdapter(agendaAppointmentsList);
+        aAdapter = new AgendaAppointmentAdapter(agendaAppointmentSet);
         RecyclerView.LayoutManager aLayoutManager = new LinearLayoutManager(view.getContext()) {
             @Override
             public boolean canScrollVertically() {
@@ -106,8 +104,12 @@ public class TodayFragment extends Fragment {
                 TimetableManager.getInstance().updateGlobals(getActivity().getApplication(), new Runnable() {
                     @Override
                     public void run() {
-                        applyGlobalContent(getView());
-                        Snackbar.make(TodayFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                        try {
+                            applyGlobalContent(getView());
+                            Snackbar.make(TodayFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 return true;
@@ -126,33 +128,38 @@ public class TodayFragment extends Fragment {
     }
 
     private void applyAgenda(View view) {
-        agendaAppointmentsList.clear();
+        agendaAppointmentSet.clear();
         String currDate = DateHelper.GetCurrentDate();
         for(Appointment a : TimetableManager.getInstance().getGlobalsAsList()) {
             if(a.getDate().equals(currDate)) {
-                agendaAppointmentsList.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), false));
+                agendaAppointmentSet.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), false));
             }
         }
-        int size = agendaAppointmentsList.size();
+        int size = agendaAppointmentSet.size();
         TextView placeholder = (TextView) view.findViewById(R.id.agendaEmptyPlaceholder);
         if(size > 0) {
             placeholder.setText("");
-            Map<Integer, AgendaAppointment> breaks = new HashMap<>();
+            LinkedHashSet<AgendaAppointment> appointmentsWithBreaks = new LinkedHashSet<>();
+
+            Object[] agendaAppointmentArray = agendaAppointmentSet.toArray();
+
             for (int i = 0; i < size; i++) {
-                if(i != (agendaAppointmentsList.size() - 1)) {
-                    AgendaAppointment aa = agendaAppointmentsList.get(i);
-                    AgendaAppointment following = agendaAppointmentsList.get(i+1);
+                AgendaAppointment aa = (AgendaAppointment) agendaAppointmentArray[i];
+                appointmentsWithBreaks.add(aa);
+                if(i < size - 1) {
+                    AgendaAppointment following = (AgendaAppointment) agendaAppointmentArray[i + 1];
                     // If break is present
                     if (!aa.getEndTime().equals(following.getStartTime())) {
-                        breaks.put(i, new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", true));
+                        appointmentsWithBreaks.add(new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", true));
                     }
                 }
             }
+            agendaAppointmentSet.clear();
+            agendaAppointmentSet.addAll(appointmentsWithBreaks);
 
-            for (int i : breaks.keySet()) agendaAppointmentsList.add(i + 1, breaks.get(i));
+            String endTime = ((AgendaAppointment) agendaAppointmentArray[agendaAppointmentArray.length -1]).getEndTime();
+            agendaAppointmentSet.add(new AgendaAppointment(endTime, "", "END", true));
 
-            String endTime = agendaAppointmentsList.get(agendaAppointmentsList.size() - 1).getEndTime();
-            agendaAppointmentsList.add(new AgendaAppointment(endTime, "", "END", true));
             aAdapter.notifyDataSetChanged();
         } else {
             placeholder.setText("Keine Vorlesungen");
