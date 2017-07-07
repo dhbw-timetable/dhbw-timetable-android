@@ -1,5 +1,6 @@
 package dhbw.timetable.navfragments.preferences;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,13 +9,21 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import dhbw.timetable.LoadingActivity;
+import dhbw.timetable.OnboardingSetup;
 import dhbw.timetable.R;
+import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
@@ -60,6 +69,8 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
     }
 
     public static class PrefsFragment extends PreferenceFragment {
+        boolean deletedTimetables = false;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -117,6 +128,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             Application application = this.getActivity().getApplication();
             if(application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
                 Log.i("FILE", "Successfully deleted timetables file.");
+                deletedTimetables = true;
             } else {
                 Log.w("FILE", "Unable to delete timetables file! Do you have one?");
             }
@@ -127,8 +139,13 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                getActivity().finish();
-                getActivity().overridePendingTransition(0, 0);
+                final Activity activity = this.getActivity();
+                if(deletedTimetables) {
+                    Intent i = new Intent(activity, LoadingActivity.class);
+                    activity.startActivity(i);
+                }
+                activity.finish();
+                activity.overridePendingTransition(0, 0);
                 return true;
             }
             return super.onOptionsItemSelected(item);

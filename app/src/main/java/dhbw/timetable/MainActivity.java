@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 applyGlobalContent();
             }
         } else if (requestCode == 2) {
+
             Log.i("ACT-RES", "Settings activity has a result");
         } else {
             Log.w("ACT-RES", "Received unknown activity result{" + resultCode + "} from " + requestCode);

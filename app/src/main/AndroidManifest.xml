@@ -54,6 +54,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
         <activity
+            android:name=".LoadingActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
+        <activity
             android:name=".navfragments.notifications.alarm.AlarmActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
