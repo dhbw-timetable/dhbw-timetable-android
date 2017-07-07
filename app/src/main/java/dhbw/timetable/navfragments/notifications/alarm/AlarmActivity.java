@@ -105,7 +105,7 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if(destroy) {
-            AlarmSupervisor.getInstance().dispose();
+            AlarmSupervisor.getInstance().dispose(this.getApplicationContext());
         } else {
             AlarmSupervisor.getInstance().snooze(this.getApplicationContext());
         }

@@ -9,7 +9,13 @@ import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,11 +42,12 @@ import dhbw.timetable.dialogs.ErrorDialog;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public final class AlarmSupervisor {
+
     private static final AlarmSupervisor INSTANCE = new AlarmSupervisor();
+    private static final String sTagAlarms = ":alarms";
     private static final int SNOOZE_DURATION = 1000 * 60 * 5; // ms = 5min
 
     private AlarmManager manager;
-    private Map<TimelessDate, PendingIntent> alarms = new HashMap<>();
     private Ringtone ringtone;
     private boolean rescheduling;
 
@@ -84,10 +92,9 @@ public final class AlarmSupervisor {
         }
         rescheduling = true;
         Log.i("ALARM", "Rescheduling all alarms...");
-        cancelAllAlarms();
+        cancelAllAlarms(context);
 
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         if(sharedPref.getBoolean("alarmOnFirstEvent", false)) {
             Map<TimelessDate, ArrayList<Appointment>> globals = TimetableManager.getInstance().getGlobals();
             ArrayList<Appointment> appointmentsOfWeek;
@@ -111,32 +118,38 @@ public final class AlarmSupervisor {
                         // If is not over
                         GregorianCalendar today = (GregorianCalendar) Calendar.getInstance();
                         if (today.getTimeInMillis() < afterShift.getTimeInMillis()) {
-                            scheduleAlarm(afterShift, context);
+                            scheduleAlarm(context, afterShift);
                         }
                     }
                 }
             }
-            Log.i("ALARM", "Rescheduled " + alarms.size() + " alarms");
+            Log.i("ALARM", "Rescheduled " + getAlarmIds(context).size() + " alarms");
         } else {
             Log.i("ALARM", "Not needed. Alarm not active.");
         }
         rescheduling = false;
     }
 
-    private void scheduleAlarm(GregorianCalendar date, Context context) {
+    private void scheduleAlarm(Context context, GregorianCalendar date) {
         Log.d("ALARM", "Scheduling alarm...");
         TimelessDate td = new TimelessDate(date);
+        int notificationId = td.hashCode();
         Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent p = PendingIntent.getBroadcast(context,
-                td.hashCode(), i, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarms.put(new TimelessDate(date), p);
+        PendingIntent p = PendingIntent.getBroadcast(context, notificationId, i, PendingIntent.FLAG_CANCEL_CURRENT);
 
         try {
-            manager.setWindow(AlarmManager.RTC_WAKEUP,
-                    date.getTimeInMillis(),
-                    1,
-                    p);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                        date.getTimeInMillis(),
+                        p);
+            } else {
+                manager.setWindow(AlarmManager.RTC_WAKEUP,
+                        date.getTimeInMillis(),
+                        1,
+                        p);
+            }
 
+            serializeAlarm(context, notificationId);
         } catch(SecurityException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -153,22 +166,11 @@ public final class AlarmSupervisor {
         Log.d("ALARM", "Alarm ready for " + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
     }
 
-    public void cancelAlarm(GregorianCalendar date) {
-        Log.i("ALARM", "Canceling " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()) +  "...");
-        PendingIntent p = alarms.get(new TimelessDate(date));
-        if(p == null) {
-            Log.e("ALARM", "Unable to find intent for "
-                    + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
-            return;
-        }
-        manager.cancel(p);
-        Log.i("ALARM", "Alarm canceled");
-    }
-
     void snooze(Context context) {
         Log.i("ALARM", "Snoozing current alarm...");
         TimelessDate today = new TimelessDate();
-        PendingIntent p = alarms.get(today);
+        Intent intent = new Intent(context, AlarmActivity.class);
+        PendingIntent p = getAlarm(context, intent, today.hashCode());
         if(p == null) {
             Log.e("ALARM", "Unable to find todays intent for "
                     + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(today.getTime()));
@@ -179,15 +181,15 @@ public final class AlarmSupervisor {
         // Reschedule
         GregorianCalendar later = (GregorianCalendar) Calendar.getInstance() ;
         later.setTimeInMillis(later.getTimeInMillis() + SNOOZE_DURATION);
-        scheduleAlarm(later, context);
+        scheduleAlarm(context, later);
 
         Log.i("ALARM", "Alarm snoozed");
     }
 
-    void dispose() {
+    void dispose(Context context) {
         Log.i("ALARM", "Disposing current alarm...");
         TimelessDate today = new TimelessDate();
-        PendingIntent p = alarms.get(today);
+        PendingIntent p = getAlarm(context, new Intent(context, AlarmActivity.class), today.hashCode());
         if(p == null) {
             Log.e("ALARM", "Unable to find todays intent for "
                     + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(today.getTime()));
@@ -197,11 +199,77 @@ public final class AlarmSupervisor {
         Log.i("ALARM", "Alarm disposed");
     }
 
-    private void cancelAllAlarms() {
+    private PendingIntent getAlarm(Context context, Intent intent, int notificationId) {
+        return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    private void cancelAlarm(Context context, Intent intent, int notificationId) {
+        Log.i("ALARM", "Canceling " + notificationId);
+        PendingIntent p = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        manager.cancel(p);
+        p.cancel();
+
+        deserializeAlarm(context,notificationId);
+        Log.i("ALARM", "Alarm canceled");
+    }
+
+    private void cancelAllAlarms(Context context) {
         Log.i("ALARM", "Canceling all alarms...");
-        for(TimelessDate d : alarms.keySet()) alarms.get(d).cancel();
-        alarms.clear();
+        for (int idAlarm : getAlarmIds(context)) {
+            cancelAlarm(context, new Intent(context, AlarmActivity.class), idAlarm);
+        }
         Log.i("ALARM", "All alarms canceled");
+    }
+
+    private void serializeAlarm(Context context, int notificationId) {
+        List<Integer> idsAlarms = getAlarmIds(context);
+
+        if (idsAlarms.contains(notificationId)) return;
+
+        idsAlarms.add(notificationId);
+
+        saveIdsInPreferences(context, idsAlarms);
+    }
+
+    private void deserializeAlarm(Context context, int notificationId) {
+        List<Integer> idsAlarms = getAlarmIds(context);
+
+        for (int i = 0; i < idsAlarms.size(); i++) {
+            if (idsAlarms.get(i) == notificationId)
+                idsAlarms.remove(i);
+        }
+
+        saveIdsInPreferences(context, idsAlarms);
+    }
+
+    private List<Integer> getAlarmIds(Context context) {
+        List<Integer> ids = new ArrayList<>();
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            JSONArray jsonArray2 = new JSONArray(prefs.getString(sTagAlarms, "[]"));
+
+            for (int i = 0; i < jsonArray2.length(); i++) {
+                ids.add(jsonArray2.getInt(i));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ids;
+    }
+
+    private static void saveIdsInPreferences(Context context, List<Integer> lstIds) {
+        JSONArray jsonArray = new JSONArray();
+        for (Integer idAlarm : lstIds) {
+            jsonArray.put(idAlarm);
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(sTagAlarms, jsonArray.toString());
+
+        editor.apply();
     }
 
     @Deprecated
