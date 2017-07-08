@@ -44,13 +44,6 @@ public class WeekFragment extends Fragment {
     private TimelessDate weekToDisplay;
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        Log.i("DEBUG", "onActivityResult");
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         final Activity activity = getActivity();
@@ -179,7 +172,6 @@ public class WeekFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.i("DEBUG", "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -187,7 +179,6 @@ public class WeekFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.i("DEBUG", "onCreateView");
         final Activity activity = getActivity();
         AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.appbar);
 
