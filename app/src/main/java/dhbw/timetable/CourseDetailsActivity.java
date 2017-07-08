@@ -12,32 +12,37 @@ import android.widget.TextView;
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
-public class DayDetailsActivity extends AppCompatActivity {
+public class CourseDetailsActivity extends AppCompatActivity {
 
-    private String day, agenda;
+    private String startTime, endTime, course, info;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
+        setContentView(R.layout.activity_course_details);
 
-        this.day = getIntent().getStringExtra("day") + "\n";
-        this.agenda = getIntent().getStringExtra("agenda");
+        this.startTime = getIntent().getStringExtra("startTime");
+        this.endTime= getIntent().getStringExtra("endTime");
+        this.course = getIntent().getStringExtra("course");
+        this.info = getIntent().getStringExtra("info");
 
-        TextView dayView = (TextView) findViewById(R.id.details_header);
-        dayView.setText(day);
+        TextView timeView = (TextView) findViewById(R.id.day_details_time);
+        timeView.setText(startTime + " - " + endTime);
 
-        TextView agendaView = (TextView) findViewById(R.id.details_agenda);
-        agendaView.setText(agenda);
+        TextView courseView = (TextView) findViewById(R.id.day_details_course);
+        courseView.setText(course);
 
-        Log.d("DETAILS", "Creating details activity with\n" + day + "\n" + agenda);
+        TextView infoView = (TextView) findViewById(R.id.day_details_info);
+        infoView.setText(info);
+
+        Log.d("DETAILS", "Creating day details activity with \n" + startTime + "-" + endTime + "; " + course + "; " + info);
         setupActionBar();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        setTitle("Agenda");
+        setTitle("Details");
     }
 
     @Override

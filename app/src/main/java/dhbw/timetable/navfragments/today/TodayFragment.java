@@ -38,7 +38,7 @@ import dhbw.timetable.views.TodaySummaryRect;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class TodayFragment extends Fragment {
-    private RecyclerView recyclerView;
+    RecyclerView recyclerView;
     private AgendaAppointmentAdapter aAdapter;
     private LinkedHashSet<AgendaAppointment> agendaAppointmentSet = new LinkedHashSet<>();
 
@@ -132,7 +132,7 @@ public class TodayFragment extends Fragment {
         String currDate = DateHelper.GetCurrentDate();
         for(Appointment a : TimetableManager.getInstance().getGlobalsAsList()) {
             if(a.getDate().equals(currDate)) {
-                agendaAppointmentSet.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), false));
+                agendaAppointmentSet.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), a.getInfo(), false));
             }
         }
         int size = agendaAppointmentSet.size();
@@ -150,7 +150,7 @@ public class TodayFragment extends Fragment {
                     AgendaAppointment following = (AgendaAppointment) agendaAppointmentArray[i + 1];
                     // If break is present
                     if (!aa.getEndTime().equals(following.getStartTime())) {
-                        appointmentsWithBreaks.add(new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", true));
+                        appointmentsWithBreaks.add(new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", "DONOTUSE", true));
                     }
                 }
             }
@@ -158,7 +158,7 @@ public class TodayFragment extends Fragment {
             agendaAppointmentSet.addAll(appointmentsWithBreaks);
 
             String endTime = ((AgendaAppointment) agendaAppointmentArray[agendaAppointmentArray.length -1]).getEndTime();
-            agendaAppointmentSet.add(new AgendaAppointment(endTime, "", "END", true));
+            agendaAppointmentSet.add(new AgendaAppointment(endTime, "", "END", "DONOTUSE", true));
 
             aAdapter.notifyDataSetChanged();
         } else {

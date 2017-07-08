@@ -4,13 +4,14 @@ package dhbw.timetable.data;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AgendaAppointment {
-    private String startTime, endTime, course;
+    private String startTime, endTime, course, info;
     private boolean isBreak;
 
-    public AgendaAppointment(String startTime, String endTime, String course, boolean isBreak) {
+    public AgendaAppointment(String startTime, String endTime, String course, String info, boolean isBreak) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.course = course;
+        this.info = info;
         this.isBreak = isBreak;
     }
 
@@ -22,6 +23,10 @@ public class AgendaAppointment {
 
     public String getCourse() {
         return course;
+    }
+
+    public String getInfo() {
+        return info;
     }
 
     public boolean isBreak() {
@@ -45,6 +50,6 @@ public class AgendaAppointment {
 
     @Override
     public String toString() {
-        return startTime + "|" + course + "|" + endTime;
+        return startTime + "|" + course + "|" + info + "|" + endTime;
     }
 }

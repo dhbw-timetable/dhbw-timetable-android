@@ -1,14 +1,22 @@
 package dhbw.timetable.navfragments.today;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.LinkedHashSet;
+
+import dhbw.timetable.ActivityHelper;
+import dhbw.timetable.CourseDetailsActivity;
+import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
+import dhbw.timetable.data.Appointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -33,8 +41,30 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.agenda_list_row, parent, false));
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.agenda_list_row, parent, false);
+        final RecyclerView mRecyclerView = (RecyclerView) parent;
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View child) {
+                int itemPos = mRecyclerView.getChildLayoutPosition(child);
+                AgendaAppointment item = (AgendaAppointment) appointments.toArray()[itemPos];
+                if (!item.isBreak()) {
+                    Log.d("DEBUG", "Would fire details with: " + item);
+                    Activity activity = ActivityHelper.getActivity();
+                    if (activity != null) {
+                        Intent detailsIntent = new Intent(activity, CourseDetailsActivity.class);
+                        detailsIntent.putExtra("startTime", item.getStartTime());
+                        detailsIntent.putExtra("endTime", item.getEndTime());
+                        detailsIntent.putExtra("course", item.getCourse());
+                        detailsIntent.putExtra("info", item.getInfo());
+                        activity.startActivity(detailsIntent);
+                    }
+                }
+            }
+        });
+
+        return new MyViewHolder(view);
     }
 
     @Override

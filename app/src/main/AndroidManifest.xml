@@ -81,5 +81,8 @@
         <activity
             android:name="dhbw.timetable.DayDetailsActivity"
             android:label="Details"/>
+        <activity
+            android:name="dhbw.timetable.CourseDetailsActivity"
+            android:label="Course Details"/>
     </application>
 </manifest>
