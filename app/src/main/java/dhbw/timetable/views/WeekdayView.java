@@ -16,6 +16,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashSet;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.DayDetailsActivity;
@@ -34,18 +35,21 @@ public class WeekdayView extends View {
     private Paint paint = new Paint();
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private View parentLayout;
-    private ArrayList<Appointment> dayAppointments;
+    private LinkedHashSet<Appointment> dayAppointments;
     private float scale;
     private int min, max;
     private boolean isFriday;
 
-    public WeekdayView(int min, int max, final View parentLayout, ArrayList<Appointment> appointments, boolean isFriday) {
+    public WeekdayView(int min, int max, final View parentLayout, final ArrayList<Appointment> appointments, boolean isFriday, final String detailsDate) {
         super(parentLayout.getContext());
         this.min = min;
         this.max = max;
         this.isFriday = isFriday;
         this.parentLayout = parentLayout;
-        this.dayAppointments= appointments;
+        dayAppointments = new LinkedHashSet<>();
+        for(Appointment app : appointments) {
+            dayAppointments.add(app);
+        }
         this.scale = getResources().getDisplayMetrics().density;
 
         this.setOnClickListener(new OnClickListener() {
@@ -53,7 +57,23 @@ public class WeekdayView extends View {
             public void onClick(View v) {
                 Activity activity = ActivityHelper.getActivity();
                 if (activity != null) {
+                    StringBuilder sb = new StringBuilder("");
+                    for (Appointment ap : dayAppointments) {
+                        Log.i("DEBUG", "" + ap);
+                        sb.append(ap.getStartTime())
+                                .append("\n")
+                                .append(ap.getCourse())
+                                .append("\n")
+                                .append(ap.getInfo())
+                                .append("\n")
+                                .append(ap.getEndTime())
+                                .append("\n\n");
+                    }
+
+
                     Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
+                    detailsIntent.putExtra("day", "" + detailsDate);
+                    detailsIntent.putExtra("agenda", sb.toString());
                     activity.startActivity(detailsIntent);
                 }
             }

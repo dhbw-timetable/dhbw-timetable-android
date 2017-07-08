@@ -122,7 +122,7 @@ public class WeekFragment extends Fragment {
 
     /** Applies timetables to UI. Return true if successful
     and false if the date requested from the UI would not
-    match the loaded globals*/
+    match the loaded globals */
     public boolean applyGlobalContent(boolean firstTry, View view, Activity activity) {
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
@@ -161,7 +161,7 @@ public class WeekFragment extends Fragment {
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
-                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4);
+                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
             body.addView(dayElement);
 
