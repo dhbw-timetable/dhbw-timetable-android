@@ -78,5 +78,8 @@
         <activity
             android:name="dhbw.timetable.navfragments.preferences.timetables.EditTimetableActivity"
             android:label="Edit timetable"/>
+        <activity
+            android:name="dhbw.timetable.DayDetailsActivity"
+            android:label="Details"/>
     </application>
 </manifest>

@@ -204,13 +204,13 @@ public final class AlarmSupervisor {
     }
 
     private void cancelAlarm(Context context, Intent intent, int notificationId) {
-        Log.i("ALARM", "Canceling " + notificationId);
+        Log.d("ALARM", "Canceling " + notificationId);
         PendingIntent p = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         manager.cancel(p);
         p.cancel();
 
         deserializeAlarm(context,notificationId);
-        Log.i("ALARM", "Alarm canceled");
+        Log.d("ALARM", "Alarm canceled");
     }
 
     private void cancelAllAlarms(Context context) {

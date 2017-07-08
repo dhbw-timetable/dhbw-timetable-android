@@ -34,69 +34,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Intent mServiceIntent;
     private TimetableSyncService mService;
 
-    private void startSyncService() {
-        mService = new TimetableSyncService(this);
-        mServiceIntent = new Intent(this, mService.getClass());
-        String syncFreq = PreferenceManager.
-                getDefaultSharedPreferences(this).getString("sync_frequency_list", "-1");
-        if(!syncFreq.equals("-1")) {
-            int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
-            mServiceIntent.putExtra("freq", msFreq);
-            if (!isMyServiceRunning(mService.getClass())) {
-                startService(mServiceIntent);
-            }
-        }
-    }
-
-    private void stopSyncService() {
-        stopService(mServiceIntent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        final int defaultSelectedItem = PreferenceManager.getDefaultSharedPreferences(this).
-                getString("standardView", "0").equals("0") ?
-                R.id.nav_today : R.id.nav_week;
-
-        navigationView.setCheckedItem(defaultSelectedItem);
-        displayFragment(defaultSelectedItem);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("SYNC", "Reconfiguring background sync...");
-        stopSyncService();
-        startSyncService();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            Log.i("ACT-RES", "Onboarding activity has a result");
-            boolean on = data.getBooleanExtra("onboardingSuccess", false);
-            if (on) {
-                Log.i("ONBOARD", "Saving onboarding as done");
-                SharedPreferences sharedPref = this.getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("onboardingDone", true);
-                editor.apply();
-
-                applyGlobalContent();
-            }
-        } else if (requestCode == 2) {
-
-            Log.i("ACT-RES", "Settings activity has a result");
-        } else {
-            Log.w("ACT-RES", "Received unknown activity result{" + resultCode + "} from " + requestCode);
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,18 +58,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.setCheckedItem(R.id.nav_today);
+        displayFragment(R.id.nav_today);
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                //Log.i ("isMyServiceRunning?", true + "");
-                return true;
+    @Override
+    protected void onDestroy() {
+        stopService(mServiceIntent);
+        Log.i("MAIN", "onDestroy!");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            Log.i("ACT-RES", "Onboarding activity has a result");
+            boolean on = data.getBooleanExtra("onboardingSuccess", false);
+            if (on) {
+                Log.i("ONBOARD", "Saving onboarding as done");
+                SharedPreferences sharedPref = this.getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("onboardingDone", true);
+                editor.apply();
+
+                applyGlobalContent();
             }
+        } else if (requestCode == 2) {
+            Log.i("ACT-RES", "Settings activity has a result");
+            Log.i("SYNC", "Reconfiguring background sync...");
+            stopSyncService();
+            startSyncService();
+        } else {
+            Log.w("ACT-RES", "Received unknown activity result{" + resultCode + "} from " + requestCode);
         }
-        //Log.i ("isMyServiceRunning?", false + "");
-        return false;
     }
 
     @Override
@@ -146,10 +109,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onDestroy() {
-        stopService(mServiceIntent);
-        Log.i("MAIN", "onDestroy!");
-        super.onDestroy();
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return displayFragment(item.getItemId());
     }
 
     void applyGlobalContent() {
@@ -193,13 +159,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return changeNeeded;
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+    private void startSyncService() {
+        mService = new TimetableSyncService(this);
+        mServiceIntent = new Intent(this, mService.getClass());
+        String syncFreq = PreferenceManager.
+                getDefaultSharedPreferences(this).getString("sync_frequency_list", "-1");
+        if(!syncFreq.equals("-1")) {
+            int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
+            mServiceIntent.putExtra("freq", msFreq);
+            if (!isMyServiceRunning(mService.getClass())) {
+                startService(mServiceIntent);
+            }
+        }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return displayFragment(item.getItemId());
+    private void stopSyncService() {
+        stopService(mServiceIntent);
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                //Log.i ("isMyServiceRunning?", true + "");
+                return true;
+            }
+        }
+        //Log.i ("isMyServiceRunning?", false + "");
+        return false;
     }
 }

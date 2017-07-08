@@ -20,12 +20,12 @@
     </string-array>
     <string-array name="pref_sync_frequency_values">
         <item>0.166666</item>
-        <item>0.25</item>
-        <item>0.75</item>
-        <item>2</item>
-        <item>24</item>
-        <item>168</item>
-        <item>720</item>
+        <item>2.5</item>
+        <item>7.5</item>
+        <item>20</item>
+        <item>240</item>
+        <item>1680</item>
+        <item>7200</item>
         <item>-1</item>
     </string-array>
     <string-array name="pref_standard_view">

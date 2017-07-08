@@ -29,15 +29,6 @@
     <PreferenceCategory
         android:title="App"
         android:key="pref_key_more_settings">
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/pref_standard_view"
-            android:entryValues="@array/pref_standard_view_values"
-            android:key="standardView"
-            android:summary="%s"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"
-            android:title="Standard view" />
         <Preference
             android:title="Info"
             android:key="info_button" />

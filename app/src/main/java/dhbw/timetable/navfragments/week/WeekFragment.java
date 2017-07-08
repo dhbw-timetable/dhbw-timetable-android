@@ -3,6 +3,7 @@ package dhbw.timetable.navfragments.week;
 import android.app.Activity;
 import android.app.Application;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -41,6 +42,13 @@ import dhbw.timetable.views.WeekdayView;
 public class WeekFragment extends Fragment {
 
     private TimelessDate weekToDisplay;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.i("DEBUG", "onActivityResult");
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -92,8 +100,12 @@ public class WeekFragment extends Fragment {
                 TimetableManager.getInstance().updateGlobals(activity.getApplication(), new Runnable() {
                     @Override
                     public void run() {
-                        applyGlobalContent(false, view, activity);
-                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                        try {
+                            applyGlobalContent(false, view, activity);
+                            Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                        } catch(IllegalArgumentException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             } else {
@@ -101,8 +113,12 @@ public class WeekFragment extends Fragment {
                     TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), new Runnable() {
                         @Override
                         public void run() {
-                            applyGlobalContent(false, view, activity);
-                            Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
+                            try {
+                                applyGlobalContent(false, view, activity);
+                                Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
+                            } catch(IllegalArgumentException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }, weekToDisplay);
                 } else {
@@ -162,45 +178,16 @@ public class WeekFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Reset to today
-        weekToDisplay = new TimelessDate();
-        int iDay = weekToDisplay.get(Calendar.DAY_OF_WEEK);
-        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
-            DateHelper.NextWeek(weekToDisplay);
-        }
-        DateHelper.Normalize(weekToDisplay);
-
-        final Activity activity = getActivity();
-        final View view = getView();
-
-        if (view != null && activity != null) {
-            activity.setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
-            TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
-                @Override
-                public void run() {
-                    Log.i("TTM", "Successfully loaded offline globals for week fragment.");
-                    applyGlobalContent(true, view, activity);
-                }
-            });
-        }
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i("DEBUG", "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.i("DEBUG", "onCreateView");
         final Activity activity = getActivity();
         AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.appbar);
 

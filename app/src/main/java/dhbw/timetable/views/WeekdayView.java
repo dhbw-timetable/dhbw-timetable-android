@@ -1,5 +1,7 @@
 package dhbw.timetable.views;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,6 +17,8 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import dhbw.timetable.ActivityHelper;
+import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 
@@ -35,7 +39,7 @@ public class WeekdayView extends View {
     private int min, max;
     private boolean isFriday;
 
-    public WeekdayView(int min, int max, View parentLayout, ArrayList<Appointment> appointments, boolean isFriday) {
+    public WeekdayView(int min, int max, final View parentLayout, ArrayList<Appointment> appointments, boolean isFriday) {
         super(parentLayout.getContext());
         this.min = min;
         this.max = max;
@@ -43,6 +47,17 @@ public class WeekdayView extends View {
         this.parentLayout = parentLayout;
         this.dayAppointments= appointments;
         this.scale = getResources().getDisplayMetrics().density;
+
+        this.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Activity activity = ActivityHelper.getActivity();
+                if (activity != null) {
+                    Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
+                    activity.startActivity(detailsIntent);
+                }
+            }
+        });
     }
 
     // TODO: Extract memory allocations where possible
