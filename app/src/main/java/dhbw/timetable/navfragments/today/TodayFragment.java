@@ -1,5 +1,7 @@
 package dhbw.timetable.navfragments.today;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,9 +23,12 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 
 import dhbw.timetable.MainActivity;
 import dhbw.timetable.R;
@@ -173,7 +178,17 @@ public class TodayFragment extends Fragment {
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if(tomorrowAppointments.size() > 0) {
-            beginView.setText("Begin: " + tomorrowAppointments.get(0).getStartTime());
+            final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
+            final SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                    getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+            GregorianCalendar startDate = tomorrowAppointments.get(0).getStartDate();
+            int shiftInMillis = ((60 * sharedPref.getInt("alarmFirstShiftHour", 0))
+                    + sharedPref.getInt("alarmFirstShiftMinute", 0)) * 60 * 1000;
+
+            String alarm = shiftInMillis > 0 ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "None";
+
+            beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + timeFormat.format(startDate.getTime()));
             StringBuilder sb = new StringBuilder();
             for(Appointment a : tomorrowAppointments) sb.append(a.getCourse() + ",\n");
             // Delete last comma
