@@ -162,7 +162,7 @@ public class TodayFragment extends Fragment {
 
             aAdapter.notifyDataSetChanged();
         } else {
-            placeholder.setText("Keine Vorlesungen");
+            placeholder.setText("No appointments");
         }
     }
 
