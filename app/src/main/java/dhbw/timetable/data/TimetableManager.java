@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 
@@ -222,6 +223,12 @@ public final class TimetableManager {
 
     public ArrayList<Appointment> getGlobalsAsList() {
         ArrayList<Appointment> weeks = new ArrayList<>();
+        for(ArrayList<Appointment> week : globalTimetables.values()) weeks.addAll(week);
+        return weeks;
+    }
+
+    public LinkedHashSet<Appointment> getGlobalsAsSet() {
+        LinkedHashSet<Appointment> weeks = new LinkedHashSet<>();
         for(ArrayList<Appointment> week : globalTimetables.values()) weeks.addAll(week);
         return weeks;
     }

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 /**
@@ -126,10 +127,19 @@ public final class DateHelper {
         return weekAppointments;
     }
 
-
-
     public static ArrayList<Appointment> GetAppointmentsOfDay(GregorianCalendar day, ArrayList<Appointment> list) {
         ArrayList<Appointment> dayAppointments = new ArrayList<>();
+        String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
+        for(Appointment a : list) {
+            if(a.getDate().equals(currDate)) {
+                dayAppointments.add(a);
+            }
+        }
+        return dayAppointments;
+    }
+
+    public static LinkedHashSet<Appointment> GetAppointmentsOfDayAsSet(GregorianCalendar day, LinkedHashSet<Appointment> list) {
+        LinkedHashSet<Appointment> dayAppointments = new LinkedHashSet<>();
         String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
         for(Appointment a : list) {
             if(a.getDate().equals(currDate)) {

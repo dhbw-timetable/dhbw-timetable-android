@@ -174,8 +174,8 @@ public class TodayFragment extends Fragment {
     private void applyTomorrow(View view) {
         TimelessDate tomorrow = new TimelessDate();
         DateHelper.AddDays(tomorrow, 1);
-        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow,
-                TimetableManager.getInstance().getGlobalsAsList());
+        LinkedHashSet<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDayAsSet(tomorrow,
+                TimetableManager.getInstance().getGlobalsAsSet());
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if(tomorrowAppointments.size() > 0) {
@@ -183,7 +183,7 @@ public class TodayFragment extends Fragment {
             final SharedPreferences sharedPref = getActivity().getSharedPreferences(
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-            GregorianCalendar startDate = tomorrowAppointments.get(0).getStartDate();
+            GregorianCalendar startDate = ((Appointment) tomorrowAppointments.toArray()[0]).getStartDate();
             int shiftInMillis = ((60 * sharedPref.getInt("alarmFirstShiftHour", 0))
                     + sharedPref.getInt("alarmFirstShiftMinute", 0)) * 60 * 1000;
 
