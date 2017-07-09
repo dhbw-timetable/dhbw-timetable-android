@@ -174,7 +174,8 @@ public class TodayFragment extends Fragment {
     private void applyTomorrow(View view) {
         TimelessDate tomorrow = new TimelessDate();
         DateHelper.AddDays(tomorrow, 1);
-        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow, TimetableManager.getInstance().getGlobalsAsList());
+        ArrayList<Appointment> tomorrowAppointments = DateHelper.GetAppointmentsOfDay(tomorrow,
+                TimetableManager.getInstance().getGlobalsAsList());
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if(tomorrowAppointments.size() > 0) {
@@ -186,7 +187,8 @@ public class TodayFragment extends Fragment {
             int shiftInMillis = ((60 * sharedPref.getInt("alarmFirstShiftHour", 0))
                     + sharedPref.getInt("alarmFirstShiftMinute", 0)) * 60 * 1000;
 
-            String alarm = shiftInMillis > 0 ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "None";
+            String alarm = shiftInMillis > 0 && sharedPref.getBoolean("alarmOnFirstEvent", false)
+                    ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "None";
 
             beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + timeFormat.format(startDate.getTime()));
             StringBuilder sb = new StringBuilder();
