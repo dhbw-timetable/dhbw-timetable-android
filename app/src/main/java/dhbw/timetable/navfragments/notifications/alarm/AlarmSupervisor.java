@@ -138,10 +138,8 @@ public final class AlarmSupervisor {
         PendingIntent p = PendingIntent.getBroadcast(context, notificationId, i, PendingIntent.FLAG_CANCEL_CURRENT);
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                        date.getTimeInMillis(),
-                        p);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                manager.setAlarmClock(new AlarmManager.AlarmClockInfo(date.getTimeInMillis(), p), p);
             } else {
                 manager.setWindow(AlarmManager.RTC_WAKEUP,
                         date.getTimeInMillis(),
