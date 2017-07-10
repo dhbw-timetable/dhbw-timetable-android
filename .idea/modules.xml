@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DHBWTimetable.iml" filepath="$PROJECT_DIR$/DHBWTimetable.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dhbw-timetable-android.iml" filepath="$PROJECT_DIR$/dhbw-timetable-android.iml" />
     </modules>
   </component>
 </project>
