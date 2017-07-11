@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -256,7 +259,13 @@ public final class TimetableManager {
                 if(TimetableManager.this.busy) {
                     Log.e("ASYNC", "Critical warning: trying to update globals asynchronous!");
                 }
+
                 TimetableManager.this.busy = true;
+
+                if(!isOnline()) {
+                    errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
+                    return null;
+                }
 
                 // Get the first timetable
                 String timetable = getActiveTimetable(application);
@@ -299,8 +308,9 @@ public final class TimetableManager {
                     Activity activity = ActivityHelper.getActivity();
                     if(activity != null) {
                         ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
-                                .show(activity.getFragmentManager(), "DLSERROR");
+                                .show(activity.getFragmentManager(), "DLSPECERROR");
                     }
+                    TimetableManager.this.busy = false;
                     return;
                 }
 
@@ -331,7 +341,15 @@ public final class TimetableManager {
                 if(TimetableManager.this.busy) {
                     Log.e("ASYNC", "Critical warning: trying to update globals asynchronous!");
                 }
+
                 TimetableManager.this.busy = true;
+
+                if(!isOnline()) {
+                    errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
+                    return null;
+                }
+
+
                 // Get the first timetable
                 String timetable = getActiveTimetable(application);
                 if (timetable.equals("undefined")) {
@@ -381,9 +399,11 @@ public final class TimetableManager {
                         Activity activity = ActivityHelper.getActivity();
                         if (activity != null) {
                             ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
-                                    .show(activity.getFragmentManager(), "DLERROR");
+                                    .show(activity.getFragmentManager(), "DLGERROR");
                         }
                     }
+
+                    TimetableManager.this.busy = false;
                     return;
                 }
 
@@ -472,6 +492,20 @@ public final class TimetableManager {
         Log.i("TTM", "Updating UI...");
         updater.run();
         Log.i("TTM", "Done");
+    }
+
+    // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
+    public boolean isOnline() {
+        try {
+            int timeoutMs = 1500;
+            Socket sock = new Socket();
+            SocketAddress sockaddr = new InetSocketAddress("8.8.8.8", 53);
+
+            sock.connect(sockaddr, timeoutMs);
+            sock.close();
+
+            return true;
+        } catch (IOException e) { return false; }
     }
 
     Map<TimelessDate, ArrayList<Appointment>> getLocals() {
