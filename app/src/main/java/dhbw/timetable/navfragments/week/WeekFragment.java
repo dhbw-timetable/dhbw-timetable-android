@@ -88,35 +88,41 @@ public class WeekFragment extends Fragment {
     }
 
     private void displayWeek(final View view, final Activity activity) {
-            if (applyGlobalContent(true, view, activity)) {
-                TimetableManager.getInstance().updateGlobals(activity.getApplication(), new Runnable() {
+        TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
+            @Override
+            public void run() {
+                Log.i("WEEK", "Loaded offline globals");
+            }
+        });
+        if (applyGlobalContent(true, view, activity)) {
+            TimetableManager.getInstance().updateGlobals(activity.getApplication(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        applyGlobalContent(false, view, activity);
+                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                    } catch(IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else {
+            if(!TimetableManager.getInstance().isBusy()) {
+                TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), new Runnable() {
                     @Override
                     public void run() {
                         try {
                             applyGlobalContent(false, view, activity);
-                            Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
                         } catch(IllegalArgumentException e) {
                             e.printStackTrace();
                         }
                     }
-                });
+                }, weekToDisplay);
             } else {
-                if(!TimetableManager.getInstance().isBusy()) {
-                    TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                applyGlobalContent(false, view, activity);
-                                Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
-                            } catch(IllegalArgumentException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, weekToDisplay);
-                } else {
-                    Log.w("ASYNC", "Tried to sync while manager was busy");
-                }
+                Log.w("ASYNC", "Tried to sync while manager was busy");
             }
+        }
     }
 
     /** Applies timetables to UI. Return true if successful
