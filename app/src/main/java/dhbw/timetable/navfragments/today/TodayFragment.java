@@ -36,6 +36,7 @@ import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
 import dhbw.timetable.data.TimelessDate;
+import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.views.TodaySummaryRect;
 
@@ -106,12 +107,23 @@ public class TodayFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
             if(!TimetableManager.getInstance().isBusy()) {
+                TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            applyGlobalContent(getView());
+                            Snackbar.make(getView(), "Updated from offline!", Snackbar.LENGTH_SHORT).show();
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 TimetableManager.getInstance().updateGlobals(getActivity().getApplication(), new Runnable() {
                     @Override
                     public void run() {
                         try {
                             applyGlobalContent(getView());
-                            Snackbar.make(TodayFragment.this.getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
@@ -207,7 +219,6 @@ public class TodayFragment extends Fragment {
         }
     }
 
-    // Apply
     private void applyWeekSummary(final View view) {
         TextView weekHeadline = (TextView) view.findViewById(R.id.weekHeadline);
         TimelessDate day = new TimelessDate();

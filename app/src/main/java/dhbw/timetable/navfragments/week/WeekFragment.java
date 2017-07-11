@@ -48,7 +48,6 @@ public class WeekFragment extends Fragment {
         int id = item.getItemId();
         final Activity activity = getActivity();
         final Application application = activity.getApplication();
-        //noinspection SimplifiableIfStatement
         final View view = WeekFragment.this.getView();
         if (id == R.id.action_refresh_week) {
             if(!TimetableManager.getInstance().isBusy()) {
