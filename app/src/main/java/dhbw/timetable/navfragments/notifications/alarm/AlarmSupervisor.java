@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -43,7 +46,9 @@ public final class AlarmSupervisor {
     private static final int SNOOZE_DURATION = 1000 * 60 * 5; // ms = 5min
 
     private AlarmManager manager;
-    private Ringtone ringtone;
+    private MediaPlayer mMediaPlayer;
+    private AudioManager audioManager;
+    private Uri alarmSound;
     private boolean rescheduling;
 
     private AlarmSupervisor() {}
@@ -54,22 +59,43 @@ public final class AlarmSupervisor {
 
     public void initialize(Context context) {
         manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mMediaPlayer = new MediaPlayer();
     }
 
-    public void setRingtone(Activity activity, Uri notification) {
-        ringtone = RingtoneManager.getRingtone(activity, notification);
-    }
-
-    public Ringtone getRingtone() {
-        return ringtone;
+    void setRingtone(Context context, Uri notification) {
+        alarmSound = notification;
+        try {
+            mMediaPlayer.setDataSource(context, notification);
+        } catch (IOException | IllegalStateException e) {
+            e.printStackTrace();
+            mMediaPlayer.reset();
+        }
     }
 
     void playRingtone() {
-        ringtone.play();
+        try {
+            final int before = audioManager.getRingerMode();
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                mMediaPlayer.prepare();
+                mMediaPlayer.start();
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        audioManager.setRingerMode(before);
+                    }
+                });
+            }
+        } catch (IOException | IllegalStateException e) {
+            e.printStackTrace();
+            mMediaPlayer.reset();
+        }
     }
 
     void stopRingtone() {
-        ringtone.stop();
+        mMediaPlayer.reset();
     }
 
      Appointment getCurrentAppointment() {
@@ -167,7 +193,12 @@ public final class AlarmSupervisor {
 
     void cancelAlarm(Context context, int notificationId) {
         Log.d("ALARM", "Canceling " + notificationId);
-        manager.cancel(getAlarm(context, notificationId));
+        PendingIntent p = getAlarm(context, notificationId);
+        if (p == null) {
+            Log.w("ALARM", "Could not find alarm " + notificationId + "!");
+            return;
+        }
+        manager.cancel(p);
         deserializeAlarm(context,notificationId);
         Log.d("ALARM", "Alarm stopped");
     }

@@ -50,7 +50,6 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
                 int itemPos = mRecyclerView.getChildLayoutPosition(child);
                 AgendaAppointment item = (AgendaAppointment) appointments.toArray()[itemPos];
                 if (!item.isBreak()) {
-                    Log.d("DEBUG", "Would fire details with: " + item);
                     Activity activity = ActivityHelper.getActivity();
                     if (activity != null) {
                         Intent detailsIntent = new Intent(activity, CourseDetailsActivity.class);

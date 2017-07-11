@@ -1,14 +1,17 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -52,6 +55,12 @@ public class AlarmFragment extends Fragment {
         aOFESwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    if(!permissionCheck()) {
+                        aOFESwitch.setChecked(false);
+                        return;
+                    }
+                }
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("alarmOnFirstEvent", isChecked);
                 editor.apply();
@@ -78,21 +87,22 @@ public class AlarmFragment extends Fragment {
                             ListView lw = ((AlertDialog)dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
-                            // TODO handle checked Item
-
-                            if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
+                            if (mMediaPlayer.isPlaying() || mMediaPlayer.isLooping()) {
+                                mMediaPlayer.reset();
+                            }
 
                             try {
                                 mMediaPlayer.setDataSource(AlarmFragment.this.getActivity(), sound);
-                                final AudioManager audioManager = (AudioManager) AlarmFragment.this
-                                        .getActivity().getSystemService(Context.AUDIO_SERVICE);
-                                if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+                                final AudioManager audioManager = (AudioManager) AlarmFragment.this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+                                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                                if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                                     mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                                     mMediaPlayer.prepare();
                                     mMediaPlayer.start();
                                 }
-                            } catch (IOException e) {
+                            } catch (IOException | IllegalStateException e) {
                                 e.printStackTrace();
+                                mMediaPlayer.reset();
                             }
 
                             SharedPreferences.Editor editor = sharedPref.edit();
@@ -101,7 +111,7 @@ public class AlarmFragment extends Fragment {
                             editor.apply();
                             toneValueView.setText(checkedItem);
                         } else {
-                            mMediaPlayer.stop();
+                            mMediaPlayer.reset();
                         }
                     }
                 }, sharedPref.getInt("alarmToneIndex", 0), "Default")
@@ -157,5 +167,18 @@ public class AlarmFragment extends Fragment {
         firstShiftValueView.setOnClickListener(onFirstShiftViewClick);
 
         return view;
+    }
+
+    private boolean permissionCheck() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            NotificationManager notificationManager = (NotificationManager)
+                    getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+            if(!notificationManager.isNotificationPolicyAccessGranted()) {
+                Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                startActivity(intent);
+                return false;
+            }
+        }
+        return true;
     }
 }
