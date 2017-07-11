@@ -66,7 +66,7 @@ public final class AlarmSupervisor {
     void setRingtone(Context context, Uri notification) {
         alarmSound = notification;
         try {
-            mMediaPlayer.setDataSource(context, notification);
+            mMediaPlayer.setDataSource(context, alarmSound);
         } catch (IOException | IllegalStateException e) {
             e.printStackTrace();
             mMediaPlayer.reset();

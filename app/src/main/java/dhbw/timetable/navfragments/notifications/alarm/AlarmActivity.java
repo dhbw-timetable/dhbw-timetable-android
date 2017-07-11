@@ -72,21 +72,15 @@ public class AlarmActivity extends AppCompatActivity {
         super.onStart();
         Log.i("ALARM-ACT", "Starting alarm activity!");
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        AlarmSupervisor.getInstance().setRingtone(this, sound);
+        AlarmSupervisor.getInstance().setRingtone(this.getApplicationContext(), sound);
         AlarmSupervisor.getInstance().playRingtone();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("ALARM-ACT", "Stopping alarm activity.");
-        AlarmSupervisor.getInstance().stopRingtone();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("ALARM-ACT", "onPause");
+        Log.i("ALARM-ACT", "Stopping alarm activity!");
+        finish();
     }
 
     @Override
@@ -102,6 +96,7 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        AlarmSupervisor.getInstance().stopRingtone();
         if(destroy) {
             AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
         } else {
