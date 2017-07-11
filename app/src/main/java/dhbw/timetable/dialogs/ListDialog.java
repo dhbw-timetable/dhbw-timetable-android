@@ -36,7 +36,9 @@ public class ListDialog extends DialogFragment {
     /**
      * Mandatory default constructor
      */
-    public ListDialog() {}
+    public ListDialog() {
+        this.setCancelable(false);
+    }
 
     /**
      * Applies the args
@@ -49,7 +51,10 @@ public class ListDialog extends DialogFragment {
         // Apply args
         builder.setTitle(title).setSingleChoiceItems(choices, active, onC).setPositiveButton("OK", onC);
 
+        Dialog d = builder.create();
+        d.setCanceledOnTouchOutside(false);
+
         // Create the AlertDialog object and return it
-        return builder.create();
+        return d;
     }
 }

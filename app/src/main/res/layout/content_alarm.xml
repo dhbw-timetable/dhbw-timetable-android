@@ -73,8 +73,19 @@
             android:paddingTop="15dp"
             android:text="Shift"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:layout_below="@+id/AlarmTone"
+            android:layout_below="@+id/VibrationTextField"
             android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/VibrationTextField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/AlarmTone"
+            android:paddingBottom="5dp"
+            android:paddingTop="15dp"
+            android:text="Vibration"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <TextView
             android:id="@+id/FirstShiftValue"
@@ -86,10 +97,22 @@
             android:text="Immediately"
             android:textAlignment="viewEnd"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:layout_below="@+id/AlarmToneValue"
+            android:layout_below="@+id/AlarmVibrationView"
             android:layout_alignParentEnd="true" />
 
 
+        <TextView
+            android:id="@+id/AlarmVibrationView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/AlarmToneValue"
+            android:paddingBottom="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="15dp"
+            android:text="None"
+            android:textAlignment="viewEnd"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <TextView
             android:id="@+id/Warning"

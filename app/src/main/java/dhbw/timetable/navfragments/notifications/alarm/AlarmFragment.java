@@ -48,6 +48,9 @@ public class AlarmFragment extends Fragment {
         final TextView toneView = (TextView) view.findViewById(R.id.AlarmTone);
         final TextView toneValueView = (TextView) view.findViewById(R.id.AlarmToneValue);
 
+        final TextView vibrationView = (TextView) view.findViewById(R.id.VibrationTextField);
+        final TextView vibrationValueView = (TextView) view.findViewById(R.id.AlarmVibrationView);
+
         final TextView firstShiftView = (TextView) view.findViewById(R.id.ShiftTextField);
         final TextView firstShiftValueView = (TextView) view.findViewById(R.id.FirstShiftValue);
 
@@ -69,6 +72,9 @@ public class AlarmFragment extends Fragment {
                         AlarmFragment.this.getActivity().getApplicationContext());
                 toneView.setEnabled(isChecked);
                 toneValueView.setEnabled(isChecked);
+
+                vibrationView.setEnabled(isChecked);
+                vibrationValueView.setEnabled(isChecked);
 
                 firstShiftView.setEnabled(isChecked);
                 firstShiftValueView.setEnabled(isChecked);
@@ -125,6 +131,22 @@ public class AlarmFragment extends Fragment {
         toneValueView.setEnabled(aOFESwitch.isChecked());
         toneValueView.setText(sharedPref.getString("alarmTone", "Default"));
         toneValueView.setOnClickListener(onToneClick);
+
+
+        View.OnClickListener onVibrationClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        };
+
+        vibrationView.setEnabled(aOFESwitch.isChecked());
+        vibrationView.setOnClickListener(onVibrationClick);
+
+        vibrationValueView.setEnabled(aOFESwitch.isChecked());
+        vibrationValueView.setText(sharedPref.getString("alarmVibration", "None"));
+        vibrationValueView.setOnClickListener(onVibrationClick);
+
 
         View.OnClickListener onFirstShiftViewClick = new View.OnClickListener() {
             @Override
