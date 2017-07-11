@@ -13,6 +13,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -136,7 +137,49 @@ public class AlarmFragment extends Fragment {
         View.OnClickListener onVibrationClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ListDialog.newInstance("Select a pattern", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get instance of Vibrator from current Context
+                        Vibrator v = (Vibrator) AlarmFragment.this.getActivity()
+                                .getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        if (which >= 0) {
+                            ListView lw = ((AlertDialog)dialog).getListView();
+                            String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
+                            // Start without a delay
+                            // Vibrate for 100 milliseconds
+                            // Sleep for 1000 milliseconds
+                            long[] pattern1 = {0, 100, 1000};
+
+                            // Alternative pattern
+                            long[] pattern2 = {0, 100, 1000, 300, 200, 100, 500, 200, 100};
+                            long[] chosenPattern = null;
+                            switch(which) {
+                                case 1:
+                                    chosenPattern = pattern1;
+                                    break;
+                                case 2:
+                                    chosenPattern = pattern2;
+                                    break;
+                            }
+
+                            if(chosenPattern != null) {
+                                // The '-1' here means to repeat ONCE
+                                v.vibrate(chosenPattern, -1);
+                            }
+
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("alarmVibrationIndex", which);
+                            editor.putString("alarmVibration", checkedItem);
+                            editor.apply();
+                            vibrationValueView.setText(checkedItem);
+                        } else {
+                            v.cancel();
+                        }
+                    }
+                }, sharedPref.getInt("alarmVibrationIndex", 0), "None", "Default", "Alternative")
+                        .show(getActivity().getFragmentManager(), "alarm_vibration");
             }
         };
 
