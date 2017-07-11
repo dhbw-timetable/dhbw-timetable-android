@@ -14,18 +14,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,6 +80,10 @@ public final class AlarmSupervisor {
         return week != null ? DateHelper.GetFirstAppointmentOfDay(week, today) : null;
     }
 
+    private static PendingIntent getAlarm(Context context, int notificationId) {
+        return PendingIntent.getBroadcast(context, notificationId, new Intent(context, AlarmReceiver.class), PendingIntent.FLAG_NO_CREATE);
+    }
+
     public void rescheduleAllAlarms(Context context) {
         if(rescheduling) {
             Log.i("ALARM", "Request denied. Already rescheduling...");
@@ -118,7 +117,7 @@ public final class AlarmSupervisor {
                         // If is not over
                         GregorianCalendar today = (GregorianCalendar) Calendar.getInstance();
                         if (today.getTimeInMillis() < afterShift.getTimeInMillis()) {
-                            scheduleAlarm(context, afterShift);
+                            addAlarm(context, afterShift);
                         }
                     }
                 }
@@ -130,13 +129,14 @@ public final class AlarmSupervisor {
         rescheduling = false;
     }
 
-    private void scheduleAlarm(Context context, GregorianCalendar date) {
-        Log.d("ALARM", "Scheduling alarm...");
-        TimelessDate td = new TimelessDate(date);
-        int notificationId = td.hashCode();
-        Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent p = PendingIntent.getBroadcast(context, notificationId, i, PendingIntent.FLAG_CANCEL_CURRENT);
-
+    private void addAlarm(Context context, GregorianCalendar date) {
+        int notificationId = new TimelessDate(date).hashCode();
+        Log.d("ALARM", "Scheduling alarm " + notificationId);
+        PendingIntent p = PendingIntent.getBroadcast(
+                context,
+                notificationId,
+                new Intent(context, AlarmReceiver.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 manager.setAlarmClock(new AlarmManager.AlarmClockInfo(date.getTimeInMillis(), p), p);
@@ -148,73 +148,46 @@ public final class AlarmSupervisor {
             }
 
             serializeAlarm(context, notificationId);
-        } catch(SecurityException e) {
+        } catch (SecurityException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-
             String errMSG = e.getMessage() + "\n" + sw.toString();
             e.printStackTrace();
+
             Activity act = ActivityHelper.getActivity();
             if(act != null) {
                 ErrorDialog.newInstance("ERROR", "Failed to schedule alarm. Did some alarms crash?", errMSG)
-                        .show(act.getFragmentManager(), "DLSERROR");
+                        .show(act.getFragmentManager(), "ALSECERROR");
             }
         }
-        Log.d("ALARM", "Alarm ready for " + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
+        Log.d("ALARM", "Alarm ready for "
+                + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
     }
 
-    void snooze(Context context) {
+    void cancelAlarm(Context context, int notificationId) {
+        Log.d("ALARM", "Canceling " + notificationId);
+        manager.cancel(getAlarm(context, notificationId));
+        deserializeAlarm(context,notificationId);
+        Log.d("ALARM", "Alarm stopped");
+    }
+
+    void snoozeAlarm(Context context) {
         Log.i("ALARM", "Snoozing current alarm...");
-        TimelessDate today = new TimelessDate();
-        Intent intent = new Intent(context, AlarmActivity.class);
-        PendingIntent p = getAlarm(context, intent, today.hashCode());
-        if(p == null) {
-            Log.e("ALARM", "Unable to find todays intent for "
-                    + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(today.getTime()));
-            return;
-        }
-        manager.cancel(p);
+        cancelAlarm(context, new TimelessDate().hashCode());
 
         // Reschedule
         GregorianCalendar later = (GregorianCalendar) Calendar.getInstance() ;
         later.setTimeInMillis(later.getTimeInMillis() + SNOOZE_DURATION);
-        scheduleAlarm(context, later);
+        addAlarm(context, later);
 
         Log.i("ALARM", "Alarm snoozed");
-    }
-
-    void dispose(Context context) {
-        Log.i("ALARM", "Disposing current alarm...");
-        TimelessDate today = new TimelessDate();
-        PendingIntent p = getAlarm(context, new Intent(context, AlarmActivity.class), today.hashCode());
-        if(p == null) {
-            Log.e("ALARM", "Unable to find todays intent for "
-                    + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(today.getTime()));
-            return;
-        }
-        manager.cancel(p);
-        Log.i("ALARM", "Alarm disposed");
-    }
-
-    private PendingIntent getAlarm(Context context, Intent intent, int notificationId) {
-        return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-    }
-
-    private void cancelAlarm(Context context, Intent intent, int notificationId) {
-        Log.d("ALARM", "Canceling " + notificationId);
-        PendingIntent p = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        manager.cancel(p);
-        p.cancel();
-
-        deserializeAlarm(context,notificationId);
-        Log.d("ALARM", "Alarm canceled");
     }
 
     private void cancelAllAlarms(Context context) {
         Log.i("ALARM", "Canceling all alarms...");
         for (int idAlarm : getAlarmIds(context)) {
-            cancelAlarm(context, new Intent(context, AlarmActivity.class), idAlarm);
+            cancelAlarm(context, idAlarm);
         }
         Log.i("ALARM", "All alarms canceled");
     }

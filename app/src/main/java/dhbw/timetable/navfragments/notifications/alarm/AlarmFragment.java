@@ -138,7 +138,7 @@ public class AlarmFragment extends Fragment {
 
                         firstShiftValueView.setText(time);
 
-                        AlarmSupervisor.getInstance().rescheduleAllAlarms(AlarmFragment.this.getContext());
+                        AlarmSupervisor.getInstance().rescheduleAllAlarms(AlarmFragment.this.getActivity().getApplicationContext());
                     }
                 },
                     sharedPref.getInt("alarmFirstShiftHour", 0),

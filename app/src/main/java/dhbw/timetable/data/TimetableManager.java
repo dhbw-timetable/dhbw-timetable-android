@@ -394,7 +394,7 @@ public final class TimetableManager {
                 updater.run();
                 Log.i("TTM", "Updated UI!");
 
-                AlarmSupervisor.getInstance().rescheduleAllAlarms(application);
+                AlarmSupervisor.getInstance().rescheduleAllAlarms(application.getApplicationContext());
 
                 handleChangePolicies(application);
 

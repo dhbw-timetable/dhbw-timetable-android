@@ -23,14 +23,12 @@ public class OnboardingSetup extends AppCompatActivity {
         setContentView(R.layout.activity_onboarding);
 
         Button aBtn = (Button) findViewById(R.id.onboard_addTimetable);
-        //Button tBtn = (Button) findViewById(R.id.onboard_tutorial);
 
         aBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(OnboardingSetup.this, NewTimetableActivity.class);
                 startActivityForResult(i, 2);
-                overridePendingTransition(0, 0);
             }
         });
     }

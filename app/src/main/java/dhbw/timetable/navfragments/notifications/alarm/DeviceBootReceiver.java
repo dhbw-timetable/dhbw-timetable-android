@@ -17,7 +17,7 @@ public class DeviceBootReceiver extends BroadcastReceiver {
             TimetableManager.getInstance().loadOfflineGlobals((Application) context.getApplicationContext(), new Runnable() {
                 @Override
                 public void run() {
-                    AlarmSupervisor.getInstance().rescheduleAllAlarms(context);
+                    AlarmSupervisor.getInstance().rescheduleAllAlarms(context.getApplicationContext());
                 }
             });
         }

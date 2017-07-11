@@ -13,17 +13,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
+import dhbw.timetable.data.TimelessDate;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
-    private boolean destroy = false; // false means snooze
+    private boolean destroy = false; // false means snoozeAlarm
     private String course, time;
 
     @Override
@@ -105,9 +103,9 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if(destroy) {
-            AlarmSupervisor.getInstance().dispose(this.getApplicationContext());
+            AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
         } else {
-            AlarmSupervisor.getInstance().snooze(this.getApplicationContext());
+            AlarmSupervisor.getInstance().snoozeAlarm(this.getApplicationContext());
         }
         Log.i("ALARM", "Destroyed activity");
     }

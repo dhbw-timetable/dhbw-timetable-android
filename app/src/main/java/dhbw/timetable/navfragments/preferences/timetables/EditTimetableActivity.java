@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import dhbw.timetable.R;
+import dhbw.timetable.data.DataImporter;
+import dhbw.timetable.dialogs.InfoDialog;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -77,7 +79,7 @@ public class EditTimetableActivity extends AppCompatActivity {
             String name = nameView.getText().toString();
             String url = urlView.getText().toString();
             // If not empty
-            if(name.length() > 0 && url.length() > 0) {
+            if (name.length() > 0 && DataImporter.URLIsValid(url)) {
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
@@ -90,6 +92,10 @@ public class EditTimetableActivity extends AppCompatActivity {
                 finish();
                 overridePendingTransition(0, 0);
                 return true;
+            } else {
+                InfoDialog.newInstance("Invalid input",
+                        "Please ensure you have entered a valid name and a reachable link.")
+                        .show(getFragmentManager(), "INPUT");
             }
         } else if (id == R.id.action_edit_delete_timetable) {
             SharedPreferences sharedPref = this.getSharedPreferences(

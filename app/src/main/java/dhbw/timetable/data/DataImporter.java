@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
-class DataImporter {
+public class DataImporter {
 
     private final static String baseURL = "https://rapla.dhbw-stuttgart.de/rapla";
     private String pageContent, key;
@@ -38,6 +38,24 @@ class DataImporter {
     DataImporter(String key, boolean global) {
         this.key = key;
         globals = global ? TimetableManager.getInstance().getGlobals() : TimetableManager.getInstance().getLocals();
+    }
+
+    private static boolean testConnection(String key) {
+        try {
+            new URL(baseURL
+                    + "?key=" + key
+                    + "&day=" + 10
+                    + "&month=" + 07
+                    + "&year=" + 2017
+            ).openConnection();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public  static boolean URLIsValid(String key) {
+        return key.length() > 15 && !key.contains(" ") && !key.contains("&") && DataImporter.testConnection(key);
     }
 
     /**

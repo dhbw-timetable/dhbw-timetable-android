@@ -18,6 +18,8 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import dhbw.timetable.R;
+import dhbw.timetable.data.DataImporter;
+import dhbw.timetable.dialogs.InfoDialog;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -66,16 +68,16 @@ public class NewTimetableActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             setResult(Activity.RESULT_CANCELED);
             finish();
-            overridePendingTransition(0, 0);
+            overridePendingTransition(0,0);
             return true;
         } else if (id == R.id.action_apply_timetable) {
             String name =  ((TextView) findViewById(R.id.new_timetable_name)).getText().toString();
             String url = ((TextView) findViewById(R.id.new_timetable_url)).getText().toString();
 
-            // If not empty
-            if(name.length() > 0 && url.length() > 0) {
+            if(!name.isEmpty() && DataImporter.URLIsValid(url)) {
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
                 // TODO Check if timetable with same name already exists before overwriting
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("t#" + name, url);
@@ -85,8 +87,12 @@ public class NewTimetableActivity extends AppCompatActivity {
                 returnIntent.putExtra("tt", url);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
-                overridePendingTransition(0, 0);
+                overridePendingTransition(0,0);
                 return true;
+            } else {
+                InfoDialog.newInstance("Invalid input",
+                        "Please ensure you have entered a valid name and a reachable link.")
+                        .show(getFragmentManager(), "INPUT");
             }
         }
         return false;
@@ -103,8 +109,6 @@ public class NewTimetableActivity extends AppCompatActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
-            // Disable shadow
-            // actionBar.setElevation(0);
         }
     }
 }
