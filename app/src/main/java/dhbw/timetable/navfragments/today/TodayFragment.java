@@ -187,12 +187,17 @@ public class TodayFragment extends Fragment {
             int shiftInMillis = ((60 * sharedPref.getInt("alarmFirstShiftHour", 0))
                     + sharedPref.getInt("alarmFirstShiftMinute", 0)) * 60 * 1000;
 
-            String alarm = shiftInMillis > 0 && sharedPref.getBoolean("alarmOnFirstEvent", false)
-                    ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "None";
+            String alarm;
+
+            if (sharedPref.getBoolean("alarmOnFirstEvent", false)) {
+                alarm = shiftInMillis > 0 ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "Immediately";
+            } else {
+                alarm = "None";
+            }
 
             beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + timeFormat.format(startDate.getTime()));
             StringBuilder sb = new StringBuilder();
-            for(Appointment a : tomorrowAppointments) sb.append(a.getCourse() + ",\n");
+            for(Appointment a : tomorrowAppointments) sb.append(a.getCourse()).append(",\n");
             // Delete last comma
             sb.deleteCharAt(sb.length() - 2);
             tomorrowSummaryView.setText(sb.toString());
