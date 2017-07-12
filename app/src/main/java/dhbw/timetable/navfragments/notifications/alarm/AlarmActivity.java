@@ -74,6 +74,7 @@ public class AlarmActivity extends AppCompatActivity {
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         AlarmSupervisor.getInstance().setRingtone(this.getApplicationContext(), sound);
         AlarmSupervisor.getInstance().playRingtone();
+        AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
     }
 
     @Override
@@ -97,6 +98,7 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         AlarmSupervisor.getInstance().stopRingtone();
+        AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
         if(destroy) {
             AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
         } else {
