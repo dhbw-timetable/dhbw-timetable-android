@@ -30,8 +30,10 @@ import java.util.Locale;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.dialogs.InfoDialog;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
@@ -57,9 +59,15 @@ public class WeekFragment extends Fragment {
                         try {
                             applyGlobalContent(true, view, activity);
                             Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
-                        } catch(IllegalArgumentException e) {
+                        } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
+                    }
+                }, new ErrorCallback() {
+                    @Override
+                    public void onError(String string) {
+                        ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
+                                .show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR2");
                     }
                 });
             }
@@ -101,9 +109,14 @@ public class WeekFragment extends Fragment {
                     try {
                         applyGlobalContent(false, view, activity);
                         Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
-                    } catch(IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
+                }
+            }, new ErrorCallback() {
+                @Override
+                public void onError(String string) {
+                    ErrorDialog.newInstance("Error", "Unable to update timetable data", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
                 }
             });
         } else {
@@ -114,9 +127,14 @@ public class WeekFragment extends Fragment {
                         try {
                             applyGlobalContent(false, view, activity);
                             Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
-                        } catch(IllegalArgumentException e) {
+                        } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
+                    }
+                }, new ErrorCallback() {
+                    @Override
+                    public void onError(String string) {
+                        ErrorDialog.newInstance("Error", "Unable to load specifiy week.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
                     }
                 }, weekToDisplay);
             } else {

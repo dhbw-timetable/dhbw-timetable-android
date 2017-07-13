@@ -35,9 +35,12 @@ import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.dialogs.ErrorDialog;
+import dhbw.timetable.navfragments.week.WeekFragment;
 import dhbw.timetable.views.TodaySummaryRect;
 
 /**
@@ -127,6 +130,12 @@ public class TodayFragment extends Fragment {
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
+                    }
+                }, new ErrorCallback() {
+                    @Override
+                    public void onError(String string) {
+                        ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
+                                .show(TodayFragment.this.getActivity().getFragmentManager(), "TODAYDLERR");
                     }
                 });
                 return true;

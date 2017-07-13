@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 
 public class TimetableSyncService extends Service {
@@ -81,6 +82,11 @@ public class TimetableSyncService extends Service {
                             Log.i("SYNC", "Background sync finished.");
                             // TODO Refresh activities ?
                             // Check onChange preference and possibly fire notifications done
+                        }
+                    }, new ErrorCallback() {
+                        @Override
+                        public void onError(String string) {
+                            Log.e("SYNC", "Background sync FAILED: " + string);
                         }
                     });
                     Log.i("SYNC", "Background sync now running");

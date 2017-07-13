@@ -10,7 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.navfragments.preferences.timetables.NewTimetableActivity;
 
 /**
@@ -46,6 +48,11 @@ public class OnboardingSetup extends AppCompatActivity {
                     public void run() {
                         Log.i("ONBOARD", "Onboarding timetable loaded.");
                         finish();
+                    }
+                }, new ErrorCallback() {
+                    @Override
+                    public void onError(String string) {
+                        ErrorDialog.newInstance("ERRROR", "Unable to load initial timetable", string).show(OnboardingSetup.this.getFragmentManager(), "ONBOARDERR");
                     }
                 });
                 setContentView(R.layout.loading);

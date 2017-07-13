@@ -246,7 +246,7 @@ public final class TimetableManager {
      * Downloads timetable contents from only on day into existing GLOBAL_TIMETABLES and writes
      * complete global data to file system
      */
-    public void reorderSpecialGlobals(final Application application, final Runnable updater, final TimelessDate date) {
+    public void reorderSpecialGlobals(final Application application, final Runnable onSuccess, final ErrorCallback errorCallback, final TimelessDate date) {
         // DO NOT CLEAR GLOBALS ONLY LOCALS
         globalTimetables.keySet().removeAll(localTimetables.keySet());
         localTimetables.clear();
@@ -305,11 +305,7 @@ public final class TimetableManager {
             protected void onPostExecute(Void result) {
                 if(!success) {
                     Log.w("TTM", "Unable to receive online data");
-                    Activity activity = ActivityHelper.getActivity();
-                    if(activity != null) {
-                        ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
-                                .show(activity.getFragmentManager(), "DLSPECERROR");
-                    }
+                    errorCallback.onError(errMSG);
                     TimetableManager.this.busy = false;
                     return;
                 }
@@ -318,7 +314,7 @@ public final class TimetableManager {
                 Log.d("TTM", TimetableManager.getInstance().serialRepresentation());
                 // Update UI
                 Log.i("TTM", "Updating UI...");
-                updater.run();
+                onSuccess.run();
                 Log.i("TTM", "Updated UI!");
 
                 TimetableManager.this.busy = false;
@@ -329,7 +325,7 @@ public final class TimetableManager {
     /**
      * Downloads timetable contents into cleared GLOBAL_TIMETABLES and writes data to file system
      */
-    public void updateGlobals(final Application application, final Runnable updater) {
+    public void updateGlobals(final Application application, final Runnable updater, final ErrorCallback errorCallback) {
         globalTimetables.clear();
         localTimetables.clear();
         new AsyncTask<Void, Void, Void>() {
@@ -392,18 +388,12 @@ public final class TimetableManager {
             @Override
             protected void onPostExecute(Void result) {
                 if(!success) {
+                    TimetableManager.this.busy = false;
                     Log.w("TTM", "Unable to receive online data");
                     // If user is on board
                     if(timetablePresent) {
-                        // let him know about this error
-                        Activity activity = ActivityHelper.getActivity();
-                        if (activity != null) {
-                            ErrorDialog.newInstance("ERROR", "Unable to receive online data", errMSG)
-                                    .show(activity.getFragmentManager(), "DLGERROR");
-                        }
+                        errorCallback.onError(errMSG);
                     }
-
-                    TimetableManager.this.busy = false;
                     return;
                 }
 
@@ -453,7 +443,11 @@ public final class TimetableManager {
         if(!secureFile(application)) {
             Log.i("TTM", "No offline globals were found, checking online.");
             if(!TimetableManager.getInstance().isBusy()) {
-                updateGlobals(application, updater);
+                updateGlobals(application, updater, new ErrorCallback() {
+                    @Override
+                    public void onError(String string) {
+                    }
+                });
             } else {
                 Log.i("ASYNC", "Tried to sync while manager was busy");
             }
@@ -495,7 +489,7 @@ public final class TimetableManager {
     }
 
     // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
-    public boolean isOnline() {
+    private boolean isOnline() {
         try {
             int timeoutMs = 1500;
             Socket sock = new Socket();
