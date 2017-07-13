@@ -12,6 +12,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -48,7 +49,6 @@ public final class AlarmSupervisor {
     private AlarmManager manager;
     private MediaPlayer mMediaPlayer;
     private AudioManager audioManager;
-    private Uri alarmSound;
     private boolean rescheduling;
 
     private AlarmSupervisor() {}
@@ -64,13 +64,39 @@ public final class AlarmSupervisor {
     }
 
     void setRingtone(Context context, Uri notification) {
-        alarmSound = notification;
         try {
-            mMediaPlayer.setDataSource(context, alarmSound);
+            mMediaPlayer.setDataSource(context, notification);
         } catch (IOException | IllegalStateException e) {
             e.printStackTrace();
             mMediaPlayer.reset();
         }
+    }
+
+    void startVibrator(Context context) {
+        // Get instance of Vibrator from current Context
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        long[][] patterns = {
+                {0, 1000, 100, 1000, 100, 1000, 100, 1000, 100},
+                {0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}};
+        int patternIndex = sharedPreferences.getInt("alarmVibrationIndex", 0);
+
+        switch(patternIndex) {
+            case 0:
+                return;
+            case 1:
+            case 2:
+                vibrator.vibrate(patterns[patternIndex-1], -1);
+                break;
+        }
+    }
+
+    void stopVibrator(Context context) {
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.cancel();
     }
 
     void playRingtone() {

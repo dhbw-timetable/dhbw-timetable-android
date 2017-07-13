@@ -150,10 +150,10 @@ public class AlarmFragment extends Fragment {
                             // Start without a delay
                             // Vibrate for 100 milliseconds
                             // Sleep for 1000 milliseconds
-                            long[] pattern1 = {0, 100, 1000};
+                            long[] pattern1 = {0, 1000, 100, 1000, 100, 1000, 100, 1000, 100};
 
                             // Alternative pattern
-                            long[] pattern2 = {0, 100, 1000, 300, 200, 100, 500, 200, 100};
+                            long[] pattern2 = {0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
                             long[] chosenPattern = null;
                             switch(which) {
                                 case 1:
