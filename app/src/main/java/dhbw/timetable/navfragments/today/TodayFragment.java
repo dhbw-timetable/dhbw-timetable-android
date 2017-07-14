@@ -93,8 +93,37 @@ public class TodayFragment extends Fragment {
                 applyGlobalContent(view);
             }
         });
-
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        final TimelessDate today = new TimelessDate();
+        final TimelessDate week = new TimelessDate();
+        DateHelper.Normalize(week);
+        TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
+            @Override
+            public void run() {
+                ArrayList appointments = DateHelper.GetAppointmentsOfDay(today, TimetableManager.getInstance().getGlobals().get(week));
+                if(appointments.size() == 0) {
+                    Log.w("TODAY", "Warning: No appointments found for day.");
+                    TimetableManager.getInstance().updateGlobals(TodayFragment.this.getActivity().getApplication(), new Runnable() {
+                        @Override
+                        public void run() {
+                            applyGlobalContent(TodayFragment.this.getView());
+                        }
+                    }, new ErrorCallback() {
+                        @Override
+                        public void onError(String string) {
+                            ErrorDialog.newInstance("Error", "Sync lag. You have no internet connection and your offline data is not up to date.", string);
+                        }
+                    });
+                } else {
+                    applyGlobalContent(TodayFragment.this.getView());
+                }
+            }
+        });
     }
 
     @Override
@@ -115,7 +144,6 @@ public class TodayFragment extends Fragment {
                     public void run() {
                         try {
                             applyGlobalContent(getView());
-                            Snackbar.make(getView(), "Updated from offline!", Snackbar.LENGTH_SHORT).show();
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }

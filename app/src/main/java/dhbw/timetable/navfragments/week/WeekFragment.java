@@ -153,7 +153,7 @@ public class WeekFragment extends Fragment {
         // Prepare appointment data
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateHelper.Normalize(day);
-        String formattedDate = new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
+        String formattedDate = new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
         activity.setTitle(formattedDate);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
@@ -184,7 +184,7 @@ public class WeekFragment extends Fragment {
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
-                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
+                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
             body.addView(dayElement);
 
@@ -217,7 +217,7 @@ public class WeekFragment extends Fragment {
             DateHelper.NextWeek(weekToDisplay);
         }
         DateHelper.Normalize(weekToDisplay);
-        activity.setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        activity.setTitle(new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {

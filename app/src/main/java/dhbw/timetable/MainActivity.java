@@ -129,8 +129,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public boolean displayFragment(int id) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         boolean changeNeeded = true;
-        currFragment = null;
         switch(id) {
             case R.id.nav_week:
                 currFragment = new WeekFragment();
@@ -139,6 +139,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 currFragment = new TodayFragment();
                 break;
             case R.id.nav_notifications:
+                if(currFragment instanceof NotificationsFragment) {
+                    drawer.closeDrawer(GravityCompat.START);
+                    return false;
+                }
                 currFragment = new NotificationsFragment();
                 break;
             case R.id.nav_settings:
@@ -154,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ft.commit();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return changeNeeded;
     }
