@@ -70,7 +70,7 @@ public class AlarmActivity extends AppCompatActivity {
         super.onStart();
             Log.i("ALARM-ACT", "Starting alarm activity!");
             AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
-            // AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+            AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         AlarmSupervisor.getInstance().stopRingtone();
-        // AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
+        AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
         if (destroy) {
             AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
         } else {

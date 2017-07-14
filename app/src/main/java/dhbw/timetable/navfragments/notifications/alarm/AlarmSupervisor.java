@@ -64,6 +64,7 @@ public final class AlarmSupervisor {
     }
 
     void startVibrator(Context context) {
+        Log.d("VIB", "Trying to vibrate...");
         // Get instance of Vibrator from current Context
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -80,12 +81,13 @@ public final class AlarmSupervisor {
                 return;
             case 1:
             case 2:
-                vibrator.vibrate(patterns[patternIndex-1], -1);
+                vibrator.vibrate(patterns[patternIndex-1], 0);
                 break;
         }
     }
 
     void stopVibrator(Context context) {
+        Log.d("VIB", "Stopping vibration...");
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.cancel();
     }
