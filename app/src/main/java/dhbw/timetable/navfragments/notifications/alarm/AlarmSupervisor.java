@@ -59,17 +59,8 @@ public final class AlarmSupervisor {
 
     public void initialize(Context context) {
         manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         mMediaPlayer = new MediaPlayer();
-    }
-
-    void setRingtone(Context context, Uri notification) {
-        try {
-            mMediaPlayer.setDataSource(context, notification);
-        } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
-            mMediaPlayer.reset();
-        }
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     void startVibrator(Context context) {
@@ -99,24 +90,28 @@ public final class AlarmSupervisor {
         vibrator.cancel();
     }
 
-    void playRingtone() {
-        try {
-            final int before = audioManager.getRingerMode();
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        audioManager.setRingerMode(before);
-                    }
-                });
+    void playRingtone(Context context) {
+        if(!mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
+            try {
+                Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                mMediaPlayer.setDataSource(context, sound);
+                final int before = audioManager.getRingerMode();
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
+                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                    mMediaPlayer.prepare();
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            audioManager.setRingerMode(before);
+                        }
+                    });
+                }
+            } catch (IOException | IllegalStateException e) {
+                e.printStackTrace();
+                mMediaPlayer.reset();
             }
-        } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
-            mMediaPlayer.reset();
         }
     }
 

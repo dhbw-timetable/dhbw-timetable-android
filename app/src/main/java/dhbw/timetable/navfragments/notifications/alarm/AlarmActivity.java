@@ -1,7 +1,5 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -70,18 +68,15 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("ALARM-ACT", "Starting alarm activity!");
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        AlarmSupervisor.getInstance().setRingtone(this.getApplicationContext(), sound);
-        AlarmSupervisor.getInstance().playRingtone();
-        AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+            Log.i("ALARM-ACT", "Starting alarm activity!");
+            AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
+            // AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.i("ALARM-ACT", "Stopping alarm activity!");
-        finish();
     }
 
     @Override
@@ -98,8 +93,8 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         AlarmSupervisor.getInstance().stopRingtone();
-        AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
-        if(destroy) {
+        // AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
+        if (destroy) {
             AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
         } else {
             AlarmSupervisor.getInstance().snoozeAlarm(this.getApplicationContext());
