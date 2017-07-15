@@ -5,12 +5,18 @@
         android:id="@+id/action_refresh_week"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:title="Refresh"
-        android:orderInCategory="9999"
+        android:orderInCategory="100"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_pick_week"
-        android:icon="@drawable/ic_insert_invitation_white_24dp"
-        android:title="Pick"
+        android:icon="@drawable/ic_view_week_white_24dp"
+        android:title="Pick date"
         android:orderInCategory="10"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_today_week"
+        android:icon="@drawable/ic_insert_invitation_white_24dp"
+        android:title="Today"
+        android:orderInCategory="1"
         app:showAsAction="always" />
 </menu>

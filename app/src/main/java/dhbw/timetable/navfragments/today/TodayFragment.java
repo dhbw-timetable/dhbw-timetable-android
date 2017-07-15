@@ -102,6 +102,7 @@ public class TodayFragment extends Fragment {
         final TimelessDate today = new TimelessDate();
         final TimelessDate week = new TimelessDate();
         DateHelper.Normalize(week);
+        final View view = TodayFragment.this.getView();
         TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
@@ -111,7 +112,11 @@ public class TodayFragment extends Fragment {
                     TimetableManager.getInstance().updateGlobals(TodayFragment.this.getActivity().getApplication(), new Runnable() {
                         @Override
                         public void run() {
-                            applyGlobalContent(TodayFragment.this.getView());
+                            if(view != null) {
+                                applyGlobalContent(view);
+                            } else {
+                                Log.w("TODAY", "WARNING: Today tried to start without view. (Too early)");
+                            }
                         }
                     }, new ErrorCallback() {
                         @Override
@@ -120,7 +125,7 @@ public class TodayFragment extends Fragment {
                         }
                     });
                 } else {
-                    applyGlobalContent(TodayFragment.this.getView());
+                    applyGlobalContent(view);
                 }
             }
         });

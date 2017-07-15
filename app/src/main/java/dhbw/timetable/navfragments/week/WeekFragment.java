@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -66,7 +67,7 @@ public class WeekFragment extends Fragment {
                 }, new ErrorCallback() {
                     @Override
                     public void onError(String string) {
-                        ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
+                        ErrorDialog.newInstance("Error", "Unable to update timetable data.", string)
                                 .show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR2");
                     }
                 });
@@ -90,6 +91,9 @@ public class WeekFragment extends Fragment {
                     weekToDisplay.get(Calendar.DAY_OF_MONTH));
             dpd.show();
             return true;
+        } else if (id == R.id.action_today_week) {
+            weekToDisplay = new TimelessDate();
+            displayWeek(view, activity);
         }
 
         return false;
@@ -99,7 +103,7 @@ public class WeekFragment extends Fragment {
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
-                Log.i("WEEK", "Loaded offline globals");
+                applyGlobalContent(false, view, activity);
             }
         });
         if (applyGlobalContent(true, view, activity)) {
@@ -116,7 +120,7 @@ public class WeekFragment extends Fragment {
             }, new ErrorCallback() {
                 @Override
                 public void onError(String string) {
-                    ErrorDialog.newInstance("Error", "Unable to update timetable data", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
+                    ErrorDialog.newInstance("Warning", "Unable to update timetable data. The data may be not up to date.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
                 }
             });
         } else {
@@ -134,11 +138,11 @@ public class WeekFragment extends Fragment {
                 }, new ErrorCallback() {
                     @Override
                     public void onError(String string) {
-                        ErrorDialog.newInstance("Error", "Unable to load specifiy week.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
+                        ErrorDialog.newInstance("Error", "Unable to load specifiy week. This week is not in your sync range. There is no data for it.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR");
                     }
                 }, weekToDisplay);
             } else {
-                Log.w("ASYNC", "Tried to sync while manager was busy");
+                Log.w("ASYNC", "Tried to sync while manager was busy.");
             }
         }
     }
@@ -153,7 +157,7 @@ public class WeekFragment extends Fragment {
         // Prepare appointment data
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateHelper.Normalize(day);
-        String formattedDate = new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
+        String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         activity.setTitle(formattedDate);
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
@@ -217,7 +221,7 @@ public class WeekFragment extends Fragment {
             DateHelper.NextWeek(weekToDisplay);
         }
         DateHelper.Normalize(weekToDisplay);
-        activity.setTitle(new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        activity.setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
@@ -231,6 +235,14 @@ public class WeekFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_week, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        Log.d("WEEKMENU", "Using menu. dpWidth=" + dpWidth);
+        if(dpWidth >= 360) {
+            inflater.inflate(R.menu.menu_week, menu);
+        } else {
+            inflater.inflate(R.menu.menu_week_small, menu);
+        }
     }
 }
