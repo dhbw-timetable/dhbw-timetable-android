@@ -140,7 +140,7 @@ public class TodayFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        final View v = getView();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
             if(!TimetableManager.getInstance().isBusy()) {
@@ -148,7 +148,11 @@ public class TodayFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            applyGlobalContent(getView());
+                            if(v != null) {
+                                applyGlobalContent(v);
+                            } else {
+                                Log.w("TODAY", "WARNING: Today tried to select option without view. (Too early)");
+                            }
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
@@ -158,8 +162,12 @@ public class TodayFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            applyGlobalContent(getView());
-                            Snackbar.make(getView(), "Updated!", Snackbar.LENGTH_SHORT).show();
+                            if (v != null) {
+                                applyGlobalContent(v);
+                                Snackbar.make(v, "Updated!", Snackbar.LENGTH_SHORT).show();
+                            } else {
+                                Log.w("TODAY", "WARNING: Today tried to select option without view. (Too early)");
+                            }
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
                         }
