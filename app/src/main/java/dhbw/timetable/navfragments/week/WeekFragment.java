@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,30 +74,31 @@ public class WeekFragment extends Fragment {
                 });
             }
             return true;
-        } else if (id == R.id.action_pick_week) {
-            DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker dpView, int year, int month, int day) {
-                    weekToDisplay.set(Calendar.YEAR, year);
-                    weekToDisplay.set(Calendar.MONTH, month);
-                    weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
-                    Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
-                    displayWeek(view, activity);
-                }
-            };
-
-            DatePickerDialog dpd = new DatePickerDialog(getContext(), handler,
-                    weekToDisplay.get(Calendar.YEAR),
-                    weekToDisplay.get(Calendar.MONTH),
-                    weekToDisplay.get(Calendar.DAY_OF_MONTH));
-            dpd.show();
-            return true;
         } else if (id == R.id.action_today_week) {
             weekToDisplay = new TimelessDate();
             displayWeek(view, activity);
         }
 
         return false;
+    }
+
+    private void pickWeek(final View view, final Activity activity) {
+        DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker dpView, int year, int month, int day) {
+                weekToDisplay.set(Calendar.YEAR, year);
+                weekToDisplay.set(Calendar.MONTH, month);
+                weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
+                Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
+                displayWeek(view, activity);
+            }
+        };
+
+        DatePickerDialog dpd = new DatePickerDialog(getContext(), handler,
+                weekToDisplay.get(Calendar.YEAR),
+                weekToDisplay.get(Calendar.MONTH),
+                weekToDisplay.get(Calendar.DAY_OF_MONTH));
+        dpd.show();
     }
 
     private void displayWeek(final View view, final Activity activity) {
@@ -150,7 +152,7 @@ public class WeekFragment extends Fragment {
     /** Applies timetables to UI. Return true if successful
     and false if the date requested from the UI would not
     match the loaded globals */
-    public boolean applyGlobalContent(boolean firstTry, View view, Activity activity) {
+    public boolean applyGlobalContent(boolean firstTry, final View view, final Activity activity) {
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
@@ -158,7 +160,15 @@ public class WeekFragment extends Fragment {
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateHelper.Normalize(day);
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
-        activity.setTitle(formattedDate);
+        // activity.setTitle(formattedDate);
+        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText(formattedDate);
+        actTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickWeek(view, activity);
+            }
+        });
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
         Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
@@ -221,7 +231,15 @@ public class WeekFragment extends Fragment {
             DateHelper.NextWeek(weekToDisplay);
         }
         DateHelper.Normalize(weekToDisplay);
-        activity.setTitle(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        // activity.setTitle();
+        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        actTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickWeek(rootView, activity);
+            }
+        });
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
@@ -239,7 +257,7 @@ public class WeekFragment extends Fragment {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         Log.d("WEEKMENU", "Using menu. dpWidth=" + dpWidth);
-        if(dpWidth >= 360) {
+        if(dpWidth >= 100) {
             inflater.inflate(R.menu.menu_week, menu);
         } else {
             inflater.inflate(R.menu.menu_week_small, menu);

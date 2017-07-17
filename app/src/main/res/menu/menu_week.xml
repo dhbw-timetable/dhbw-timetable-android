@@ -8,12 +8,6 @@
         android:orderInCategory="100"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_pick_week"
-        android:icon="@drawable/ic_view_week_white_24dp"
-        android:title="Pick date"
-        android:orderInCategory="10"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/action_today_week"
         android:icon="@drawable/ic_insert_invitation_white_24dp"
         android:title="Today"

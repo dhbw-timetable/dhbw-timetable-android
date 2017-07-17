@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import dhbw.timetable.R;
 import dhbw.timetable.navfragments.notifications.alarm.AlarmFragment;
@@ -32,7 +33,10 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Notifications");
+        // getActivity().setTitle("Notifications");
+        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText("Notifications");
+        actTitle.setOnClickListener(null);
     }
 
     @Override

@@ -12,10 +12,6 @@
                     android:title="Today"
                     app:showAsAction="always|withText" />
                 <item
-                    android:id="@+id/action_pick_week"
-                    android:title="Pick date"
-                    app:showAsAction="always|withText" />
-                <item
                     android:id="@+id/action_refresh_week"
                     android:title="Refresh"
                     app:showAsAction="always|withText" />

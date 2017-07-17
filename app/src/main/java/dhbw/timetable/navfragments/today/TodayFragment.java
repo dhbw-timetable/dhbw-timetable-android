@@ -60,7 +60,10 @@ public class TodayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Today");
+        //getActivity().setTitle("Today");
+        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText("Today");
+        actTitle.setOnClickListener(null);
         Log.d("TODAY", "onViewCreated");
     }
 
@@ -189,9 +192,13 @@ public class TodayFragment extends Fragment {
     }
 
     public void applyGlobalContent(View view) {
-        applyAgenda(view);
-        applyTomorrow(view);
-        applyWeekSummary(view);
+        try {
+            applyAgenda(view);
+            applyTomorrow(view);
+            applyWeekSummary(view);
+        } catch(IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     private void applyAgenda(View view) {
