@@ -23,6 +23,7 @@ import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class WeekFragment extends Fragment {
         final Application application = activity.getApplication();
         final View view = WeekFragment.this.getView();
         if (id == R.id.action_refresh_week) {
-            if(!TimetableManager.getInstance().isBusy()) {
+            if(!TimetableManager.getInstance().isRunning()) {
                 TimetableManager.getInstance().updateGlobals(application, new Runnable() {
                     @Override
                     public void run() {
@@ -72,33 +73,43 @@ public class WeekFragment extends Fragment {
                                 .show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR2");
                     }
                 });
+            } else {
+                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
             }
             return true;
         } else if (id == R.id.action_today_week) {
-            weekToDisplay = new TimelessDate();
-            displayWeek(view, activity);
+            if(!TimetableManager.getInstance().isRunning()) {
+                weekToDisplay = new TimelessDate();
+                displayWeek(view, activity);
+            } else {
+                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
+            }
         }
 
         return false;
     }
 
     private void pickWeek(final View view, final Activity activity) {
-        DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker dpView, int year, int month, int day) {
-                weekToDisplay.set(Calendar.YEAR, year);
-                weekToDisplay.set(Calendar.MONTH, month);
-                weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
-                Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
-                displayWeek(view, activity);
-            }
-        };
+        if(!TimetableManager.getInstance().isRunning()) {
+            DatePickerDialog.OnDateSetListener handler = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker dpView, int year, int month, int day) {
+                    weekToDisplay.set(Calendar.YEAR, year);
+                    weekToDisplay.set(Calendar.MONTH, month);
+                    weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
+                    Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
+                    displayWeek(view, activity);
+                }
+            };
 
-        DatePickerDialog dpd = new DatePickerDialog(getContext(), handler,
-                weekToDisplay.get(Calendar.YEAR),
-                weekToDisplay.get(Calendar.MONTH),
-                weekToDisplay.get(Calendar.DAY_OF_MONTH));
-        dpd.show();
+            DatePickerDialog dpd = new DatePickerDialog(getContext(), handler,
+                    weekToDisplay.get(Calendar.YEAR),
+                    weekToDisplay.get(Calendar.MONTH),
+                    weekToDisplay.get(Calendar.DAY_OF_MONTH));
+            dpd.show();
+        } else {
+            Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void displayWeek(final View view, final Activity activity) {
@@ -126,7 +137,7 @@ public class WeekFragment extends Fragment {
                 }
             });
         } else {
-            if(!TimetableManager.getInstance().isBusy()) {
+            if(!TimetableManager.getInstance().isRunning()) {
                 TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), new Runnable() {
                     @Override
                     public void run() {
@@ -145,6 +156,7 @@ public class WeekFragment extends Fragment {
                 }, weekToDisplay);
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy.");
+                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
             }
         }
     }

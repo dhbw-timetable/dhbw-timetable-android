@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class TodayFragment extends Fragment {
         final TimelessDate today = new TimelessDate();
         final TimelessDate week = new TimelessDate();
         DateHelper.Normalize(week);
-        final View view = TodayFragment.this.getView();
+        final View view = getView();
         TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
             @Override
             public void run() {
@@ -143,16 +144,16 @@ public class TodayFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        final View v = getView();
+        final View view = getView();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
-            if(!TimetableManager.getInstance().isBusy()) {
+            if(!TimetableManager.getInstance().isRunning()) {
                 TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            if(v != null) {
-                                applyGlobalContent(v);
+                            if(view != null) {
+                                applyGlobalContent(view);
                             } else {
                                 Log.w("TODAY", "WARNING: Today tried to select option without view. (Too early)");
                             }
@@ -165,9 +166,9 @@ public class TodayFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            if (v != null) {
-                                applyGlobalContent(v);
-                                Snackbar.make(v, "Updated!", Snackbar.LENGTH_SHORT).show();
+                            if (view != null) {
+                                applyGlobalContent(view);
+                                Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
                             } else {
                                 Log.w("TODAY", "WARNING: Today tried to select option without view. (Too early)");
                             }
@@ -185,6 +186,7 @@ public class TodayFragment extends Fragment {
                 return true;
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy");
+                Toast.makeText(getContext(), "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
             }
         }
 

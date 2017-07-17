@@ -53,6 +53,7 @@ public final class TimetableManager {
     private final Map<TimelessDate, ArrayList<Appointment>> globalTimetables = new HashMap<>();
     private final Map<TimelessDate, ArrayList<Appointment>> localTimetables  = new HashMap<>();
     private boolean busy = false;
+    private AsyncTask<Void, Void, Void> currentTask;
 
     private TimetableManager() {}
 
@@ -216,12 +217,22 @@ public final class TimetableManager {
         }
     }
 
+    @Deprecated
     public boolean isBusy() {
         return busy;
     }
 
     public Map<TimelessDate, ArrayList<Appointment>> getGlobals() {
         return globalTimetables;
+    }
+
+    public AsyncTask<Void, Void, Void> getTask() {
+        return currentTask;
+    }
+
+    public boolean isRunning() {
+        return currentTask != null && (currentTask.getStatus() == AsyncTask.Status.RUNNING
+                || currentTask.getStatus() == AsyncTask.Status.PENDING);
     }
 
     public ArrayList<Appointment> getGlobalsAsList() {
@@ -247,21 +258,16 @@ public final class TimetableManager {
      * complete global data to file system
      */
     public void reorderSpecialGlobals(final Application application, final Runnable onSuccess, final ErrorCallback errorCallback, final TimelessDate date) {
+        TimetableManager.this.busy = true;
         // DO NOT CLEAR GLOBALS ONLY LOCALS
         globalTimetables.keySet().removeAll(localTimetables.keySet());
         localTimetables.clear();
-        new AsyncTask<Void, Void, Void>() {
+        currentTask = new AsyncTask<Void, Void, Void>() {
             boolean success = false;
             String errMSG = "";
 
             @Override
             protected Void doInBackground(Void... noArgs) {
-                if(TimetableManager.this.busy) {
-                    Log.e("ASYNC", "Critical warning: trying to update globals asynchronous!");
-                }
-
-                TimetableManager.this.busy = true;
-
                 if(!isOnline()) {
                     errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
                     return null;
@@ -319,27 +325,23 @@ public final class TimetableManager {
 
                 TimetableManager.this.busy = false;
             }
-        }.execute();
+        };
+        currentTask.execute();
     }
 
     /**
      * Downloads timetable contents into cleared GLOBAL_TIMETABLES and writes data to file system
      */
     public void updateGlobals(final Application application, final Runnable updater, final ErrorCallback errorCallback) {
+        TimetableManager.this.busy = true;
         globalTimetables.clear();
         localTimetables.clear();
-        new AsyncTask<Void, Void, Void>() {
+        currentTask = new AsyncTask<Void, Void, Void>() {
             boolean success = false, timetablePresent = true;
             String errMSG;
 
             @Override
             protected Void doInBackground(Void... noArgs) {
-                if(TimetableManager.this.busy) {
-                    Log.e("ASYNC", "Critical warning: trying to update globals asynchronous!");
-                }
-
-                TimetableManager.this.busy = true;
-
                 if(!isOnline()) {
                     errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
                     return null;
@@ -432,7 +434,8 @@ public final class TimetableManager {
 
                 TimetableManager.this.busy = false;
             }
-        }.execute();
+        };
+        currentTask.execute();
     }
 
     /**
