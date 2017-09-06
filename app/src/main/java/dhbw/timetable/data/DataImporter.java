@@ -124,17 +124,26 @@ public class DataImporter {
         Node aNode = block.getFirstChild();
         NodeList aChildren = aNode.getChildNodes();
 
-        // Filter &#160;
-        String timeData = ((CharacterData) aChildren.item(0)).getData();
-        String time = timeData.substring(0, 5).concat(timeData.substring(6));
-        String course = "";
-        String info = "";
-        if (aChildren.item(2).getNodeType() == Node.ELEMENT_NODE) {
-            course = "No course specified";
-            info = importInfoFromSpan(aChildren.item(2).getChildNodes().item(4).getChildNodes());
+        int correctShift = 0;
+        // If no time is provided, appointment is whole work day
+        String timeData, time;
+        if (aChildren.item(0).getNodeType() == Node.ELEMENT_NODE) {
+            time = "08:00-18:00";
+            correctShift = -1;
         } else {
-            course = ((CharacterData) aChildren.item(2)).getData();
-            info = importInfoFromSpan(aChildren.item(3).getChildNodes().item(4).getChildNodes());
+            timeData = ((CharacterData) aChildren.item(0)).getData();
+            // Filter &#160; alias &nbsp;
+            time = timeData.substring(0, 5).concat(timeData.substring(6));
+        }
+
+        // If no course is provieded it may be holiday or special event
+        String course, info;
+        if (aChildren.item(2 + correctShift).getNodeType() == Node.ELEMENT_NODE) {
+            course = "No course specified";
+            info = importInfoFromSpan(aChildren.item(2 + correctShift).getChildNodes().item(4).getChildNodes());
+        } else {
+            course = ((CharacterData) aChildren.item(2 + correctShift)).getData();
+            info = importInfoFromSpan(aChildren.item(3 + correctShift).getChildNodes().item(4).getChildNodes());
         }
 
         Appointment a = new Appointment(time, date, course, info);
