@@ -17,7 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.navfragments.notifications.NotificationsFragment;
 import dhbw.timetable.navfragments.notifications.alarm.AlarmSupervisor;
 import dhbw.timetable.navfragments.preferences.PreferencesActivity;
@@ -132,31 +134,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean displayFragment(int id) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         boolean changeNeeded = true;
-        switch(id) {
-            case R.id.nav_week:
-                currFragment = new WeekFragment();
-                break;
-            case R.id.nav_today:
-                currFragment = new TodayFragment();
-                break;
-            case R.id.nav_notifications:
-                if(currFragment instanceof NotificationsFragment) {
-                    drawer.closeDrawer(GravityCompat.START);
-                    return false;
-                }
-                currFragment = new NotificationsFragment();
-                break;
-            case R.id.nav_settings:
-                Intent i = new Intent(this, PreferencesActivity.class);
-                startActivityForResult(i, 2);
-                overridePendingTransition(0, 0);
-                changeNeeded = false;
-        }
+        if (!TimetableManager.getInstance().isRunning()) {
+            switch (id) {
+                case R.id.nav_week:
+                    currFragment = new WeekFragment();
+                    break;
+                case R.id.nav_today:
+                    currFragment = new TodayFragment();
+                    break;
+                case R.id.nav_notifications:
+                    if (currFragment instanceof NotificationsFragment) {
+                        drawer.closeDrawer(GravityCompat.START);
+                        return false;
+                    }
+                    currFragment = new NotificationsFragment();
+                    break;
+                case R.id.nav_settings:
+                    Intent i = new Intent(this, PreferencesActivity.class);
+                    startActivityForResult(i, 2);
+                    overridePendingTransition(0, 0);
+                    changeNeeded = false;
+            }
 
-        if(currFragment != null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_main, currFragment);
-            ft.commit();
+            if (currFragment != null) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_main, currFragment);
+                ft.commit();
+            }
+        } else {
+            changeNeeded = false;
+            Toast.makeText(this, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
         }
 
         drawer.closeDrawer(GravityCompat.START);

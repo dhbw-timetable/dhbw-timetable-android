@@ -90,13 +90,6 @@ public class TodayFragment extends Fragment {
         recyclerView.setLayoutManager(aLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(aAdapter);
-
-        TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), new Runnable() {
-            @Override
-            public void run() {
-                applyGlobalContent(view);
-            }
-        });
         return view;
     }
 
@@ -347,9 +340,13 @@ public class TodayFragment extends Fragment {
         ra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getActivity()).displayFragment(R.id.nav_week);
-                NavigationView navigationView = (NavigationView) TodayFragment.this.getActivity().findViewById(R.id.nav_view);
-                navigationView.setCheckedItem(R.id.nav_week);
+                if(!TimetableManager.getInstance().isRunning()) {
+                    ((MainActivity) getActivity()).displayFragment(R.id.nav_week);
+                    NavigationView navigationView = (NavigationView) TodayFragment.this.getActivity().findViewById(R.id.nav_view);
+                    navigationView.setCheckedItem(R.id.nav_week);
+                } else {
+                    Toast.makeText(getActivity(), "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         gl.addView(ra);

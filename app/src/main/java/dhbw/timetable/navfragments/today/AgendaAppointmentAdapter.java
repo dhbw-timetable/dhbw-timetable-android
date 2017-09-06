@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.LinkedHashSet;
 
@@ -17,6 +18,7 @@ import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.Appointment;
+import dhbw.timetable.data.TimetableManager;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -47,18 +49,22 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View child) {
-                int itemPos = mRecyclerView.getChildLayoutPosition(child);
-                AgendaAppointment item = (AgendaAppointment) appointments.toArray()[itemPos];
-                if (!item.isBreak()) {
-                    Activity activity = ActivityHelper.getActivity();
-                    if (activity != null) {
-                        Intent detailsIntent = new Intent(activity, CourseDetailsActivity.class);
-                        detailsIntent.putExtra("startTime", item.getStartTime());
-                        detailsIntent.putExtra("endTime", item.getEndTime());
-                        detailsIntent.putExtra("course", item.getCourse());
-                        detailsIntent.putExtra("info", item.getInfo());
-                        activity.startActivity(detailsIntent);
+                if(!TimetableManager.getInstance().isRunning()) {
+                    int itemPos = mRecyclerView.getChildLayoutPosition(child);
+                    AgendaAppointment item = (AgendaAppointment) appointments.toArray()[itemPos];
+                    if (!item.isBreak()) {
+                        Activity activity = ActivityHelper.getActivity();
+                        if (activity != null) {
+                            Intent detailsIntent = new Intent(activity, CourseDetailsActivity.class);
+                            detailsIntent.putExtra("startTime", item.getStartTime());
+                            detailsIntent.putExtra("endTime", item.getEndTime());
+                            detailsIntent.putExtra("course", item.getCourse());
+                            detailsIntent.putExtra("info", item.getInfo());
+                            activity.startActivity(detailsIntent);
+                        }
                     }
+                } else {
+                    Toast.makeText(view.getContext(), "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

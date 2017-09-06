@@ -13,6 +13,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
+import dhbw.timetable.data.TimetableManager;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -56,7 +58,7 @@ public class WeekdayView extends View {
             @Override
             public void onClick(View v) {
                 Activity activity = ActivityHelper.getActivity();
-                if (activity != null) {
+                if (activity != null && !TimetableManager.getInstance().isRunning()) {
                     StringBuilder sb = new StringBuilder("");
                     for (Appointment ap : dayAppointments) {
                         Log.i("DEBUG", "" + ap);
@@ -75,6 +77,8 @@ public class WeekdayView extends View {
                     detailsIntent.putExtra("day", "" + detailsDate);
                     detailsIntent.putExtra("agenda", sb.toString());
                     activity.startActivity(detailsIntent);
+                } else {
+                    Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
