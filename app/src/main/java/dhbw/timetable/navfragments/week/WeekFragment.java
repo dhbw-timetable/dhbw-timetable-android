@@ -80,7 +80,7 @@ public class WeekFragment extends Fragment {
         } else if (id == R.id.action_today_week) {
             if(!TimetableManager.getInstance().isRunning()) {
                 weekToDisplay = new TimelessDate();
-                displayWeek(view, activity);
+                displayWeek(view, activity, true);
             } else {
                 Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
             }
@@ -98,7 +98,7 @@ public class WeekFragment extends Fragment {
                     weekToDisplay.set(Calendar.MONTH, month);
                     weekToDisplay.set(Calendar.DAY_OF_MONTH, day);
                     Log.i("DATE", "Picked date: " + day + "." + month + "." + year);
-                    displayWeek(view, activity);
+                    displayWeek(view, activity, false);
                 }
             };
 
@@ -112,7 +112,7 @@ public class WeekFragment extends Fragment {
         }
     }
 
-    private void displayWeek(final View view, final Activity activity) {
+    private void displayWeek(final View view, final Activity activity, final boolean today) {
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
@@ -125,7 +125,7 @@ public class WeekFragment extends Fragment {
                 public void run() {
                     try {
                         applyGlobalContent(false, view, activity);
-                        Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, today ? "Updated to today!" : "Updated!", Snackbar.LENGTH_SHORT).show();
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }

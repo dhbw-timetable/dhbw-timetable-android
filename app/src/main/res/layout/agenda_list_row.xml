@@ -9,7 +9,6 @@
         android:id="@+id/courseTime"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="08:00"
         android:textAppearance="@style/AgendaTime"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -25,6 +24,5 @@
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="Logik und Grundlagen"
         android:textAppearance="@style/CourseText" />
 </RelativeLayout>
