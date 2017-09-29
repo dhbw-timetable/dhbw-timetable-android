@@ -129,6 +129,7 @@ public final class DateHelper {
 
     public static ArrayList<Appointment> GetAppointmentsOfDay(GregorianCalendar day, ArrayList<Appointment> list) {
         ArrayList<Appointment> dayAppointments = new ArrayList<>();
+        if (list == null) return dayAppointments;
         String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
         for(Appointment a : list) {
             if(a.getDate().equals(currDate)) {
