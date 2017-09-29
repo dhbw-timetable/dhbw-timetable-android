@@ -9,8 +9,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/action_today_week"
-        android:icon="@drawable/ic_insert_invitation_white_24dp"
-        android:title="Today"
         android:orderInCategory="1"
-        app:showAsAction="always" />
+        android:title="Today"
+        app:showAsAction="ifRoom" />
 </menu>
