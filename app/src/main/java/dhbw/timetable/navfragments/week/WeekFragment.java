@@ -189,7 +189,7 @@ public class WeekFragment extends Fragment {
         } else if (weekAppointments.size() == 0) {
             body.removeAllViews();
             times.removeAllViews();
-            InfoDialog.newInstance("Info", "No appointments found on client.").show(activity.getFragmentManager(), "Empty");
+            InfoDialog.newInstance("Info", "No appointments found on client. Loading from online now!").show(activity.getFragmentManager(), "Empty");
             return true;
         }
 

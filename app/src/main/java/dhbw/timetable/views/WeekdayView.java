@@ -118,13 +118,13 @@ public class WeekdayView extends View {
             StaticLayout textLayout = new StaticLayout(
                     a.getCourse(),
                     textPaint,
-                    appointmentWidth,
+                    appointmentWidth-32,
                     Layout.Alignment.ALIGN_CENTER,
                     1.0f,
                     0.0f,
                     false);
             canvas.save();
-            canvas.translate(x1,
+            canvas.translate(x1+16,
                     transpose(startOnMin + ((endOnMin - startOnMin) / 2))
                             - (textLayout.getHeight() / 2));
             textLayout.draw(canvas);
