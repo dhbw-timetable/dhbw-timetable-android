@@ -6,5 +6,6 @@
 /.idea/dictionaries
 .DS_Store
 /build
+/app/build.gradle
 /captures
 .externalNativeBuild
