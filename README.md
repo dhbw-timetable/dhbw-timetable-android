@@ -1,5 +1,5 @@
 # DHBW-Timetable-android
-This is an android app for a project from student of the DHBW Stuttgart.
+This is an android app for a project from students of the DHBW Stuttgart.
 
 [<img width="120px" height="50px" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png">](https://play.google.com/store/apps/details?id=dhbw.timetable)
 
@@ -11,7 +11,4 @@ It scans the rapla based dhbw timetable from https://rapla.dhbw-stuttgart.de/ an
 - Beautiful view on day agenda and week summary
 - Be notified when calendar data changes
 - Get dynamically alarmed at a time you define before your first lecture starts
-
-## Planned
-- Sync your calendar with cloud services e.g. Google, Outlook or iCloud
-- Spotify integration for alarm sounds
+- Offline available timetable
