@@ -325,7 +325,7 @@ public class TodayFragment extends Fragment {
                 startTime = startA.getStartTime();
                 endTime = endA.getEndTime();
             } else {
-                startTime = endTime = "00:00";
+                startTime = endTime = "";
             }
             ((TextView) view.findViewById(startID)).setText(startTime);
             ((TextView) view.findViewById(endID)).setText(endTime);
