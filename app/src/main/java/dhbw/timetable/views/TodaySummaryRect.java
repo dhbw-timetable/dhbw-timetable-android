@@ -41,7 +41,7 @@ public class TodaySummaryRect extends View {
     }
 
     private void drawWeek(Canvas canvas) {
-
+        final int hMargin = 3;
         float aWidth = pLayout.getMeasuredWidth() / 5;
         for(int i = 0; i < wData.size(); i++) {
             for (Appointment a : wData.get(i)) {
@@ -54,9 +54,9 @@ public class TodaySummaryRect extends View {
                 float aHeight = ((endOnMin - min) * pLayout.getMeasuredHeight()) / (max - min);
 
                 canvas.drawRoundRect(new RectF(new Rect(
-                        (int) startX,
+                        (int) (startX + hMargin),
                         (int) startY,
-                        (int) (startX + aWidth),
+                        (int) (startX + aWidth - hMargin),
                         (int) aHeight)),
                         dp(3),dp(3), paint);
             }
