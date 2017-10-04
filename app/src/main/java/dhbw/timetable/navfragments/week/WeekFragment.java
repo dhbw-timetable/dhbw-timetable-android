@@ -60,7 +60,7 @@ public class WeekFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            applyGlobalContent(true, view, activity);
+                            applyGlobalContent(true, false, view, activity);
                             Snackbar.make(view, "Updated!", Snackbar.LENGTH_SHORT).show();
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
@@ -116,15 +116,15 @@ public class WeekFragment extends Fragment {
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
-                applyGlobalContent(false, view, activity);
+                applyGlobalContent(false, false, view, activity);
             }
         });
-        if (applyGlobalContent(true, view, activity)) {
+        if (applyGlobalContent(true, false, view, activity)) {
             TimetableManager.getInstance().updateGlobals(activity.getApplication(), new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        applyGlobalContent(false, view, activity);
+                        applyGlobalContent(false, false, view, activity);
                         Snackbar.make(view, today ? "Updated to today!" : "Updated!", Snackbar.LENGTH_SHORT).show();
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
@@ -142,7 +142,7 @@ public class WeekFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            applyGlobalContent(false, view, activity);
+                            applyGlobalContent(false, true, view, activity);
                             Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
@@ -164,7 +164,7 @@ public class WeekFragment extends Fragment {
     /** Applies timetables to UI. Return true if successful
     and false if the date requested from the UI would not
     match the loaded globals */
-    public boolean applyGlobalContent(boolean firstTry, final View view, final Activity activity) {
+    public boolean applyGlobalContent(boolean firstTry, boolean special, final View view, final Activity activity) {
         LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
@@ -184,12 +184,14 @@ public class WeekFragment extends Fragment {
 
         ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
         Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
-        if(weekAppointments.size() == 0 && firstTry) {
+        if (weekAppointments.size() == 0 && firstTry) {
             return false;
         } else if (weekAppointments.size() == 0) {
             body.removeAllViews();
             times.removeAllViews();
-            InfoDialog.newInstance("Info", "No appointments found on client. Loading from online now!").show(activity.getFragmentManager(), "Empty");
+            if (special) {
+                InfoDialog.newInstance("Info", "No appointments found. Sync range to low or simply no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
+            }
             return true;
         }
 
@@ -239,7 +241,7 @@ public class WeekFragment extends Fragment {
         // Reset to today
         weekToDisplay = new TimelessDate();
         int iDay = weekToDisplay.get(Calendar.DAY_OF_WEEK);
-        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
+        if (iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
             DateHelper.NextWeek(weekToDisplay);
         }
         DateHelper.Normalize(weekToDisplay);
@@ -256,7 +258,7 @@ public class WeekFragment extends Fragment {
             @Override
             public void run() {
                 Log.i("TTM", "Successfully loaded offline globals for week fragment.");
-                applyGlobalContent(true, rootView, activity);
+                applyGlobalContent(true, false, rootView, activity);
             }
         });
 
