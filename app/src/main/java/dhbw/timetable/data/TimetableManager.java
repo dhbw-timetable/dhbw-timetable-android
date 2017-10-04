@@ -103,7 +103,7 @@ public final class TimetableManager {
                 for(TimelessDate date : offlineTimetables.keySet()) {
                     // Can only compare if available
                     if(globalTimetables.containsKey(date)) {
-                        Log.i("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime()));
+                        Log.d("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
                         if(!areAppointmentsEqual(offlineTimetables.get(date),
                                 globalTimetables.get(date))) {
                             return true;
@@ -125,8 +125,7 @@ public final class TimetableManager {
                     }
                 }
                 if(offlineTimetables.containsKey(nextWeek)) {
-                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek),
-                            globalTimetables.get(nextWeek))) {
+                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek), globalTimetables.get(nextWeek))) {
                         return true;
                     }
                 }

@@ -50,6 +50,7 @@ public final class AlarmSupervisor {
     private MediaPlayer mMediaPlayer;
     private AudioManager audioManager;
     private boolean rescheduling, initialized = false;
+    private int beforeRingerMode;
 
     private AlarmSupervisor() {}
 
@@ -98,18 +99,12 @@ public final class AlarmSupervisor {
             try {
                 Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 mMediaPlayer.setDataSource(context, sound);
-                final int before = audioManager.getRingerMode();
+                beforeRingerMode = audioManager.getRingerMode();
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                     mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                     mMediaPlayer.prepare();
                     mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            audioManager.setRingerMode(before);
-                        }
-                    });
                 }
             } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
@@ -121,6 +116,7 @@ public final class AlarmSupervisor {
     void stopRingtone() {
         if (initialized) {
             mMediaPlayer.reset();
+            audioManager.setRingerMode(beforeRingerMode);
         }
     }
 
