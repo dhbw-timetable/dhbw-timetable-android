@@ -117,11 +117,13 @@ public final class DateHelper {
         return new Pair<>(min, max);
     }
 
-    public static ArrayList<Appointment> GetWeekAppointments(GregorianCalendar day, ArrayList<Appointment> superList) {
+    public static ArrayList<Appointment> GetWeekAppointments(GregorianCalendar week, ArrayList<Appointment> superList) {
         ArrayList<Appointment> weekAppointments = new ArrayList<>();
-        for(Appointment a : superList) {
-            if(DateHelper.IsSameWeek(a.getStartDate(), day)) {
-                weekAppointments.add(a);
+        if (superList != null) {
+            for (Appointment a : superList) {
+                if (DateHelper.IsSameWeek(a.getStartDate(), week)) {
+                    weekAppointments.add(a);
+                }
             }
         }
         return weekAppointments;
@@ -129,11 +131,12 @@ public final class DateHelper {
 
     public static ArrayList<Appointment> GetAppointmentsOfDay(GregorianCalendar day, ArrayList<Appointment> list) {
         ArrayList<Appointment> dayAppointments = new ArrayList<>();
-        if (list == null) return dayAppointments;
-        String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
-        for(Appointment a : list) {
-            if(a.getDate().equals(currDate)) {
-                dayAppointments.add(a);
+        if (list != null) {
+            String currDate = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(day.getTime());
+            for (Appointment a : list) {
+                if (a.getDate().equals(currDate)) {
+                    dayAppointments.add(a);
+                }
             }
         }
         return dayAppointments;

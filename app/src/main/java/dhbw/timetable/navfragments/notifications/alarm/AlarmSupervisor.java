@@ -49,7 +49,7 @@ public final class AlarmSupervisor {
     private AlarmManager manager;
     private MediaPlayer mMediaPlayer;
     private AudioManager audioManager;
-    private boolean rescheduling;
+    private boolean rescheduling, initialized = false;
 
     private AlarmSupervisor() {}
 
@@ -61,6 +61,7 @@ public final class AlarmSupervisor {
         manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mMediaPlayer = new MediaPlayer();
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        initialized = true;
     }
 
     void startVibrator(Context context) {
@@ -93,7 +94,7 @@ public final class AlarmSupervisor {
     }
 
     void playRingtone(Context context) {
-        if(!mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
+        if (initialized && !mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
             try {
                 Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 mMediaPlayer.setDataSource(context, sound);
@@ -118,7 +119,9 @@ public final class AlarmSupervisor {
     }
 
     void stopRingtone() {
-        mMediaPlayer.reset();
+        if (initialized) {
+            mMediaPlayer.reset();
+        }
     }
 
      Appointment getCurrentAppointment() {
@@ -217,13 +220,13 @@ public final class AlarmSupervisor {
     void cancelAlarm(Context context, int notificationId) {
         Log.d("ALARM", "Canceling " + notificationId);
         PendingIntent p = getAlarm(context, notificationId);
-        if (p == null) {
+        if (p != null) {
+            manager.cancel(p);
+        } else {
             Log.w("ALARM", "Could not find alarm " + notificationId + "!");
-            return;
         }
-        manager.cancel(p);
-        deserializeAlarm(context,notificationId);
-        Log.d("ALARM", "Alarm stopped");
+        deserializeAlarm(context, notificationId);
+        Log.d("ALARM", "Alarm stopped and removed");
     }
 
     void snoozeAlarm(Context context) {

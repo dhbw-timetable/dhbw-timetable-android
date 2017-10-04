@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DHBW Timetable</string>
+    <string name="app_name">DHBW-Timetable</string>
     <string name="author">Hendrik Ulbrich</string>
     <string name="TIMETABLES_FILE">timetables</string>
     <string name="preference_file_key">dhbw.timetable.PREFERENCE_FILE_KEY</string>
@@ -9,7 +9,7 @@
     <string name="action_settings">Settings</string>
 
     <string-array name="pref_sync_frequency_titles">
-        <item>1 minutes</item>
+        <item>1 minute</item>
         <item>15 minutes</item>
         <item>45 minutes</item>
         <item>2 hours</item>
