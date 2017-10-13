@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     void applyGlobalContent() {
         if(currFragment instanceof WeekFragment) {
             WeekFragment frag = ((WeekFragment) currFragment);
-            frag.applyGlobalContent(false, frag.getView(), this);
+            frag.applyGlobalContent(false, false, frag.getView(), this);
         } else if(currFragment instanceof TodayFragment) {
             TodayFragment frag = ((TodayFragment) currFragment);
             frag.applyGlobalContent(frag.getView());

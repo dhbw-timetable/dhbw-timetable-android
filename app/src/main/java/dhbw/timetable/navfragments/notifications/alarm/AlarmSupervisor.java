@@ -49,7 +49,8 @@ public final class AlarmSupervisor {
     private AlarmManager manager;
     private MediaPlayer mMediaPlayer;
     private AudioManager audioManager;
-    private boolean rescheduling;
+    private boolean rescheduling, initialized = false;
+    private int beforeRingerMode;
 
     private AlarmSupervisor() {}
 
@@ -61,6 +62,7 @@ public final class AlarmSupervisor {
         manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mMediaPlayer = new MediaPlayer();
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        initialized = true;
     }
 
     void startVibrator(Context context) {
@@ -93,22 +95,16 @@ public final class AlarmSupervisor {
     }
 
     void playRingtone(Context context) {
-        if(!mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
+        if (initialized && !mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
             try {
                 Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 mMediaPlayer.setDataSource(context, sound);
-                final int before = audioManager.getRingerMode();
+                beforeRingerMode = audioManager.getRingerMode();
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                     mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                     mMediaPlayer.prepare();
                     mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            audioManager.setRingerMode(before);
-                        }
-                    });
                 }
             } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
@@ -118,7 +114,10 @@ public final class AlarmSupervisor {
     }
 
     void stopRingtone() {
-        mMediaPlayer.reset();
+        if (initialized) {
+            mMediaPlayer.reset();
+            audioManager.setRingerMode(beforeRingerMode);
+        }
     }
 
      Appointment getCurrentAppointment() {
@@ -217,13 +216,13 @@ public final class AlarmSupervisor {
     void cancelAlarm(Context context, int notificationId) {
         Log.d("ALARM", "Canceling " + notificationId);
         PendingIntent p = getAlarm(context, notificationId);
-        if (p == null) {
+        if (p != null) {
+            manager.cancel(p);
+        } else {
             Log.w("ALARM", "Could not find alarm " + notificationId + "!");
-            return;
         }
-        manager.cancel(p);
-        deserializeAlarm(context,notificationId);
-        Log.d("ALARM", "Alarm stopped");
+        deserializeAlarm(context, notificationId);
+        Log.d("ALARM", "Alarm stopped and removed");
     }
 
     void snoozeAlarm(Context context) {

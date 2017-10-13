@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -102,7 +103,7 @@ public final class TimetableManager {
                 for(TimelessDate date : offlineTimetables.keySet()) {
                     // Can only compare if available
                     if(globalTimetables.containsKey(date)) {
-                        Log.i("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime()));
+                        Log.d("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
                         if(!areAppointmentsEqual(offlineTimetables.get(date),
                                 globalTimetables.get(date))) {
                             return true;
@@ -124,8 +125,7 @@ public final class TimetableManager {
                     }
                 }
                 if(offlineTimetables.containsKey(nextWeek)) {
-                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek),
-                            globalTimetables.get(nextWeek))) {
+                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek), globalTimetables.get(nextWeek))) {
                         return true;
                     }
                 }
@@ -171,40 +171,41 @@ public final class TimetableManager {
     }
 
     private static void fireBanner(Uri sound) {
-        Activity curr = getActivity();
+        final Activity curr = getActivity();
+        if (curr != null) {
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(curr)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setAutoCancel(true)
+                            .setSound(sound)
+                            .setLargeIcon(BitmapFactory.decodeResource(curr.getResources(), R.mipmap.ic_launcher_large))
+                            .setContentTitle(curr.getResources().getString(R.string.app_name))
+                            .setContentText("Your timetable changed!");
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(curr)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setAutoCancel(true)
-                        .setSound(sound)
-                        .setLargeIcon(BitmapFactory.decodeResource(curr.getResources(),R.mipmap.ic_launcher_large))
-                        .setContentTitle(curr.getResources().getString(R.string.app_name))
-                        .setContentText("Your timetable changed!");
+            if (sound != null) {
+                mBuilder.setSound(sound);
+            }
 
-        if(sound != null) {
-            mBuilder.setSound(sound);
+            // Creates an explicit intent for an Activity in your app
+            Intent resultIntent = new Intent(curr, curr.getClass());
+
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(curr);
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(curr.getClass());
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent = stackBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager mNotificationManager = (NotificationManager)
+                    curr.getSystemService(Context.NOTIFICATION_SERVICE);
+            // mId allows you to update the notification later on.
+            mNotificationManager.notify(1337, mBuilder.build());
         }
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(curr, curr.getClass());
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(curr);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(curr.getClass());
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager)
-                curr.getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        mNotificationManager.notify(1337, mBuilder.build());
     }
 
     private static boolean secureFile(Application application) {

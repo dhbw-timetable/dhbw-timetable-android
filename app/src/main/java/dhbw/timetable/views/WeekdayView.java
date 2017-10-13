@@ -149,13 +149,13 @@ public class WeekdayView extends View {
     }
 
     private void drawGrid(Canvas canvas) {
-        paint.setStrokeWidth(dp(1));
         paint.setColor(Color.parseColor("#E0E0E0"));
 
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for(int i = 0; i * k < height; i++) {
+            paint.setStrokeWidth(dp(((i % 2 == 0) == (min % 60 == 0)) ? 2 : 1));
             canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
         }
     }
