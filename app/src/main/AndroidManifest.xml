@@ -27,15 +27,7 @@
                 <action android:name=".services.ActivityRecognition.RestartSensor"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".navfragments.notifications.alarm.AlarmReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- Will not be called unless the application explicitly enables it -->
-        <receiver android:name=".navfragments.notifications.alarm.DeviceBootReceiver"
-            android:enabled="false">
+        <receiver android:name=".navfragments.notifications.alarm.DeviceBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
