@@ -2,6 +2,7 @@ package dhbw.timetable.navfragments.notifications.alarm;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,10 @@ import android.util.Log;
 
 import org.json.JSONArray;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -33,9 +37,12 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
+import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimelessDate;
+import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
+import dhbw.timetable.rablabla.data.DataImporter;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -46,10 +53,8 @@ public final class AlarmSupervisor {
     private static final String sTagAlarms = ":alarms";
     private static final int SNOOZE_DURATION = 1000 * 60 * 5; // ms = 5min
 
-    private AlarmManager manager;
     private MediaPlayer mMediaPlayer;
-    private AudioManager audioManager;
-    private boolean rescheduling, initialized = false;
+    private boolean rescheduling;
     private int beforeRingerMode;
 
     private AlarmSupervisor() {}
@@ -58,11 +63,8 @@ public final class AlarmSupervisor {
         return INSTANCE;
     }
 
-    public void initialize(Context context) {
-        manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    public void initialize() {
         mMediaPlayer = new MediaPlayer();
-        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        initialized = true;
     }
 
     void startVibrator(Context context) {
@@ -95,10 +97,14 @@ public final class AlarmSupervisor {
     }
 
     void playRingtone(Context context) {
-        if (initialized && !mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
+        if (mMediaPlayer == null) {
+            initialize();
+        }
+        if (!mMediaPlayer.isPlaying() && !mMediaPlayer.isLooping()) {
             try {
                 Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 mMediaPlayer.setDataSource(context, sound);
+                final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                 beforeRingerMode = audioManager.getRingerMode();
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
@@ -113,23 +119,78 @@ public final class AlarmSupervisor {
         }
     }
 
-    void stopRingtone() {
-        if (initialized) {
+    void stopRingtone(Context context) {
+        if (mMediaPlayer != null) {
             mMediaPlayer.reset();
-            audioManager.setRingerMode(beforeRingerMode);
+            ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(beforeRingerMode);
         }
     }
 
-     Appointment getCurrentAppointment() {
-        TimelessDate today = new TimelessDate();
-        TimelessDate monday = new TimelessDate(today);
-        DateHelper.Normalize(monday);
-        ArrayList<Appointment> week = TimetableManager.getInstance().getGlobals().get(monday);
-        return week != null ? DateHelper.GetFirstAppointmentOfDay(week, today) : null;
+     Appointment getCurrentAppointment(Application app) {
+         Appointment first = null;
+         TimelessDate today = new TimelessDate();
+         TimelessDate monday = new TimelessDate(today);
+         DateHelper.Normalize(monday);
+         Log.i("ALARM", "today=" + new SimpleDateFormat("dd.MM.yyyy").format(today.getTime())
+                 + ", monday=" + new SimpleDateFormat("dd.MM.yyyy").format(monday.getTime()));
+         Map<TimelessDate, ArrayList<Appointment>> data = TimetableManager.getInstance().getGlobals();
+
+         // Refill data from drive if empty
+         if (data.isEmpty()) {
+             Log.i("ALARM", "Data from RAM was empty... :( Loading now offline globals");
+             try {
+                 FileInputStream fis = app.openFileInput(app.getResources().getString(R.string.TIMETABLES_FILE));
+                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+
+                 String line;
+                 while ((line = bufferedReader.readLine()) != null) {
+                     if(line.isEmpty()) continue;
+                     String[] aData = line.split("\t");
+                     String[] date = aData[0].split("\\.");
+                     TimelessDate g = new TimelessDate();
+                     g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
+                     g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
+                     g.set(Calendar.YEAR, Integer.parseInt(date[2]));
+                     TimetableManager.getInstance().insertAppointment(
+                             TimetableManager.getInstance().getGlobals(),
+                             (TimelessDate) g.clone(),
+                             new Appointment(aData[1], g, aData[2], aData[3]));
+                 }
+                 Log.i("ALARM", "Success!");
+                 bufferedReader.close();
+             } catch (Exception e) {
+                 e.printStackTrace();
+
+                 Log.e("ALARM", "FAILED!");
+             }
+             Log.i("ALARM", "Done");
+         }
+
+         Log.i("ALARM", "Checking now...");
+         if (data.containsKey(monday)) {
+             ArrayList<Appointment> weekAppointments = data.get(monday);
+             first = DateHelper.GetFirstAppointmentOfDay(weekAppointments, today);
+             if (first != null) {
+                 Log.i("ALARM", "Found apppointment " + first + " as first! ");
+             } else {
+                 Log.i("ALARM", "First appointment not found. Debugging week data...");
+                 for (Appointment a : weekAppointments) {
+                     Log.i("ALARM", "" + a);
+                 }
+             }
+         } else {
+             Log.i("ALARM", "Could not find week :( Debugging map data...");
+             for (TimelessDate debugMonday : data.keySet()) {
+                 Log.i("ALARM", "" + debugMonday + " : " + data.get(debugMonday));
+             }
+         }
+
+         return first;
     }
 
     private static PendingIntent getAlarm(Context context, int notificationId) {
-        return PendingIntent.getBroadcast(context, notificationId, new Intent(context, AlarmReceiver.class), PendingIntent.FLAG_NO_CREATE);
+        return PendingIntent.getBroadcast(context, notificationId,
+                new Intent(context, AlarmReceiver.class), PendingIntent.FLAG_NO_CREATE);
     }
 
     public void rescheduleAllAlarms(Context context) {
@@ -186,6 +247,7 @@ public final class AlarmSupervisor {
                 new Intent(context, AlarmReceiver.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         try {
+            AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 manager.setAlarmClock(new AlarmManager.AlarmClockInfo(date.getTimeInMillis(), p), p);
             } else {
@@ -217,7 +279,7 @@ public final class AlarmSupervisor {
         Log.d("ALARM", "Canceling " + notificationId);
         PendingIntent p = getAlarm(context, notificationId);
         if (p != null) {
-            manager.cancel(p);
+            ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(p);
         } else {
             Log.w("ALARM", "Could not find alarm " + notificationId + "!");
         }
@@ -248,7 +310,9 @@ public final class AlarmSupervisor {
     private void serializeAlarm(Context context, int notificationId) {
         List<Integer> idsAlarms = getAlarmIds(context);
 
-        if (idsAlarms.contains(notificationId)) return;
+        if (idsAlarms.contains(notificationId)) {
+            return;
+        }
 
         idsAlarms.add(notificationId);
 
@@ -259,8 +323,9 @@ public final class AlarmSupervisor {
         List<Integer> idsAlarms = getAlarmIds(context);
 
         for (int i = 0; i < idsAlarms.size(); i++) {
-            if (idsAlarms.get(i) == notificationId)
+            if (idsAlarms.get(i) == notificationId) {
                 idsAlarms.remove(i);
+            }
         }
 
         saveIdsInPreferences(context, idsAlarms);
@@ -285,14 +350,10 @@ public final class AlarmSupervisor {
 
     private static void saveIdsInPreferences(Context context, List<Integer> lstIds) {
         JSONArray jsonArray = new JSONArray();
-        for (Integer idAlarm : lstIds) {
-            jsonArray.put(idAlarm);
-        }
-
+        lstIds.forEach(jsonArray::put);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(sTagAlarms, jsonArray.toString());
-
         editor.apply();
     }
 
