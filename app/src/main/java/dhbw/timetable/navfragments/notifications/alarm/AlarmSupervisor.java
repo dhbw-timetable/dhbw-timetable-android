@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -35,14 +34,11 @@ import java.util.Map;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
-import dhbw.timetable.data.DateHelper;
-import dhbw.timetable.data.ErrorCallback;
-import dhbw.timetable.data.TimelessDate;
-import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
-import dhbw.timetable.rablabla.data.DataImporter;
+import dhbw.timetable.rablabla.data.BackportAppointment;
+import dhbw.timetable.rablabla.data.DateUtilities;
+import dhbw.timetable.rablabla.data.TimelessDate;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -126,14 +122,14 @@ public final class AlarmSupervisor {
         }
     }
 
-     Appointment getCurrentAppointment(Application app) {
-         Appointment first = null;
+    BackportAppointment getCurrentAppointment(Application app) {
+         BackportAppointment first = null;
          TimelessDate today = new TimelessDate();
          TimelessDate monday = new TimelessDate(today);
-         DateHelper.Normalize(monday);
+         DateUtilities.Backport.Normalize(monday);
          Log.i("ALARM", "today=" + new SimpleDateFormat("dd.MM.yyyy").format(today.getTime())
                  + ", monday=" + new SimpleDateFormat("dd.MM.yyyy").format(monday.getTime()));
-         Map<TimelessDate, ArrayList<Appointment>> data = TimetableManager.getInstance().getGlobals();
+         Map<TimelessDate, ArrayList<BackportAppointment>> data = TimetableManager.getInstance().getGlobals();
 
          // Refill data from drive if empty
          if (data.isEmpty()) {
@@ -151,10 +147,12 @@ public final class AlarmSupervisor {
                      g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
                      g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                      g.set(Calendar.YEAR, Integer.parseInt(date[2]));
+
+                     BackportAppointment a =  new BackportAppointment(aData[1], g, aData[2], aData[3]);
+
                      TimetableManager.getInstance().insertAppointment(
                              TimetableManager.getInstance().getGlobals(),
-                             (TimelessDate) g.clone(),
-                             new Appointment(aData[1], g, aData[2], aData[3]));
+                             (TimelessDate) g.clone(), a);
                  }
                  Log.i("ALARM", "Success!");
                  bufferedReader.close();
@@ -168,13 +166,13 @@ public final class AlarmSupervisor {
 
          Log.i("ALARM", "Checking now...");
          if (data.containsKey(monday)) {
-             ArrayList<Appointment> weekAppointments = data.get(monday);
-             first = DateHelper.GetFirstAppointmentOfDay(weekAppointments, today);
+             ArrayList<BackportAppointment> weekAppointments = data.get(monday);
+             first = DateUtilities.Backport.GetFirstAppointmentOfDay(weekAppointments, today);
              if (first != null) {
                  Log.i("ALARM", "Found apppointment " + first + " as first! ");
              } else {
                  Log.i("ALARM", "First appointment not found. Debugging week data...");
-                 for (Appointment a : weekAppointments) {
+                 for (BackportAppointment a : weekAppointments) {
                      Log.i("ALARM", "" + a);
                  }
              }
@@ -204,16 +202,16 @@ public final class AlarmSupervisor {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         if(sharedPref.getBoolean("alarmOnFirstEvent", false)) {
-            Map<TimelessDate, ArrayList<Appointment>> globals = TimetableManager.getInstance().getGlobals();
-            ArrayList<Appointment> appointmentsOfWeek;
+            Map<TimelessDate, ArrayList<BackportAppointment>> globals = TimetableManager.getInstance().getGlobals();
+            ArrayList<BackportAppointment> appointmentsOfWeek;
             TimelessDate tempDay;
-            Appointment firstAppointment;
+            BackportAppointment firstAppointment;
             for (TimelessDate week : globals.keySet()) {
                 appointmentsOfWeek = globals.get(week);
                 for (int day = 0; day < 5; day++) {
                     tempDay = (TimelessDate) week.clone();
-                    DateHelper.AddDays(tempDay, day);
-                    firstAppointment = DateHelper.GetFirstAppointmentOfDay(appointmentsOfWeek, tempDay);
+                    DateUtilities.Backport.AddDays(tempDay, day);
+                    firstAppointment = DateUtilities.Backport.GetFirstAppointmentOfDay(appointmentsOfWeek, tempDay);
                     // Only if there are appointments
                     if (firstAppointment != null) {
                         // apply shifting

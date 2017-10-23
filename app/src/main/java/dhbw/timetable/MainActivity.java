@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("");
-        AlarmSupervisor.getInstance().initialize(this.getApplicationContext());
+        AlarmSupervisor.getInstance().initialize();
         setContentView(R.layout.activity_main);
 
         // Onboarding check

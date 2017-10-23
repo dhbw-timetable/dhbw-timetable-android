@@ -10,18 +10,19 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
+import dhbw.timetable.rablabla.data.BackportAppointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class TodaySummaryRect extends View {
+
     private Paint paint = new Paint();
     private View pLayout;
-    private ArrayList<ArrayList<Appointment>> wData;
+    private ArrayList<ArrayList<BackportAppointment>> wData;
     private int min, max;
 
-    public TodaySummaryRect(int min, int max, View parentLayout, ArrayList<ArrayList<Appointment>> appointments) {
+    public TodaySummaryRect(int min, int max, View parentLayout, ArrayList<ArrayList<BackportAppointment>> appointments) {
         super(parentLayout.getContext());
         pLayout = parentLayout;
         this.wData = appointments;
@@ -44,7 +45,7 @@ public class TodaySummaryRect extends View {
         final int hMargin = 3;
         float aWidth = pLayout.getMeasuredWidth() / 5;
         for(int i = 0; i < wData.size(); i++) {
-            for (Appointment a : wData.get(i)) {
+            for (BackportAppointment a : wData.get(i)) {
                 float startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
                         + a.getStartDate().get(Calendar.MINUTE);
                 float endOnMin = a.getEndDate().get(Calendar.HOUR_OF_DAY) * 60

@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +37,13 @@ public class ManageTimetablesActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        tAdapter = new TimetablesAdapter(timetableList, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timetable item = timetableList.get(recyclerView.getChildLayoutPosition(v));
-                Intent i = new Intent(ManageTimetablesActivity.this, EditTimetableActivity.class);
-                i.putExtra("url", item.getKey());
-                i.putExtra("name", item.getName());
-                startActivity(i);
-                overridePendingTransition(0, 0);
-            }
+        tAdapter = new TimetablesAdapter(timetableList, v -> {
+            Timetable item = timetableList.get(recyclerView.getChildLayoutPosition(v));
+            Intent i = new Intent(ManageTimetablesActivity.this, EditTimetableActivity.class);
+            i.putExtra("url", item.getURL());
+            i.putExtra("name", item.getName());
+            startActivity(i);
+            overridePendingTransition(0, 0);
         });
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -80,8 +76,6 @@ public class ManageTimetablesActivity extends AppCompatActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
-            // Disable shadow
-            // actionBar.setElevation(0);
         }
     }
 
@@ -89,7 +83,7 @@ public class ManageTimetablesActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /** Enable the back button */
+        // Enable the back button
         if (id == android.R.id.home) {
             finish();
             overridePendingTransition(0, 0);

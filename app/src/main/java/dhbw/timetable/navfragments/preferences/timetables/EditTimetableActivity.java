@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.DataImporter;
 import dhbw.timetable.dialogs.InfoDialog;
+import dhbw.timetable.rablabla.data.NetworkUtilities;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -79,7 +79,7 @@ public class EditTimetableActivity extends AppCompatActivity {
             String name = nameView.getText().toString();
             String url = urlView.getText().toString();
             // If not empty
-            if (name.length() > 0 && DataImporter.URLIsValid(url)) {
+            if (name.length() > 0 && NetworkUtilities.URLIsValid(url)) {
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();

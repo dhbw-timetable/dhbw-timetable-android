@@ -1,17 +1,20 @@
 package dhbw.timetable.data;
 
+import dhbw.timetable.rablabla.data.Lecture;
+
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
-public class AgendaAppointment {
-    private String startTime, endTime, course, info;
+public class AgendaAppointment extends Lecture {
+
+    private String startTime, endTime;
     private boolean isBreak;
 
     public AgendaAppointment(String startTime, String endTime, String course, String info, boolean isBreak) {
+        super(course, info);
+
         this.startTime = startTime;
         this.endTime = endTime;
-        this.course = course;
-        this.info = info;
         this.isBreak = isBreak;
     }
 
@@ -20,14 +23,6 @@ public class AgendaAppointment {
     }
 
     public String getEndTime() { return endTime; }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public String getInfo() {
-        return info;
-    }
 
     public boolean isBreak() {
         return isBreak;
@@ -52,4 +47,5 @@ public class AgendaAppointment {
     public String toString() {
         return startTime + "|" + course + "|" + info + "|" + endTime;
     }
+
 }

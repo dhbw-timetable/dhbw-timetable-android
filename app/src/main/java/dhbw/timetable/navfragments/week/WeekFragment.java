@@ -3,7 +3,6 @@ package dhbw.timetable.navfragments.week;
 import android.app.Activity;
 import android.app.Application;
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,15 +30,16 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
-import dhbw.timetable.data.DateHelper;
 import dhbw.timetable.data.ErrorCallback;
-import dhbw.timetable.data.TimelessDate;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.dialogs.InfoDialog;
+import dhbw.timetable.rablabla.data.BackportAppointment;
+import dhbw.timetable.rablabla.data.DateUtilities;
+import dhbw.timetable.rablabla.data.TimelessDate;
 import dhbw.timetable.views.SideTimesView;
 import dhbw.timetable.views.WeekdayView;
+
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -170,19 +170,14 @@ public class WeekFragment extends Fragment {
 
         // Prepare appointment data
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
-        DateHelper.Normalize(day);
+        DateUtilities.Backport.Normalize(day);
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         // activity.setTitle(formattedDate);
         TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText(formattedDate);
-        actTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickWeek(view, activity);
-            }
-        });
+        actTitle.setOnClickListener(v -> pickWeek(view, activity));
 
-        ArrayList<Appointment> weekAppointments = DateHelper.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
+        ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
         Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
         if (weekAppointments.size() == 0 && firstTry) {
             return false;
@@ -195,12 +190,13 @@ public class WeekFragment extends Fragment {
             return true;
         }
 
-        for(Appointment a : weekAppointments) Log.d("TTM", a.toString());
-        Pair<Integer, Integer> borders = DateHelper.GetBorders(weekAppointments);
+        for(BackportAppointment a : weekAppointments) Log.d("TTM", a.toString());
+
+        Integer[] borders = DateUtilities.Backport.GetBorders(weekAppointments);
 
         // If margin is possible
-        int fExtensionFirst = borders.first >= 30 ? borders.first - 30 : borders.first;
-        int fExtensionSecond = borders.second <= 1410 ? borders.second + 30 : borders.second;
+        int fExtensionFirst = borders[0] >= 30 ? borders[0] - 30 : borders[0];
+        int fExtensionSecond = borders[1] <= 1410 ? borders[1] + 30 : borders[1];
 
         // Initialize side time view
         times.removeAllViews();
@@ -212,11 +208,11 @@ public class WeekFragment extends Fragment {
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
-                    DateHelper.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
+                    DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
             body.addView(dayElement);
 
-            DateHelper.AddDays(day, 1);
+            DateUtilities.Backport.AddDays(day, 1);
         }
         return true;
     }
@@ -242,18 +238,13 @@ public class WeekFragment extends Fragment {
         weekToDisplay = new TimelessDate();
         int iDay = weekToDisplay.get(Calendar.DAY_OF_WEEK);
         if (iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
-            DateHelper.NextWeek(weekToDisplay);
+            DateUtilities.Backport.NextWeek(weekToDisplay);
         }
-        DateHelper.Normalize(weekToDisplay);
+        DateUtilities.Backport.Normalize(weekToDisplay);
         // activity.setTitle();
         TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
-        actTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickWeek(rootView, activity);
-            }
-        });
+        actTitle.setOnClickListener(v -> pickWeek(rootView, activity));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), new Runnable() {
             @Override
             public void run() {
