@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +58,8 @@ public class AlarmFragment extends Fragment {
         aOFESwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    if(!permissionCheck()) {
+                if (isChecked) {
+                    if (!permissionCheck()) {
                         aOFESwitch.setChecked(false);
                         return;
                     }
@@ -91,7 +90,7 @@ public class AlarmFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
+                            ListView lw = ((AlertDialog) dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
                             if (mMediaPlayer.isPlaying() || mMediaPlayer.isLooping()) {
@@ -144,7 +143,7 @@ public class AlarmFragment extends Fragment {
                         Vibrator v = (Vibrator) AlarmFragment.this.getActivity()
                                 .getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
                         if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
+                            ListView lw = ((AlertDialog) dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
                             // Start without a delay
@@ -155,7 +154,7 @@ public class AlarmFragment extends Fragment {
                             // Alternative pattern
                             long[] pattern2 = {0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
                             long[] chosenPattern = null;
-                            switch(which) {
+                            switch (which) {
                                 case 1:
                                     chosenPattern = pattern1;
                                     break;
@@ -164,7 +163,7 @@ public class AlarmFragment extends Fragment {
                                     break;
                             }
 
-                            if(chosenPattern != null) {
+                            if (chosenPattern != null) {
                                 // The '-1' here means to repeat ONCE
                                 v.vibrate(chosenPattern, -1);
                             }
@@ -216,9 +215,9 @@ public class AlarmFragment extends Fragment {
                         AlarmSupervisor.getInstance().rescheduleAllAlarms(AlarmFragment.this.getActivity().getApplicationContext());
                     }
                 },
-                    sharedPref.getInt("alarmFirstShiftHour", 0),
-                    sharedPref.getInt("alarmFirstShiftMinute", 0),
-                    true
+                        sharedPref.getInt("alarmFirstShiftHour", 0),
+                        sharedPref.getInt("alarmFirstShiftMinute", 0),
+                        true
                 );
                 timePickerDialog.show();
             }
@@ -238,7 +237,7 @@ public class AlarmFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             NotificationManager notificationManager = (NotificationManager)
                     getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-            if(!notificationManager.isNotificationPolicyAccessGranted()) {
+            if (!notificationManager.isNotificationPolicyAccessGranted()) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                 startActivity(intent);
                 return false;

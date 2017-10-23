@@ -1,17 +1,20 @@
 package dhbw.timetable.data;
 
+import dhbw.timetable.rapla.data.event.Lecture;
+
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
-public class AgendaAppointment {
-    private String startTime, endTime, course, info;
+public class AgendaAppointment extends Lecture {
+
+    private String startTime, endTime;
     private boolean isBreak;
 
-    public AgendaAppointment(String startTime, String endTime, String course, String info, boolean isBreak) {
+    public AgendaAppointment(String startTime, String endTime, String title, String persons, String resources, boolean isBreak) {
+        super(title, persons, resources);
+
         this.startTime = startTime;
         this.endTime = endTime;
-        this.course = course;
-        this.info = info;
         this.isBreak = isBreak;
     }
 
@@ -19,14 +22,8 @@ public class AgendaAppointment {
         return startTime;
     }
 
-    public String getEndTime() { return endTime; }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public String getInfo() {
-        return info;
+    public String getEndTime() {
+        return endTime;
     }
 
     public boolean isBreak() {
@@ -35,8 +32,8 @@ public class AgendaAppointment {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj != null) {
-            if(obj instanceof AgendaAppointment) {
+        if (obj != null) {
+            if (obj instanceof AgendaAppointment) {
                 return this.toString().equals(obj.toString());
             }
         }
@@ -50,6 +47,7 @@ public class AgendaAppointment {
 
     @Override
     public String toString() {
-        return startTime + "|" + course + "|" + info + "|" + endTime;
+        return startTime + "|" + title + "|" + persons + " " + resources + "|" + endTime;
     }
+
 }

@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,8 @@ public class NotificationsFragment extends Fragment {
     private TabLayout mTabLayout = null;
 
     // Mandatory Constructor
-    public NotificationsFragment() {}
+    public NotificationsFragment() {
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -41,11 +41,11 @@ public class NotificationsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.content_notifications,container, false);
+        View rootView = inflater.inflate(R.layout.content_notifications, container, false);
 
         AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appbar);
 
-        if(appBarLayout.getChildCount() == 1) {
+        if (appBarLayout.getChildCount() == 1) {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
 
             mViewPager = (ViewPager) rootView.findViewById(R.id.tab_container);
@@ -64,9 +64,6 @@ public class NotificationsFragment extends Fragment {
 
         return rootView;
     }
-
-
-
 
 
     /**

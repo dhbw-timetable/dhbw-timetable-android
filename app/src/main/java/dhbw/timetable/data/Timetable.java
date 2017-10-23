@@ -4,27 +4,28 @@ package dhbw.timetable.data;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class Timetable {
-    private String name, key;
 
-    public Timetable(String name, String key) {
+    private String name, url;
+
+    public Timetable(String name, String url) {
         this.name = name;
-        this.key = key;
+        this.url = url;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getKey() {
-        return key;
+    public String getURL() {
+        return url;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setURL(String url) {
+        this.url = url;
     }
 
 }

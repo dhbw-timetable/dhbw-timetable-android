@@ -48,11 +48,11 @@ public class SideTimesView extends View {
 
         final float height = sLayout.getMeasuredHeight();
         final float k = (WeekdayView.Y_GRID_SPACE * height) / (max - min);
-        for(int i = 0; i * k < height; i++) {
-            if(i % 2 == 0) {
+        for (int i = 0; i * k < height; i++) {
+            if (i % 2 == 0) {
                 paint.setColor(getResources().getColor(R.color.textColorSecondary));
-                int iM = min%60;
-                int iH = min/60 + i/2;
+                int iM = min % 60;
+                int iH = min / 60 + i / 2;
                 String sM = iM < 10 ? "0" + iM : "" + iM;
                 String sH = iH < 10 ? "0" + iH : "" + iH;
                 String time = sH + ":" + sM;

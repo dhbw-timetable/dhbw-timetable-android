@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import java.util.List;
+
 import dhbw.timetable.R;
 import dhbw.timetable.data.Timetable;
 
@@ -43,7 +45,7 @@ class TimetablesAdapter extends RecyclerView.Adapter<TimetablesAdapter.MyViewHol
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Timetable timetable = timetablesList.get(position);
         holder.name.setText(timetable.getName());
-        holder.key.setText(timetable.getKey());
+        holder.key.setText(timetable.getURL());
     }
 
     @Override

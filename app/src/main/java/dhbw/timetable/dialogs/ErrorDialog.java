@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -32,7 +31,8 @@ public class ErrorDialog extends InfoDialog {
     /**
      * Mandatory default constructor
      */
-    public ErrorDialog() {}
+    public ErrorDialog() {
+    }
 
     /**
      * Applies the args
@@ -61,7 +61,7 @@ public class ErrorDialog extends InfoDialog {
                 View.OnClickListener onMore = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        final AlertDialog alertDialog =  ((AlertDialog) dialog);
+                        final AlertDialog alertDialog = ((AlertDialog) dialog);
                         alertDialog.setMessage(ErrorDialog.this.message + "\n\n" + ErrorDialog.this.moreMSG);
                         button.setVisibility(View.GONE);
                     }

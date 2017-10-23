@@ -22,8 +22,8 @@ import java.util.LinkedHashSet;
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.TimetableManager;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -37,49 +37,44 @@ public class WeekdayView extends View {
     private Paint paint = new Paint();
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private View parentLayout;
-    private LinkedHashSet<Appointment> dayAppointments;
+    private LinkedHashSet<BackportAppointment> dayAppointments;
     private float scale;
     private int min, max;
     private boolean isFriday;
 
-    public WeekdayView(int min, int max, final View parentLayout, final ArrayList<Appointment> appointments, boolean isFriday, final String detailsDate) {
+    public WeekdayView(int min, int max, final View parentLayout, final ArrayList<BackportAppointment> appointments, boolean isFriday, final String detailsDate) {
         super(parentLayout.getContext());
         this.min = min;
         this.max = max;
         this.isFriday = isFriday;
         this.parentLayout = parentLayout;
         dayAppointments = new LinkedHashSet<>();
-        for(Appointment app : appointments) {
-            dayAppointments.add(app);
-        }
+        dayAppointments.addAll(appointments);
         this.scale = getResources().getDisplayMetrics().density;
 
-        this.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Activity activity = ActivityHelper.getActivity();
-                if (activity != null && !TimetableManager.getInstance().isRunning()) {
-                    StringBuilder sb = new StringBuilder("");
-                    for (Appointment ap : dayAppointments) {
-                        Log.i("DEBUG", "" + ap);
-                        sb.append(ap.getStartTime())
-                                .append("\n")
-                                .append(ap.getCourse())
-                                .append("\n")
-                                .append(ap.getInfo())
-                                .append("\n")
-                                .append(ap.getEndTime())
-                                .append("\n\n");
-                    }
-
-
-                    Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
-                    detailsIntent.putExtra("day", "" + detailsDate);
-                    detailsIntent.putExtra("agenda", sb.toString());
-                    activity.startActivity(detailsIntent);
-                } else {
-                    Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
+        this.setOnClickListener(v -> {
+            Activity activity = ActivityHelper.getActivity();
+            if (activity != null && !TimetableManager.getInstance().isRunning()) {
+                StringBuilder sb = new StringBuilder("");
+                for (BackportAppointment ap : dayAppointments) {
+                    Log.i("DEBUG", "" + ap);
+                    sb.append(ap.getStartTime())
+                            .append("\n")
+                            .append(ap.getTitle())
+                            .append("\n")
+                            .append(ap.getInfo())
+                            .append("\n")
+                            .append(ap.getEndTime())
+                            .append("\n\n");
                 }
+
+
+                Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
+                detailsIntent.putExtra("day", "" + detailsDate);
+                detailsIntent.putExtra("agenda", sb.toString());
+                activity.startActivity(detailsIntent);
+            } else {
+                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -89,7 +84,7 @@ public class WeekdayView extends View {
     public void onDraw(Canvas canvas) {
         drawGrid(canvas);
 
-        for(Appointment a : dayAppointments) {
+        for (BackportAppointment a : dayAppointments) {
             textPaint.setColor(getResources().getColor(R.color.colorPrimary));
             int startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
                     + a.getStartDate().get(Calendar.MINUTE);
@@ -116,15 +111,15 @@ public class WeekdayView extends View {
             Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
             textPaint.setTypeface(bold);
             StaticLayout textLayout = new StaticLayout(
-                    a.getCourse(),
+                    a.getTitle(),
                     textPaint,
-                    appointmentWidth-32,
+                    appointmentWidth - 32,
                     Layout.Alignment.ALIGN_CENTER,
                     1.0f,
                     0.0f,
                     false);
             canvas.save();
-            canvas.translate(x1+16,
+            canvas.translate(x1 + 16,
                     transpose(startOnMin + ((endOnMin - startOnMin) / 2))
                             - (textLayout.getHeight() / 2));
             textLayout.draw(canvas);
@@ -136,8 +131,6 @@ public class WeekdayView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
-        // Log.i("LAYOUT", dp(getMeasuredWidth()) + " x " + dp(getMeasuredHeight()));
-        // Log.i("LAYOUT", getMeasuredWidth() + " x " + getMeasuredHeight());
     }
 
     private int dp(int px) {
@@ -154,7 +147,7 @@ public class WeekdayView extends View {
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
-        for(int i = 0; i * k < height; i++) {
+        for (int i = 0; i * k < height; i++) {
             paint.setStrokeWidth(dp(((i % 2 == 0) == (min % 60 == 0)) ? 2 : 1));
             canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
         }

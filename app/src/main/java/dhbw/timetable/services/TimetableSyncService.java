@@ -27,7 +27,8 @@ public class TimetableSyncService extends Service {
     }
 
     // NEEDED
-    public TimetableSyncService() {}
+    public TimetableSyncService() {
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -35,6 +36,7 @@ public class TimetableSyncService extends Service {
         startTimer(intent.getIntExtra("freq", -1));
         return START_STICKY;
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -75,7 +77,7 @@ public class TimetableSyncService extends Service {
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-                if(!TimetableManager.getInstance().isBusy()) {
+                if (!TimetableManager.getInstance().isBusy()) {
                     TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
                         @Override
                         public void run() {

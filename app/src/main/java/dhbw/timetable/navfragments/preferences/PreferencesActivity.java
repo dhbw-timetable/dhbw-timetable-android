@@ -2,30 +2,18 @@ package dhbw.timetable.navfragments.preferences;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import dhbw.timetable.LoadingActivity;
-import dhbw.timetable.OnboardingSetup;
 import dhbw.timetable.R;
-import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.InfoDialog;
-import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
 
 /**
@@ -126,7 +114,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
 
         private void onSyncRangeChange() {
             Application application = this.getActivity().getApplication();
-            if(application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
+            if (application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
                 Log.i("FILE", "Successfully deleted timetables file.");
                 deletedTimetables = true;
             } else {
@@ -134,13 +122,15 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             }
         }
 
-        /** Enable the back button */
+        /**
+         * Enable the back button
+         */
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 final Activity activity = this.getActivity();
-                if(deletedTimetables) {
+                if (deletedTimetables) {
                     Intent i = new Intent(activity, LoadingActivity.class);
                     activity.startActivity(i);
                 }
