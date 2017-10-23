@@ -36,9 +36,9 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
-import dhbw.timetable.rablabla.data.BackportAppointment;
-import dhbw.timetable.rablabla.data.DateUtilities;
-import dhbw.timetable.rablabla.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
+import dhbw.timetable.rapla.date.DateUtilities;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -53,7 +53,8 @@ public final class AlarmSupervisor {
     private boolean rescheduling;
     private int beforeRingerMode;
 
-    private AlarmSupervisor() {}
+    private AlarmSupervisor() {
+    }
 
     public static AlarmSupervisor getInstance() {
         return INSTANCE;
@@ -76,12 +77,12 @@ public final class AlarmSupervisor {
                 {0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}};
         int patternIndex = sharedPreferences.getInt("alarmVibrationIndex", 0);
 
-        switch(patternIndex) {
+        switch (patternIndex) {
             case 0:
                 return;
             case 1:
             case 2:
-                vibrator.vibrate(patterns[patternIndex-1], 0);
+                vibrator.vibrate(patterns[patternIndex - 1], 0);
                 break;
         }
     }
@@ -123,67 +124,67 @@ public final class AlarmSupervisor {
     }
 
     BackportAppointment getCurrentAppointment(Application app) {
-         BackportAppointment first = null;
-         TimelessDate today = new TimelessDate();
-         TimelessDate monday = new TimelessDate(today);
-         DateUtilities.Backport.Normalize(monday);
-         Log.i("ALARM", "today=" + new SimpleDateFormat("dd.MM.yyyy").format(today.getTime())
-                 + ", monday=" + new SimpleDateFormat("dd.MM.yyyy").format(monday.getTime()));
-         Map<TimelessDate, ArrayList<BackportAppointment>> data = TimetableManager.getInstance().getGlobals();
+        BackportAppointment first = null;
+        TimelessDate today = new TimelessDate();
+        TimelessDate monday = new TimelessDate(today);
+        DateUtilities.Backport.Normalize(monday);
+        Log.i("ALARM", "today=" + new SimpleDateFormat("dd.MM.yyyy").format(today.getTime())
+                + ", monday=" + new SimpleDateFormat("dd.MM.yyyy").format(monday.getTime()));
+        Map<TimelessDate, ArrayList<BackportAppointment>> data = TimetableManager.getInstance().getGlobals();
 
-         // Refill data from drive if empty
-         if (data.isEmpty()) {
-             Log.i("ALARM", "Data from RAM was empty... :( Loading now offline globals");
-             try {
-                 FileInputStream fis = app.openFileInput(app.getResources().getString(R.string.TIMETABLES_FILE));
-                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+        // Refill data from drive if empty
+        if (data.isEmpty()) {
+            Log.i("ALARM", "Data from RAM was empty... :( Loading now offline globals");
+            try {
+                FileInputStream fis = app.openFileInput(app.getResources().getString(R.string.TIMETABLES_FILE));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
 
-                 String line;
-                 while ((line = bufferedReader.readLine()) != null) {
-                     if(line.isEmpty()) continue;
-                     String[] aData = line.split("\t");
-                     String[] date = aData[0].split("\\.");
-                     TimelessDate g = new TimelessDate();
-                     g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
-                     g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
-                     g.set(Calendar.YEAR, Integer.parseInt(date[2]));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (line.isEmpty()) continue;
+                    String[] aData = line.split("\t");
+                    String[] date = aData[0].split("\\.");
+                    TimelessDate g = new TimelessDate();
+                    g.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
+                    g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
+                    g.set(Calendar.YEAR, Integer.parseInt(date[2]));
 
-                     BackportAppointment a =  new BackportAppointment(aData[1], g, aData[2], aData[3]);
+                    BackportAppointment a = new BackportAppointment(aData[1], g, aData[2], aData[3], aData[4]);
 
-                     TimetableManager.getInstance().insertAppointment(
-                             TimetableManager.getInstance().getGlobals(),
-                             (TimelessDate) g.clone(), a);
-                 }
-                 Log.i("ALARM", "Success!");
-                 bufferedReader.close();
-             } catch (Exception e) {
-                 e.printStackTrace();
+                    TimetableManager.getInstance().insertAppointment(
+                            TimetableManager.getInstance().getGlobals(),
+                            (TimelessDate) g.clone(), a);
+                }
+                Log.i("ALARM", "Success!");
+                bufferedReader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
 
-                 Log.e("ALARM", "FAILED!");
-             }
-             Log.i("ALARM", "Done");
-         }
+                Log.e("ALARM", "FAILED!");
+            }
+            Log.i("ALARM", "Done");
+        }
 
-         Log.i("ALARM", "Checking now...");
-         if (data.containsKey(monday)) {
-             ArrayList<BackportAppointment> weekAppointments = data.get(monday);
-             first = DateUtilities.Backport.GetFirstAppointmentOfDay(weekAppointments, today);
-             if (first != null) {
-                 Log.i("ALARM", "Found apppointment " + first + " as first! ");
-             } else {
-                 Log.i("ALARM", "First appointment not found. Debugging week data...");
-                 for (BackportAppointment a : weekAppointments) {
-                     Log.i("ALARM", "" + a);
-                 }
-             }
-         } else {
-             Log.i("ALARM", "Could not find week :( Debugging map data...");
-             for (TimelessDate debugMonday : data.keySet()) {
-                 Log.i("ALARM", "" + debugMonday + " : " + data.get(debugMonday));
-             }
-         }
+        Log.i("ALARM", "Checking now...");
+        if (data.containsKey(monday)) {
+            ArrayList<BackportAppointment> weekAppointments = data.get(monday);
+            first = DateUtilities.Backport.GetFirstAppointmentOfDay(weekAppointments, today);
+            if (first != null) {
+                Log.i("ALARM", "Found apppointment " + first + " as first! ");
+            } else {
+                Log.i("ALARM", "First appointment not found. Debugging week data...");
+                for (BackportAppointment a : weekAppointments) {
+                    Log.i("ALARM", "" + a);
+                }
+            }
+        } else {
+            Log.i("ALARM", "Could not find week :( Debugging map data...");
+            for (TimelessDate debugMonday : data.keySet()) {
+                Log.i("ALARM", "" + debugMonday + " : " + data.get(debugMonday));
+            }
+        }
 
-         return first;
+        return first;
     }
 
     private static PendingIntent getAlarm(Context context, int notificationId) {
@@ -192,7 +193,7 @@ public final class AlarmSupervisor {
     }
 
     public void rescheduleAllAlarms(Context context) {
-        if(rescheduling) {
+        if (rescheduling) {
             Log.i("ALARM", "Request denied. Already rescheduling...");
             return;
         }
@@ -201,7 +202,7 @@ public final class AlarmSupervisor {
         cancelAllAlarms(context);
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        if(sharedPref.getBoolean("alarmOnFirstEvent", false)) {
+        if (sharedPref.getBoolean("alarmOnFirstEvent", false)) {
             Map<TimelessDate, ArrayList<BackportAppointment>> globals = TimetableManager.getInstance().getGlobals();
             ArrayList<BackportAppointment> appointmentsOfWeek;
             TimelessDate tempDay;
@@ -264,7 +265,7 @@ public final class AlarmSupervisor {
             e.printStackTrace();
 
             Activity act = ActivityHelper.getActivity();
-            if(act != null) {
+            if (act != null) {
                 ErrorDialog.newInstance("ERROR", "Failed to schedule alarm. Did some alarms crash?", errMSG)
                         .show(act.getFragmentManager(), "ALSECERROR");
             }
@@ -290,7 +291,7 @@ public final class AlarmSupervisor {
         cancelAlarm(context, new TimelessDate().hashCode());
 
         // Reschedule
-        GregorianCalendar later = (GregorianCalendar) Calendar.getInstance() ;
+        GregorianCalendar later = (GregorianCalendar) Calendar.getInstance();
         later.setTimeInMillis(later.getTimeInMillis() + SNOOZE_DURATION);
         addAlarm(context, later);
 

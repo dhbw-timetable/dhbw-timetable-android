@@ -56,9 +56,9 @@ public class ManageTimetablesActivity extends AppCompatActivity {
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        for(String key : sharedPref.getAll().keySet()) {
+        for (String key : sharedPref.getAll().keySet()) {
             // filter for timetables
-            if(key.startsWith("t#")) {
+            if (key.startsWith("t#")) {
                 timetableList.add(new Timetable(key.substring(2), sharedPref.getString(key, "")));
             }
         }
@@ -89,9 +89,9 @@ public class ManageTimetablesActivity extends AppCompatActivity {
             overridePendingTransition(0, 0);
             return true;
         } else if (id == R.id.action_add_timetable) {
-            if(timetableList.size() > 0) {
+            if (timetableList.size() > 0) {
                 InfoDialog.newInstance(
-                                "No multiple timetables", "You already have a timetable." +
+                        "No multiple timetables", "You already have a timetable." +
                                 " Delete or edit it to get different data.")
                         .show(getFragmentManager(), "noTimetableAdd");
                 return false;

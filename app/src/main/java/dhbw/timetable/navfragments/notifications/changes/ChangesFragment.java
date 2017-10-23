@@ -1,5 +1,6 @@
 package dhbw.timetable.navfragments.notifications.changes;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -9,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +48,7 @@ public class ChangesFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
+                            ListView lw = ((AlertDialog) dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("onChangeCritIndex", which);
@@ -81,14 +81,14 @@ public class ChangesFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
+                            ListView lw = ((AlertDialog) dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("onChangeFormIndex", which);
                             editor.putString("onChangeForm", checkedItem);
 
                             // Force one dimension enabled
-                            if(checkedItem.equals("None")) {
+                            if (checkedItem.equals("None")) {
                                 editor.putInt("onChangeToneIndex", 1);
                                 editor.putString("onChangeTone", "Default");
                                 toneValueView.setText("Default");
@@ -117,10 +117,10 @@ public class ChangesFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which >= 0) {
-                            ListView lw = ((AlertDialog)dialog).getListView();
+                            ListView lw = ((AlertDialog) dialog).getListView();
                             String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
                             // Play the tone
-                            if(checkedItem.equals("Default")) {
+                            if (checkedItem.equals("Default")) {
                                 Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                                 Ringtone r = RingtoneManager.getRingtone(ChangesFragment.this.getActivity()
                                         .getApplication().getApplicationContext(), notification);
@@ -131,7 +131,7 @@ public class ChangesFragment extends Fragment {
                             editor.putString("onChangeTone", checkedItem);
 
                             // Force one dimension enabled
-                            if(checkedItem.equals("None")) {
+                            if (checkedItem.equals("None")) {
                                 editor.putInt("onChangeFormIndex", 1);
                                 editor.putString("onChangeForm", "Banner");
                                 formValueView.setText("Banner");

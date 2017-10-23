@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import dhbw.timetable.R;
-import dhbw.timetable.rablabla.data.BackportAppointment;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -44,7 +44,7 @@ public class TodaySummaryRect extends View {
     private void drawWeek(Canvas canvas) {
         final int hMargin = 3;
         float aWidth = pLayout.getMeasuredWidth() / 5;
-        for(int i = 0; i < wData.size(); i++) {
+        for (int i = 0; i < wData.size(); i++) {
             for (BackportAppointment a : wData.get(i)) {
                 float startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
                         + a.getStartDate().get(Calendar.MINUTE);
@@ -55,11 +55,11 @@ public class TodaySummaryRect extends View {
                 float aHeight = ((endOnMin - min) * pLayout.getMeasuredHeight()) / (max - min);
 
                 canvas.drawRoundRect(new RectF(new Rect(
-                        (int) (startX + hMargin),
-                        (int) startY,
-                        (int) (startX + aWidth - hMargin),
-                        (int) aHeight)),
-                        dp(3),dp(3), paint);
+                                (int) (startX + hMargin),
+                                (int) startY,
+                                (int) (startX + aWidth - hMargin),
+                                (int) aHeight)),
+                        dp(3), dp(3), paint);
             }
         }
     }

@@ -4,8 +4,7 @@
         android:key="pref_key_sync_settings">
         <Preference
             android:title="Manage timetables"
-            android:key="manage_timetables_button"
-            />
+            android:key="manage_timetables_button" />
         <ListPreference
             android:defaultValue="-1"
             android:entries="@array/pref_sync_frequency_titles"
@@ -19,12 +18,12 @@
             android:inputType="number"
             android:key="sync_range_future"
             android:defaultValue="1"
-            android:title="Sync range future"/>
+            android:title="Sync range future" />
         <EditTextPreference
             android:inputType="number"
             android:key="sync_range_past"
             android:defaultValue="1"
-            android:title="Sync range past"/>
+            android:title="Sync range past" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="App"

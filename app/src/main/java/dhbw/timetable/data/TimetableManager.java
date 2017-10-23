@@ -40,11 +40,10 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
 import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.navfragments.notifications.alarm.AlarmSupervisor;
-
-import dhbw.timetable.rablabla.data.BackportAppointment;
-import dhbw.timetable.rablabla.data.DataImporter;
-import dhbw.timetable.rablabla.data.DateUtilities;
-import dhbw.timetable.rablabla.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
+import dhbw.timetable.rapla.date.DateUtilities;
+import dhbw.timetable.rapla.parser.DataImporter;
 
 import static dhbw.timetable.ActivityHelper.getActivity;
 
@@ -56,11 +55,12 @@ public final class TimetableManager {
     private final static TimetableManager INSTANCE = new TimetableManager();
 
     private final Map<TimelessDate, ArrayList<BackportAppointment>> globalTimetables = new HashMap<>();
-    private final Map<TimelessDate, ArrayList<BackportAppointment>> localTimetables  = new HashMap<>();
+    private final Map<TimelessDate, ArrayList<BackportAppointment>> localTimetables = new HashMap<>();
     private boolean busy = false;
     private AsyncTask<Void, Void, Void> currentTask;
 
-    private TimetableManager() {}
+    private TimetableManager() {
+    }
 
     public static TimetableManager getInstance() {
         return INSTANCE;
@@ -69,9 +69,9 @@ public final class TimetableManager {
     private static String getActiveTimetable(Application a) {
         SharedPreferences sharedPref = a.getSharedPreferences(
                 a.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        for(String key : sharedPref.getAll().keySet()) {
+        for (String key : sharedPref.getAll().keySet()) {
             // filter for timetables
-            if(key.startsWith("t#")) {
+            if (key.startsWith("t#")) {
                 return sharedPref.getString(key, "undefined");
             }
         }
@@ -79,7 +79,7 @@ public final class TimetableManager {
     }
 
     private boolean areAppointmentsEqual(ArrayList<BackportAppointment> l1, ArrayList<BackportAppointment> l2) {
-        if(l1.size() == l2.size()) {
+        if (l1.size() == l2.size()) {
             BackportAppointment a1, a2;
             for (int i = 0; i < l1.size(); i++) {
                 a1 = l1.get(i);
@@ -91,7 +91,7 @@ public final class TimetableManager {
     }
 
     private boolean notificationNeeded(Application application, SharedPreferences sharedPref) {
-        if(!secureFile(application)) {
+        if (!secureFile(application)) {
             Log.i("TTM", "No offline globals to compare.");
             return false;
         }
@@ -104,11 +104,11 @@ public final class TimetableManager {
             case "Every change":
                 offlineTimetables = loadOfflineGlobalsIntoList(application);
 
-                for(TimelessDate date : offlineTimetables.keySet()) {
+                for (TimelessDate date : offlineTimetables.keySet()) {
                     // Can only compare if available
-                    if(globalTimetables.containsKey(date)) {
+                    if (globalTimetables.containsKey(date)) {
                         Log.d("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
-                        if(!areAppointmentsEqual(offlineTimetables.get(date),
+                        if (!areAppointmentsEqual(offlineTimetables.get(date),
                                 globalTimetables.get(date))) {
                             return true;
                         }
@@ -122,14 +122,14 @@ public final class TimetableManager {
 
                 offlineTimetables = loadOfflineGlobalsIntoList(application);
 
-                if(offlineTimetables.containsKey(thisWeek)) {
-                    if(!areAppointmentsEqual(offlineTimetables.get(thisWeek),
+                if (offlineTimetables.containsKey(thisWeek)) {
+                    if (!areAppointmentsEqual(offlineTimetables.get(thisWeek),
                             globalTimetables.get(thisWeek))) {
                         return true;
                     }
                 }
-                if(offlineTimetables.containsKey(nextWeek)) {
-                    if(!areAppointmentsEqual(offlineTimetables.get(nextWeek), globalTimetables.get(nextWeek))) {
+                if (offlineTimetables.containsKey(nextWeek)) {
+                    if (!areAppointmentsEqual(offlineTimetables.get(nextWeek), globalTimetables.get(nextWeek))) {
                         return true;
                     }
                 }
@@ -141,7 +141,7 @@ public final class TimetableManager {
 
     private static Uri getTone(SharedPreferences sharedPreferences) {
         String tone = sharedPreferences.getString("onChangeTone", "None");
-        switch(tone) {
+        switch (tone) {
             case "None":
                 return null;
             case "Default":
@@ -248,13 +248,13 @@ public final class TimetableManager {
 
     public LinkedHashSet<BackportAppointment> getGlobalsAsSet() {
         LinkedHashSet<BackportAppointment> weeks = new LinkedHashSet<>();
-        for(ArrayList<BackportAppointment> week : globalTimetables.values()) weeks.addAll(week);
+        for (ArrayList<BackportAppointment> week : globalTimetables.values()) weeks.addAll(week);
         return weeks;
     }
 
     private ArrayList<BackportAppointment> getLocalsAsList() {
         ArrayList<BackportAppointment> weeks = new ArrayList<BackportAppointment>();
-        for(ArrayList<BackportAppointment> week : localTimetables.values()) weeks.addAll(week);
+        for (ArrayList<BackportAppointment> week : localTimetables.values()) weeks.addAll(week);
         return weeks;
     }
 
@@ -273,7 +273,7 @@ public final class TimetableManager {
 
             @Override
             protected Void doInBackground(Void... noArgs) {
-                if(!isOnline()) {
+                if (!isOnline()) {
                     errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
                     return null;
                 }
@@ -304,7 +304,7 @@ public final class TimetableManager {
 
                     success = true;
                     globalTimetables.putAll(localTimetables);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
@@ -318,7 +318,7 @@ public final class TimetableManager {
 
             @Override
             protected void onPostExecute(Void result) {
-                if(!success) {
+                if (!success) {
                     Log.w("TTM", "Unable to receive online data");
                     errorCallback.onError(errMSG);
                     TimetableManager.this.busy = false;
@@ -351,7 +351,7 @@ public final class TimetableManager {
 
             @Override
             protected Void doInBackground(Void... noArgs) {
-                if(!isOnline()) {
+                if (!isOnline()) {
                     errMSG = "No internet. Maybe there is a problem with your internet or with the rapla server.";
                     return null;
                 }
@@ -389,7 +389,7 @@ public final class TimetableManager {
                     }
 
                     success = true;
-                } catch(Exception e) {
+                } catch (Exception e) {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
@@ -402,11 +402,11 @@ public final class TimetableManager {
 
             @Override
             protected void onPostExecute(Void result) {
-                if(!success) {
+                if (!success) {
                     TimetableManager.this.busy = false;
                     Log.w("TTM", "Unable to receive online data");
                     // If user is on board
-                    if(timetablePresent) {
+                    if (timetablePresent) {
                         errorCallback.onError(errMSG);
                     }
                     return;
@@ -454,11 +454,11 @@ public final class TimetableManager {
     /**
      * Loads the last downloaded timetables into GLOBAL_TIMETABLES
      */
-    public void loadOfflineGlobals(Application application , Runnable updater) {
+    public void loadOfflineGlobals(Application application, Runnable updater) {
         // If no OfflineGlobals were found, try to load them from online
-        if(!secureFile(application)) {
+        if (!secureFile(application)) {
             Log.i("TTM", "No offline globals were found, checking online.");
-            if(!TimetableManager.getInstance().isBusy()) {
+            if (!TimetableManager.getInstance().isBusy()) {
                 updateGlobals(application, updater, new ErrorCallback() {
                     @Override
                     public void onError(String string) {
@@ -479,7 +479,7 @@ public final class TimetableManager {
             String line;
             BackportAppointment a;
             while ((line = bufferedReader.readLine()) != null) {
-                if(line.isEmpty()) continue;
+                if (line.isEmpty()) continue;
 
                 String[] aData = line.split("\t");
                 String[] date = aData[0].split("\\.");
@@ -488,7 +488,7 @@ public final class TimetableManager {
                 g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                 g.set(Calendar.YEAR, Integer.parseInt(date[2]));
 
-                a = new BackportAppointment(aData[1], g, aData[2], aData[3]);
+                a = new BackportAppointment(aData[1], g, aData[2], aData[3], aData[4]);
 
                 TimetableManager.getInstance().insertAppointment(globalTimetables, new TimelessDate(g), a);
             }
@@ -514,7 +514,9 @@ public final class TimetableManager {
             sock.close();
 
             return true;
-        } catch (IOException e) { return false; }
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     Map<TimelessDate, ArrayList<BackportAppointment>> getLocals() {
@@ -525,7 +527,7 @@ public final class TimetableManager {
         TimelessDate week = new TimelessDate(date);
         DateUtilities.Backport.Normalize(week);
 
-        if(!globals.containsKey(week)) globals.put(week, new ArrayList<BackportAppointment>());
+        if (!globals.containsKey(week)) globals.put(week, new ArrayList<BackportAppointment>());
         globals.get(week).add(a);
     }
 
@@ -541,7 +543,7 @@ public final class TimetableManager {
             String line;
             BackportAppointment a;
             while ((line = bufferedReader.readLine()) != null) {
-                if(line.isEmpty()) continue;
+                if (line.isEmpty()) continue;
 
                 String[] aData = line.split("\t");
                 String[] date = aData[0].split("\\.");
@@ -550,7 +552,7 @@ public final class TimetableManager {
                 g.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
                 g.set(Calendar.YEAR, Integer.parseInt(date[2]));
 
-                a = new BackportAppointment(aData[1], g, aData[2], aData[3]);
+                a = new BackportAppointment(aData[1], g, aData[2], aData[3], aData[4]);
 
                 TimetableManager.getInstance().insertAppointment(offlineAppointments, (TimelessDate) g.clone(), a);
             }

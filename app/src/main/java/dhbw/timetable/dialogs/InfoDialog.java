@@ -29,7 +29,8 @@ public class InfoDialog extends DialogFragment {
     /**
      * Mandatory default constructor
      */
-    public InfoDialog() {}
+    public InfoDialog() {
+    }
 
     /**
      * Applies the args

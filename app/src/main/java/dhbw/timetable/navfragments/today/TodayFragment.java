@@ -36,9 +36,9 @@ import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
-import dhbw.timetable.rablabla.data.BackportAppointment;
-import dhbw.timetable.rablabla.data.DateUtilities;
-import dhbw.timetable.rablabla.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
+import dhbw.timetable.rapla.date.DateUtilities;
 import dhbw.timetable.views.TodaySummaryRect;
 
 /**
@@ -100,12 +100,12 @@ public class TodayFragment extends Fragment {
         final View view = getView();
         TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), () -> {
             ArrayList<BackportAppointment> appointments = DateUtilities.Backport.GetAppointmentsOfDay(today, TimetableManager.getInstance().getGlobals().get(week));
-            if(appointments.size() == 0) {
+            if (appointments.size() == 0) {
                 Log.w("TODAY", "Warning: No appointments found for day.");
                 TimetableManager.getInstance().updateGlobals(TodayFragment.this.getActivity().getApplication(), new Runnable() {
                     @Override
                     public void run() {
-                        if(view != null) {
+                        if (view != null) {
                             applyGlobalContent(view);
                         } else {
                             Log.w("TODAY", "WARNING: Today tried to start without view. (Too early)");
@@ -130,10 +130,10 @@ public class TodayFragment extends Fragment {
         final View view = getView();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh_today) {
-            if(!TimetableManager.getInstance().isRunning()) {
+            if (!TimetableManager.getInstance().isRunning()) {
                 TimetableManager.getInstance().loadOfflineGlobals(getActivity().getApplication(), () -> {
                     try {
-                        if(view != null) {
+                        if (view != null) {
                             applyGlobalContent(view);
                         } else {
                             Log.w("TODAY", "WARNING: Today tried to select option without view. (Too early)");
@@ -175,7 +175,7 @@ public class TodayFragment extends Fragment {
             applyAgenda(view);
             applyTomorrow(view);
             applyWeekSummary(view);
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
@@ -184,13 +184,13 @@ public class TodayFragment extends Fragment {
         agendaAppointmentSet.clear();
         String currDate = DateUtilities.Backport.GetCurrentDate();
         for (BackportAppointment a : TimetableManager.getInstance().getGlobalsAsList()) {
-            if(a.getDate().equals(currDate)) {
-                agendaAppointmentSet.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getCourse(), a.getInfo(), false));
+            if (a.getDate().equals(currDate)) {
+                agendaAppointmentSet.add(new AgendaAppointment(a.getStartTime(), a.getEndTime(), a.getTitle(), a.getPersons(), a.getResources(), false));
             }
         }
         int size = agendaAppointmentSet.size();
         TextView placeholder = (TextView) view.findViewById(R.id.agendaEmptyPlaceholder);
-        if(size > 0) {
+        if (size > 0) {
             placeholder.setText("");
             LinkedHashSet<AgendaAppointment> appointmentsWithBreaks = new LinkedHashSet<>();
 
@@ -199,19 +199,19 @@ public class TodayFragment extends Fragment {
             for (int i = 0; i < size; i++) {
                 AgendaAppointment aa = (AgendaAppointment) agendaAppointmentArray[i];
                 appointmentsWithBreaks.add(aa);
-                if(i < size - 1) {
+                if (i < size - 1) {
                     AgendaAppointment following = (AgendaAppointment) agendaAppointmentArray[i + 1];
                     // If break is present
                     if (!aa.getEndTime().equals(following.getStartTime())) {
-                        appointmentsWithBreaks.add(new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", "DONOTUSE", true));
+                        appointmentsWithBreaks.add(new AgendaAppointment(aa.getEndTime(), "DONOTUSE", "BREAK", "DONOTUSE", "DONOTUSE", true));
                     }
                 }
             }
             agendaAppointmentSet.clear();
             agendaAppointmentSet.addAll(appointmentsWithBreaks);
 
-            String endTime = ((AgendaAppointment) agendaAppointmentArray[agendaAppointmentArray.length -1]).getEndTime();
-            agendaAppointmentSet.add(new AgendaAppointment(endTime, "", "END", "DONOTUSE", true));
+            String endTime = ((AgendaAppointment) agendaAppointmentArray[agendaAppointmentArray.length - 1]).getEndTime();
+            agendaAppointmentSet.add(new AgendaAppointment(endTime, "", "END", "DONOTUSE", "DONOTUSE", true));
 
             aAdapter.notifyDataSetChanged();
         } else {
@@ -226,7 +226,7 @@ public class TodayFragment extends Fragment {
                 TimetableManager.getInstance().getGlobalsAsSet());
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
-        if(tomorrowAppointments.size() > 0) {
+        if (tomorrowAppointments.size() > 0) {
             final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
             final SharedPreferences sharedPref = getActivity().getSharedPreferences(
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -245,7 +245,8 @@ public class TodayFragment extends Fragment {
 
             beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + timeFormat.format(startDate.getTime()));
             StringBuilder sb = new StringBuilder();
-            for(BackportAppointment a : tomorrowAppointments) sb.append(a.getCourse()).append(",\n");
+            for (BackportAppointment a : tomorrowAppointments)
+                sb.append(a.getTitle()).append(",\n");
             // Delete last comma
             sb.deleteCharAt(sb.length() - 2);
             tomorrowSummaryView.setText(sb.toString());
@@ -260,7 +261,7 @@ public class TodayFragment extends Fragment {
         TimelessDate day = new TimelessDate();
 
         int iDay = day.get(Calendar.DAY_OF_WEEK);
-        if(iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
+        if (iDay == Calendar.SATURDAY || iDay == Calendar.SUNDAY) {
             DateUtilities.Backport.NextWeek(day);
             weekHeadline.setText("Next week");
         } else {
@@ -275,11 +276,11 @@ public class TodayFragment extends Fragment {
         int startID = -1, endID = -1;
         BackportAppointment startA, endA;
         ArrayList<ArrayList<BackportAppointment>> wData = new ArrayList<>();
-        for(int d = 0; d < 5; d++) {
+        for (int d = 0; d < 5; d++) {
             startA = endA = null;
             ArrayList<BackportAppointment> dayAppointments = DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments);
             wData.add(dayAppointments);
-            if (dayAppointments.size() > 0){
+            if (dayAppointments.size() > 0) {
                 startA = dayAppointments.get(0);
                 endA = dayAppointments.get(dayAppointments.size() - 1);
             }
@@ -322,7 +323,7 @@ public class TodayFragment extends Fragment {
         TodaySummaryRect ra = new TodaySummaryRect(borders[0], borders[1], gl, wData);
         ra.setBackgroundColor(Color.WHITE);
         ra.setOnClickListener(v -> {
-            if(!TimetableManager.getInstance().isRunning()) {
+            if (!TimetableManager.getInstance().isRunning()) {
                 ((MainActivity) getActivity()).displayFragment(R.id.nav_week);
                 NavigationView navigationView = (NavigationView) TodayFragment.this.getActivity().findViewById(R.id.nav_view);
                 navigationView.setCheckedItem(R.id.nav_week);

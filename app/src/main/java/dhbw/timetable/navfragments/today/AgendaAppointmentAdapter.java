@@ -25,12 +25,12 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
     private LinkedHashSet<AgendaAppointment> appointments;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView time, course;
+        TextView time, title;
 
         MyViewHolder(View view) {
             super(view);
             time = (TextView) view.findViewById(R.id.courseTime);
-            course = (TextView) view.findViewById(R.id.courseTitle);
+            title = (TextView) view.findViewById(R.id.courseTitle);
         }
     }
 
@@ -44,7 +44,7 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
         final RecyclerView mRecyclerView = (RecyclerView) parent;
 
         view.setOnClickListener(child -> {
-            if(!TimetableManager.getInstance().isRunning()) {
+            if (!TimetableManager.getInstance().isRunning()) {
                 int itemPos = mRecyclerView.getChildLayoutPosition(child);
                 AgendaAppointment item = (AgendaAppointment) appointments.toArray()[itemPos];
                 if (!item.isBreak()) {
@@ -53,7 +53,7 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
                         Intent detailsIntent = new Intent(activity, CourseDetailsActivity.class);
                         detailsIntent.putExtra("startTime", item.getStartTime());
                         detailsIntent.putExtra("endTime", item.getEndTime());
-                        detailsIntent.putExtra("course", item.getCourse());
+                        detailsIntent.putExtra("title", item.getTitle());
                         detailsIntent.putExtra("info", item.getInfo());
                         activity.startActivity(detailsIntent);
                     }
@@ -71,17 +71,17 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
         AgendaAppointment a = (AgendaAppointment) appointments.toArray()[position];
         // AgendaAppointment a = appointments.get(position);
         holder.time.setText(a.getStartTime());
-        holder.course.setText(a.getCourse());
+        holder.title.setText(a.getTitle());
 
         holder.time.setTextAppearance(holder.time.getContext(),
-                (position == 0 || position == (appointments.size()-1)) ?
+                (position == 0 || position == (appointments.size() - 1)) ?
                         R.style.AgendaTimeMain : R.style.AgendaTime);
 
-        float scale = holder.course.getResources().getDisplayMetrics().density;
+        float scale = holder.title.getResources().getDisplayMetrics().density;
         int dpAsPixels = (int) (10 * scale + 0.5f);
-        holder.course.setBackgroundResource(a.isBreak() ?
+        holder.title.setBackgroundResource(a.isBreak() ?
                 R.drawable.break_background : R.drawable.course_background);
-        holder.course.setPadding(dpAsPixels, 0, dpAsPixels, 0);
+        holder.title.setPadding(dpAsPixels, 0, dpAsPixels, 0);
     }
 
     @Override

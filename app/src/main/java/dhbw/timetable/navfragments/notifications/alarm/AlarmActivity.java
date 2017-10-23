@@ -11,15 +11,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import dhbw.timetable.R;
-import dhbw.timetable.rablabla.data.BackportAppointment;
-import dhbw.timetable.rablabla.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
     private boolean destroy = false; // false means snoozeAlarm
-    private String course, time;
+    private String title, time;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,12 +45,12 @@ public class AlarmActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         BackportAppointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment(getApplication());
-        if(appointment != null) {
-            course = appointment.getCourse();
+        if (appointment != null) {
+            title = appointment.getTitle();
             time = appointment.getStartTime();
 
             TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
-            alarmTextInfo.setText(course + " at " + time);
+            alarmTextInfo.setText(title + " at " + time);
         } else {
             Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
             destroy = true;
@@ -61,9 +61,9 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-            Log.i("ALARM-ACT", "Starting alarm activity!");
-            AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
-            AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+        Log.i("ALARM-ACT", "Starting alarm activity!");
+        AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
+        AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
     }
 
     @Override

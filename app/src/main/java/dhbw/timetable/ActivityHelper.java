@@ -31,7 +31,7 @@ public class ActivityHelper {
                     return activity;
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("ERROR", "Cant get current activity :( " + e.getClass());
         }
         return null;

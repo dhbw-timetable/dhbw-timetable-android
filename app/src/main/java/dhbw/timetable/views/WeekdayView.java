@@ -23,7 +23,7 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.TimetableManager;
-import dhbw.timetable.rablabla.data.BackportAppointment;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -49,9 +49,7 @@ public class WeekdayView extends View {
         this.isFriday = isFriday;
         this.parentLayout = parentLayout;
         dayAppointments = new LinkedHashSet<>();
-        for (BackportAppointment app : appointments) {
-            dayAppointments.add(app);
-        }
+        dayAppointments.addAll(appointments);
         this.scale = getResources().getDisplayMetrics().density;
 
         this.setOnClickListener(v -> {
@@ -62,7 +60,7 @@ public class WeekdayView extends View {
                     Log.i("DEBUG", "" + ap);
                     sb.append(ap.getStartTime())
                             .append("\n")
-                            .append(ap.getCourse())
+                            .append(ap.getTitle())
                             .append("\n")
                             .append(ap.getInfo())
                             .append("\n")
@@ -113,15 +111,15 @@ public class WeekdayView extends View {
             Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
             textPaint.setTypeface(bold);
             StaticLayout textLayout = new StaticLayout(
-                    a.getCourse(),
+                    a.getTitle(),
                     textPaint,
-                    appointmentWidth-32,
+                    appointmentWidth - 32,
                     Layout.Alignment.ALIGN_CENTER,
                     1.0f,
                     0.0f,
                     false);
             canvas.save();
-            canvas.translate(x1+16,
+            canvas.translate(x1 + 16,
                     transpose(startOnMin + ((endOnMin - startOnMin) / 2))
                             - (textLayout.getHeight() / 2));
             textLayout.draw(canvas);
@@ -149,7 +147,7 @@ public class WeekdayView extends View {
         final float height = parentLayout.getMeasuredHeight();
         final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
-        for(int i = 0; i * k < height; i++) {
+        for (int i = 0; i * k < height; i++) {
             paint.setStrokeWidth(dp(((i % 2 == 0) == (min % 60 == 0)) ? 2 : 1));
             canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
         }
