@@ -3,7 +3,6 @@ package dhbw.timetable.navfragments.today;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,8 @@ import java.util.LinkedHashSet;
 
 import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.CourseDetailsActivity;
-import dhbw.timetable.DayDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
-import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.TimetableManager;
 
 /**
