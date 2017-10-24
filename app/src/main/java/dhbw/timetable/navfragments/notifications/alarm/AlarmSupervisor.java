@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -37,12 +36,9 @@ import dhbw.timetable.ActivityHelper;
 import dhbw.timetable.R;
 import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
-import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimelessDate;
-import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
-import dhbw.timetable.rablabla.data.DataImporter;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017

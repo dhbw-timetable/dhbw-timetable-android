@@ -15,8 +15,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import dhbw.timetable.R;
 import dhbw.timetable.data.DataImporter;
 import dhbw.timetable.dialogs.InfoDialog;

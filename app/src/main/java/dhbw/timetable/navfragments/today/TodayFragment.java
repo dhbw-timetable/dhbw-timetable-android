@@ -38,10 +38,8 @@ import dhbw.timetable.data.Appointment;
 import dhbw.timetable.data.DateHelper;
 import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimelessDate;
-import dhbw.timetable.data.Timetable;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
-import dhbw.timetable.navfragments.week.WeekFragment;
 import dhbw.timetable.views.TodaySummaryRect;
 
 /**
