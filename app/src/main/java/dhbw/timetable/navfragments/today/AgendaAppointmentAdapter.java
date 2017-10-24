@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.LinkedHashSet;
 
 import dhbw.timetable.ActivityHelper;
-import dhbw.timetable.#CourseDetailsActivity;
+import dhbw.timetable.CourseDetailsActivity;
 import dhbw.timetable.R;
 import dhbw.timetable.data.AgendaAppointment;
 import dhbw.timetable.data.TimetableManager;
