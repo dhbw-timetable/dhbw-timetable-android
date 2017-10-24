@@ -114,7 +114,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
 
         private void onSyncRangeChange() {
             Application application = this.getActivity().getApplication();
-            if(application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
+            if (application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
                 Log.i("FILE", "Successfully deleted timetables file.");
                 deletedTimetables = true;
             } else {
@@ -122,13 +122,15 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             }
         }
 
-        /** Enable the back button */
+        /**
+         * Enable the back button
+         */
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 final Activity activity = this.getActivity();
-                if(deletedTimetables) {
+                if (deletedTimetables) {
                     Intent i = new Intent(activity, LoadingActivity.class);
                     activity.startActivity(i);
                 }

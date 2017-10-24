@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dhbw.timetable">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
@@ -17,25 +20,27 @@
         <service
             android:name=".services.TimetableSyncService"
             android:enabled="true" />
+
         <receiver
             android:name=".services.TimetableRestarterBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:label="RestartServiceWhenStopped">
             <intent-filter>
-                <action android:name=".services.ActivityRecognition.RestartSensor"/>
+                <action android:name=".services.ActivityRecognition.RestartSensor" />
             </intent-filter>
         </receiver>
         <receiver android:name=".navfragments.notifications.alarm.AlarmReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver android:name=".navfragments.notifications.alarm.DeviceBootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -50,38 +55,35 @@
             android:name=".OnboardingSetup"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-        </activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity
             android:name=".LoadingActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-        </activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity
             android:name=".navfragments.notifications.alarm.AlarmActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:showOnLockScreen="true"
-            android:screenOrientation="sensorPortrait">
-        </activity>
+            android:screenOrientation="sensorPortrait"></activity>
         <activity
             android:name="dhbw.timetable.navfragments.preferences.PreferencesActivity"
-            android:label="@string/action_settings"/>
+            android:label="@string/action_settings" />
         <activity
             android:name="dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity"
-            android:label="Timetables"/>
+            android:label="Timetables" />
         <activity
             android:name="dhbw.timetable.navfragments.preferences.timetables.NewTimetableActivity"
-            android:label="New timetable"/>
+            android:label="New timetable" />
         <activity
             android:name="dhbw.timetable.navfragments.preferences.timetables.EditTimetableActivity"
-            android:label="Edit timetable"/>
+            android:label="Edit timetable" />
         <activity
             android:name="dhbw.timetable.DayDetailsActivity"
-            android:label="Details"/>
+            android:label="Details" />
         <activity
             android:name="dhbw.timetable.CourseDetailsActivity"
-            android:label="Course Details"/>
+            android:label="Course Details" />
     </application>
 </manifest>

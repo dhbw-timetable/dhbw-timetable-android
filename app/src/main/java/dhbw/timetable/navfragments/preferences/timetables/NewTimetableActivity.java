@@ -16,8 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.DataImporter;
 import dhbw.timetable.dialogs.InfoDialog;
+import dhbw.timetable.rapla.network.NetworkUtilities;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
@@ -39,16 +39,9 @@ public class NewTimetableActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().startsWith("https://rapla.dhbw-stuttgart.de/rapla?key=")) {
-                    String trimmed = s.toString()
-                            .substring("https://rapla.dhbw-stuttgart.de/rapla?key=".length());
-                    int end = trimmed.indexOf("&");
-                    if(end != -1) {
-                        trimmed = trimmed.substring(0, end);
-                    }
-                    urlView.setText(trimmed);
-                    Toast.makeText(NewTimetableActivity.this, "Some magic happened!", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(NewTimetableActivity.this,
+                        "URL is " + (NetworkUtilities.URLIsValid(s.toString())
+                                ? "valid!" : "invalid!"), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -62,17 +55,17 @@ public class NewTimetableActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /** Enable the back button */
+        // Enable the back button
         if (id == android.R.id.home) {
             setResult(Activity.RESULT_CANCELED);
             finish();
-            overridePendingTransition(0,0);
+            overridePendingTransition(0, 0);
             return true;
         } else if (id == R.id.action_apply_timetable) {
-            String name =  ((TextView) findViewById(R.id.new_timetable_name)).getText().toString();
+            String name = ((TextView) findViewById(R.id.new_timetable_name)).getText().toString();
             String url = ((TextView) findViewById(R.id.new_timetable_url)).getText().toString();
 
-            if(!name.isEmpty() && DataImporter.URLIsValid(url)) {
+            if (!name.isEmpty() && NetworkUtilities.URLIsValid(url)) {
                 SharedPreferences sharedPref = this.getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
@@ -85,7 +78,7 @@ public class NewTimetableActivity extends AppCompatActivity {
                 returnIntent.putExtra("tt", url);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
                 return true;
             } else {
                 InfoDialog.newInstance("Invalid input",

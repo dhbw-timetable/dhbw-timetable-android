@@ -5,22 +5,21 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
-import dhbw.timetable.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
     private boolean destroy = false; // false means snoozeAlarm
-    private String course, time;
+    private String title, time;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,33 +30,27 @@ public class AlarmActivity extends AppCompatActivity {
         Button snoozeBtn = (Button) findViewById(R.id.snoozeButton);
         Button stopBtn = (Button) findViewById(R.id.alarmStopButton);
 
-        snoozeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                destroy = false;
-                finish();
-            }
+        snoozeBtn.setOnClickListener(v -> {
+            destroy = false;
+            finish();
         });
 
-        stopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                destroy = true;
-                finish();
-            }
+        stopBtn.setOnClickListener(v -> {
+            destroy = true;
+            finish();
         });
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-        Appointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment();
-        if(appointment != null) {
-            course = appointment.getCourse();
+        BackportAppointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment(getApplication());
+        if (appointment != null) {
+            title = appointment.getTitle();
             time = appointment.getStartTime();
 
             TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
-            alarmTextInfo.setText(course + " at " + time);
+            alarmTextInfo.setText(title + " at " + time);
         } else {
             Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
             destroy = true;
@@ -68,9 +61,9 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-            Log.i("ALARM-ACT", "Starting alarm activity!");
-            AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
-            AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+        Log.i("ALARM-ACT", "Starting alarm activity!");
+        AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
+        AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
     }
 
     @Override
@@ -92,7 +85,7 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AlarmSupervisor.getInstance().stopRingtone();
+        AlarmSupervisor.getInstance().stopRingtone(getApplicationContext());
         AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
         if (destroy) {
             AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());

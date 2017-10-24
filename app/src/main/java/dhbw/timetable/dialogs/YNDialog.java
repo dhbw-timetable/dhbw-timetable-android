@@ -20,8 +20,8 @@ public class YNDialog extends DialogFragment {
      * Create a new instance of YNDialog, providing args.
      */
     public static YNDialog newInstance(String message, String yes, String no,
-                                DialogInterface.OnClickListener onYes,
-                                DialogInterface.OnClickListener onNo) {
+                                       DialogInterface.OnClickListener onYes,
+                                       DialogInterface.OnClickListener onNo) {
         YNDialog f = new YNDialog();
 
         f.message = message;
@@ -36,7 +36,8 @@ public class YNDialog extends DialogFragment {
     /**
      * Mandatory default constructor
      */
-    public YNDialog() {}
+    public YNDialog() {
+    }
 
     /**
      * Applies the args

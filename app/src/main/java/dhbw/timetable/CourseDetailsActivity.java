@@ -14,7 +14,7 @@ import android.widget.TextView;
  */
 public class CourseDetailsActivity extends AppCompatActivity {
 
-    private String startTime, endTime, course, info;
+    private String startTime, endTime, title, info;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,20 +22,20 @@ public class CourseDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_course_details);
 
         this.startTime = getIntent().getStringExtra("startTime");
-        this.endTime= getIntent().getStringExtra("endTime");
-        this.course = getIntent().getStringExtra("course");
+        this.endTime = getIntent().getStringExtra("endTime");
+        this.title = getIntent().getStringExtra("title");
         this.info = getIntent().getStringExtra("info");
 
         TextView timeView = (TextView) findViewById(R.id.day_details_time);
         timeView.setText(startTime + " - " + endTime);
 
-        TextView courseView = (TextView) findViewById(R.id.day_details_course);
-        courseView.setText(course);
+        TextView titleView = (TextView) findViewById(R.id.day_details_course);
+        titleView.setText(title);
 
         TextView infoView = (TextView) findViewById(R.id.day_details_info);
         infoView.setText(info);
 
-        Log.d("DETAILS", "Creating day details activity with \n" + startTime + "-" + endTime + "; " + course + "; " + info);
+        Log.d("DETAILS", "Creating day details activity with \n" + startTime + "-" + endTime + "; " + title + "; " + info);
         setupActionBar();
     }
 

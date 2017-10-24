@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("");
-        AlarmSupervisor.getInstance().initialize(this.getApplicationContext());
+        AlarmSupervisor.getInstance().initialize();
         setContentView(R.layout.activity_main);
 
         // Onboarding check
@@ -122,10 +122,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     void applyGlobalContent() {
-        if(currFragment instanceof WeekFragment) {
+        if (currFragment instanceof WeekFragment) {
             WeekFragment frag = ((WeekFragment) currFragment);
             frag.applyGlobalContent(false, false, frag.getView(), this);
-        } else if(currFragment instanceof TodayFragment) {
+        } else if (currFragment instanceof TodayFragment) {
             TodayFragment frag = ((TodayFragment) currFragment);
             frag.applyGlobalContent(frag.getView());
         }
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mServiceIntent = new Intent(this, mService.getClass());
         String syncFreq = PreferenceManager.
                 getDefaultSharedPreferences(this).getString("sync_frequency_list", "-1");
-        if(!syncFreq.equals("-1")) {
+        if (!syncFreq.equals("-1")) {
             int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
             mServiceIntent.putExtra("freq", msFreq);
             if (!isMyServiceRunning(mService.getClass())) {

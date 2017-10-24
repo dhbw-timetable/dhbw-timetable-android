@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class ActivityHelper {
 
+    @SuppressWarnings("all")
     public static Activity getActivity() {
         try {
             Class activityThreadClass = Class.forName("android.app.ActivityThread");
@@ -20,7 +21,7 @@ public class ActivityHelper {
                 return null;
 
             for (Object activityRecord : activities.values()) {
-                Class activityRecordClass = activityRecord.getClass();
+                Class<? extends Object> activityRecordClass = activityRecord.getClass();
                 Field breakField = activityRecordClass.getDeclaredField("paused");
                 breakField.setAccessible(true);
                 if (!breakField.getBoolean(activityRecord)) {
@@ -30,7 +31,7 @@ public class ActivityHelper {
                     return activity;
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("ERROR", "Cant get current activity :( " + e.getClass());
         }
         return null;
