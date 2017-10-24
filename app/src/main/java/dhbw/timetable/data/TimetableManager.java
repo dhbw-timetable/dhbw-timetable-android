@@ -27,7 +27,6 @@ import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -107,7 +106,7 @@ public final class TimetableManager {
                 for (TimelessDate date : offlineTimetables.keySet()) {
                     // Can only compare if available
                     if (globalTimetables.containsKey(date)) {
-                        Log.d("COMP", "Comparing week " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
+                        Log.d("COMP", "Comparing week " + DateUtilities.GERMAN_STD_SDATEFORMAT.format(date.getTime()));
                         if (!areAppointmentsEqual(offlineTimetables.get(date),
                                 globalTimetables.get(date))) {
                             return true;
@@ -292,7 +291,7 @@ public final class TimetableManager {
 
                 TimelessDate endDate = (TimelessDate) startDate.clone();
 
-                Log.i("TTM", "REORDER algorithm for " + new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(startDate.getTime()));
+                Log.i("TTM", "REORDER algorithm for " + DateUtilities.GERMAN_STD_SDATEFORMAT.format(startDate.getTime()));
 
                 // Run download algorithm for ArrayList LOCAL_TIMETABLES
                 try {
@@ -377,8 +376,7 @@ public final class TimetableManager {
                 DateUtilities.Backport.AddDays(endDate, Integer.parseInt(prefs.getString("sync_range_future", "1")) * 7);
                 DateUtilities.Backport.Normalize(endDate);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-                Log.i("TTM", "Running algorithm from " + sdf.format(startDate.getTime()) + " to " + sdf.format(endDate.getTime()));
+                Log.i("TTM", "Running algorithm from " + DateUtilities.GERMAN_STD_SDATEFORMAT.format(startDate.getTime()) + " to " + DateUtilities.GERMAN_STD_SDATEFORMAT.format(endDate.getTime()));
 
                 // Run download algorithm for ArrayList LOCAL_TIMETABLES
                 try {

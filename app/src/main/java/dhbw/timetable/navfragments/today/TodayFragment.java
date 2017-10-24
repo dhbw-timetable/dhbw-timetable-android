@@ -23,7 +23,6 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -227,7 +226,6 @@ public class TodayFragment extends Fragment {
         TextView beginView = (TextView) view.findViewById(R.id.beginTime);
         TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
         if (tomorrowAppointments.size() > 0) {
-            final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
             final SharedPreferences sharedPref = getActivity().getSharedPreferences(
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
@@ -238,12 +236,12 @@ public class TodayFragment extends Fragment {
             String alarm;
 
             if (sharedPref.getBoolean("alarmOnFirstEvent", false)) {
-                alarm = shiftInMillis > 0 ? timeFormat.format(startDate.getTimeInMillis() - shiftInMillis) : "Immediately";
+                alarm = shiftInMillis > 0 ? DateUtilities.GERMAN_STD_STIMEFORMAT.format(startDate.getTimeInMillis() - shiftInMillis) : "Immediately";
             } else {
                 alarm = "None";
             }
 
-            beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + timeFormat.format(startDate.getTime()));
+            beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + DateUtilities.GERMAN_STD_STIMEFORMAT.format(startDate.getTime()));
             StringBuilder sb = new StringBuilder();
             for (BackportAppointment a : tomorrowAppointments)
                 sb.append(a.getTitle()).append(",\n");

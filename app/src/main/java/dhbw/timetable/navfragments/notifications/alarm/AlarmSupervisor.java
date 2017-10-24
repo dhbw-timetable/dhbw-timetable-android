@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -128,8 +127,8 @@ public final class AlarmSupervisor {
         TimelessDate today = new TimelessDate();
         TimelessDate monday = new TimelessDate(today);
         DateUtilities.Backport.Normalize(monday);
-        Log.i("ALARM", "today=" + new SimpleDateFormat("dd.MM.yyyy").format(today.getTime())
-                + ", monday=" + new SimpleDateFormat("dd.MM.yyyy").format(monday.getTime()));
+        Log.i("ALARM", "today=" + DateUtilities.GERMAN_STD_SDATEFORMAT.format(today.getTime())
+                + ", monday=" + DateUtilities.GERMAN_STD_SDATEFORMAT.format(monday.getTime()));
         Map<TimelessDate, ArrayList<BackportAppointment>> data = TimetableManager.getInstance().getGlobals();
 
         // Refill data from drive if empty
@@ -271,7 +270,8 @@ public final class AlarmSupervisor {
             }
         }
         Log.d("ALARM", "Alarm ready for "
-                + new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.GERMANY).format(date.getTime()));
+                + " " + DateUtilities.GERMAN_STD_STIMEFORMAT.format(date.getTime())
+                + DateUtilities.GERMAN_STD_SDATEFORMAT.format(date.getTime()));
     }
 
     void cancelAlarm(Context context, int notificationId) {
