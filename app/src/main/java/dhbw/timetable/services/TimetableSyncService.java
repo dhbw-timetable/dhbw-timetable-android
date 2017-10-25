@@ -15,6 +15,7 @@ import dhbw.timetable.data.TimetableManager;
 
 public class TimetableSyncService extends Service {
 
+    // NEEDED
     private static TimetableSyncService INSTANCE;
 
     private Timer timer;
@@ -27,13 +28,15 @@ public class TimetableSyncService extends Service {
     }
 
     // NEEDED
-    public TimetableSyncService() {
-    }
+    public TimetableSyncService() {}
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        startTimer(intent.getIntExtra("freq", -1));
+        // Do not trust android
+        if (intent != null && intent.getAction() != null) {
+            startTimer(intent.getIntExtra("freq", -1));
+        }
         return START_STICKY;
     }
 
@@ -78,19 +81,11 @@ public class TimetableSyncService extends Service {
         timerTask = new TimerTask() {
             public void run() {
                 if (!TimetableManager.getInstance().isBusy()) {
-                    TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i("SYNC", "Background sync finished.");
-                            // TODO Refresh activities ?
-                            // Check onChange preference and possibly fire notifications done
-                        }
-                    }, new ErrorCallback() {
-                        @Override
-                        public void onError(String string) {
-                            Log.e("SYNC", "Background sync FAILED: " + string);
-                        }
-                    });
+                    TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), () -> {
+                        Log.i("SYNC", "Background sync finished.");
+                        // TODO Refresh activities ?
+                        // Check onChange preference and possibly fire notifications done
+                    }, string -> Log.e("SYNC", "Background sync FAILED: " + string));
                     Log.i("SYNC", "Background sync now running");
                 } else {
                     Log.w("SYNC", "Tried asynchronous sync");
