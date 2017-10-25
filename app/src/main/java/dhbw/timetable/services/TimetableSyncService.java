@@ -35,6 +35,7 @@ public class TimetableSyncService extends Service {
         super.onStartCommand(intent, flags, startId);
         // Do not trust android
         if (intent != null && intent.getAction() != null) {
+            Log.w("SYNC", "Android did not pass intent to background service");
             startTimer(intent.getIntExtra("freq", -1));
         }
         return START_STICKY;
