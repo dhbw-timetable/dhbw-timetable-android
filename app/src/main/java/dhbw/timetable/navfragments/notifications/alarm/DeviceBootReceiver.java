@@ -14,12 +14,9 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Log.i("BOOT", "Boot completed. Loading offline globals and resetup alarms");
-            TimetableManager.getInstance().loadOfflineGlobals((Application) context.getApplicationContext(), new Runnable() {
-                @Override
-                public void run() {
-                    AlarmSupervisor.getInstance().initialize();
-                    AlarmSupervisor.getInstance().rescheduleAllAlarms(context.getApplicationContext());
-                }
+            TimetableManager.getInstance().loadOfflineGlobals((Application) context.getApplicationContext(), () -> {
+                AlarmSupervisor.getInstance().initialize();
+                AlarmSupervisor.getInstance().rescheduleAllAlarms(context.getApplicationContext());
             });
         }
     }

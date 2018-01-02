@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 /**
- * Created by Hendrik Ulbrich (C) 2017
+ * Created by Hendrik Ulbrich (c) 2017
  */
 public class App extends Application {
 

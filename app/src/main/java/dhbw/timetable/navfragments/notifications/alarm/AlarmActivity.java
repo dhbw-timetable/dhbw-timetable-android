@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,7 +19,7 @@ import dhbw.timetable.rapla.data.time.TimelessDate;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
-    private boolean destroy = false; // false means snoozeAlarm
+    private boolean destroy = false; // false means snooze the alarm
     private String title, time;
 
     @Override
@@ -35,10 +36,12 @@ public class AlarmActivity extends AppCompatActivity {
             finish();
         });
 
-        stopBtn.setOnClickListener(v -> {
+        View.OnClickListener stopAlarm = v -> {
             destroy = true;
             finish();
-        });
+        };
+
+        stopBtn.setOnClickListener(stopAlarm);
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -49,12 +52,19 @@ public class AlarmActivity extends AppCompatActivity {
             title = appointment.getTitle();
             time = appointment.getStartTime();
 
+            // If appointment is already over for five minutes, stop alarm
+            if (appointment.getStartDate().getTimeInMillis() < System.currentTimeMillis() - (1000 * 60 * 5)) {
+                Log.w("ALARM", "Missed an alarm for appointment " + title + " at " + time);
+                stopAlarm.onClick(null);
+            }
+
             TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
             alarmTextInfo.setText(title + " at " + time);
+
+
         } else {
             Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
-            destroy = true;
-            finish();
+            stopAlarm.onClick(null);
         }
     }
 
@@ -62,8 +72,10 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.i("ALARM-ACT", "Starting alarm activity!");
-        AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
-        AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+        if (!destroy) {
+            AlarmSupervisor.getInstance().playRingtone(getApplicationContext());
+            AlarmSupervisor.getInstance().startVibrator(getApplicationContext());
+        }
     }
 
     @Override
@@ -86,11 +98,11 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         AlarmSupervisor.getInstance().stopRingtone(getApplicationContext());
-        AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
+        AlarmSupervisor.getInstance().stopVibrator(getApplicationContext());
         if (destroy) {
-            AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
+            AlarmSupervisor.getInstance().cancelAlarm(getApplicationContext(), new TimelessDate().hashCode());
         } else {
-            AlarmSupervisor.getInstance().snoozeAlarm(this.getApplicationContext());
+            AlarmSupervisor.getInstance().snoozeAlarm(getApplicationContext());
         }
         Log.i("ALARM", "Destroyed activity");
     }

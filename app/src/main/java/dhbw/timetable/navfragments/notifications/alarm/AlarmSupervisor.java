@@ -170,15 +170,15 @@ public final class AlarmSupervisor {
             if (first != null) {
                 Log.i("ALARM", "Found apppointment " + first + " as first! ");
             } else {
-                Log.i("ALARM", "First appointment not found. Debugging week data...");
+                Log.e("ALARM", "First appointment not found. Debugging week data...");
                 for (BackportAppointment a : weekAppointments) {
-                    Log.i("ALARM", "" + a);
+                    Log.e("ALARM", "" + a);
                 }
             }
         } else {
-            Log.i("ALARM", "Could not find week :( Debugging map data...");
+            Log.e("ALARM", "Could not find week :( Debugging map data...");
             for (TimelessDate debugMonday : data.keySet()) {
-                Log.i("ALARM", "" + debugMonday + " : " + data.get(debugMonday));
+                Log.e("ALARM", "" + debugMonday + " : " + data.get(debugMonday));
             }
         }
 
