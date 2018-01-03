@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -11,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -183,15 +185,41 @@ public class WeekFragment extends Fragment {
 
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
+            LinearLayout dayWrapper = new LinearLayout(getContext());
+            dayWrapper.setOrientation(LinearLayout.VERTICAL);
+
+            // Head
+            TextView dayNameView = new TextView(getContext());
+            dayNameView.setText(dayNames[i]);
+            dayNameView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            dayNameView.setTextSize(dp(9));
+            dayNameView.setTypeface(null, Typeface.BOLD);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+            dayNameView.setLayoutParams(layoutParams);
+
+            // Body
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
                     DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4,
                     new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()), dayNames[i]);
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
-            body.addView(dayElement);
+
+            // Into wrapper
+            dayWrapper.addView(dayNameView);
+            dayWrapper.addView(dayElement);
+
+            // Into parent
+            body.addView(dayWrapper);
 
             DateUtilities.Backport.AddDays(day, 1);
         }
         return true;
+    }
+
+
+    private int dp(int px) {
+        return (int) (px * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     @Override
