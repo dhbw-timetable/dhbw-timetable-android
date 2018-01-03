@@ -152,28 +152,33 @@ public class WeekdayView extends View {
             canvas.save();
             Typeface currentTypeFace1 = textPaint.getTypeface();
             textPaint.setTypeface(Typeface.create(currentTypeFace1, Typeface.NORMAL));
+
             canvas.drawText(a.getStartTime() + " - " + a.getEndTime(), rect.left + 16, rect.top + 32, textPaint);
+
+            // Draw info
             if (rect.bottom - rect.top > 100) {
                 canvas.drawText(TextUtils.ellipsize(a.getInfo(), textPaint,
                         dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END).toString(),
                         rect.left + 16, rect.bottom - 16, textPaint);
             }
 
-            // Draw the course title
-            StaticLayout courseTitleLayout = new StaticLayout(
-                    TextUtils.ellipsize(a.getTitle().trim(), textPaint, dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END),
-                    textPaint,
-                    dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32,
-                    Layout.Alignment.ALIGN_NORMAL,
-                    1.0f,
-                    0.0f,
-                    false);
-            Typeface currentTypeFace = textPaint.getTypeface();
-            Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
-            textPaint.setTypeface(bold);
-            canvas.save();
-            canvas.translate(rect.left + 16, rect.top + 16 + dp(16));
-            courseTitleLayout.draw(canvas);
+            // Draw course title
+            if (rect.bottom - rect.top > 32) {
+                StaticLayout courseTitleLayout = new StaticLayout(
+                        TextUtils.ellipsize(a.getTitle().trim(), textPaint, dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END),
+                        textPaint,
+                        dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32,
+                        Layout.Alignment.ALIGN_NORMAL,
+                        1.0f,
+                        0.0f,
+                        false);
+                Typeface currentTypeFace = textPaint.getTypeface();
+                Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
+                textPaint.setTypeface(bold);
+                canvas.save();
+                canvas.translate(rect.left + 16, rect.top + 16 + dp(16));
+                courseTitleLayout.draw(canvas);
+            }
 
             // Reset
             canvas.restore();
