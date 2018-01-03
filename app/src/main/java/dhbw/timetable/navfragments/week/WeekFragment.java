@@ -146,7 +146,7 @@ public class WeekFragment extends Fragment {
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         // activity.setTitle(formattedDate);
         TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
-        actTitle.setText(formattedDate);
+        actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(day.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(view, activity));
 
         ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(
@@ -184,13 +184,14 @@ public class WeekFragment extends Fragment {
         String[] dayNames = { "Mo", "Tu", "We", "Th", "Fr" };
 
         WeekdayView dayElement;
+        TimelessDate tempDay = (TimelessDate) weekToDisplay.clone();
         for (int i = 0; i < 5; i++) {
             LinearLayout dayWrapper = new LinearLayout(getContext());
             dayWrapper.setOrientation(LinearLayout.VERTICAL);
 
             // Head
             TextView dayNameView = new TextView(getContext());
-            dayNameView.setText(dayNames[i]);
+            dayNameView.setText(new SimpleDateFormat("EEE dd.", Locale.GERMANY).format(day.getTime()));
             dayNameView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             dayNameView.setTextSize(dp(9));
             dayNameView.setTypeface(null, Typeface.BOLD);
@@ -248,7 +249,7 @@ public class WeekFragment extends Fragment {
         DateUtilities.Backport.Normalize(weekToDisplay);
         // activity.setTitle();
         TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
-        actTitle.setText(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(rootView, activity));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), () -> {
             Log.i("TTM", "Successfully loaded offline globals for week fragment.");
