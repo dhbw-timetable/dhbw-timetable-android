@@ -12,6 +12,7 @@ import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -117,11 +118,45 @@ public class WeekdayView extends View {
         drawGrid(canvas);
         fitRectsToParent();
         for (BackportAppointment a : eventRectangles.keySet()) {
+            RectF rect = eventRectangles.get(a);
             Log.i("1337", a.getStartTime() + "-" + a.getEndTime() + " = " + eventRectangles.get(a).toShortString());
 
             textPaint.setColor(getResources().getColor(R.color.colorPrimary));
             // Draw the appointment rectangle
-            canvas.drawRoundRect(eventRectangles.get(a), dp(7), dp(7), textPaint);
+            canvas.drawRoundRect(rect, dp(7), dp(7), textPaint);
+
+            textPaint.setColor(Color.WHITE);
+            textPaint.setTextSize(dp(14));
+
+            // Draw the course time
+            canvas.save();
+            Typeface currentTypeFace1 = textPaint.getTypeface();
+            textPaint.setTypeface(Typeface.create(currentTypeFace1, Typeface.NORMAL));
+            canvas.drawText(a.getStartTime() + " - " + a.getEndTime(), rect.left + 16, rect.top + 32, textPaint);
+            if (rect.bottom - rect.top > 100) {
+                canvas.drawText(TextUtils.ellipsize(a.getInfo(), textPaint,
+                        dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END).toString(),
+                        rect.left + 16, rect.bottom - 16, textPaint);
+            }
+
+            // Draw the course title
+            StaticLayout courseTitleLayout = new StaticLayout(
+                    TextUtils.ellipsize(a.getTitle().trim(), textPaint, dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END),
+                    textPaint,
+                    dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32,
+                    Layout.Alignment.ALIGN_NORMAL,
+                    1.0f,
+                    0.0f,
+                    false);
+            Typeface currentTypeFace = textPaint.getTypeface();
+            Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
+            textPaint.setTypeface(bold);
+            canvas.save();
+            canvas.translate(rect.left + 16, rect.top + 16 + dp(16));
+            courseTitleLayout.draw(canvas);
+
+            // Reset
+            canvas.restore();
         }
         Log.i("1337", "= = = = = = = = =");
     }
@@ -130,6 +165,10 @@ public class WeekdayView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(dp((2 * X_OFFSET + X_WIDTH) * (shiftX_max + 1) + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
+    }
+
+    private int transpose(int minValue) {
+        return (minValue - min) * parentLayout.getMeasuredHeight() / (max - min);
     }
 
     private int dp(int px) {
