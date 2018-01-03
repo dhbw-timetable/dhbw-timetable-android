@@ -5,18 +5,14 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -43,11 +39,10 @@ public class WeekdayView extends View {
     private Paint paint = new Paint();
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private View parentLayout;
-    private LinearLayout dayContainer;
     private LinkedHashSet<BackportAppointment> dayAppointments;
     private float scale;
     private int min, max, shiftX_max = 0;
-    private boolean isFriday;
+    private boolean isFriday, fit = false;
 
     public WeekdayView(int min, int max, final View parentLayout, final ArrayList<BackportAppointment> appointments, boolean isFriday, final String detailsDate, final String dayName) {
         super(parentLayout.getContext());
@@ -58,7 +53,29 @@ public class WeekdayView extends View {
         dayAppointments = new LinkedHashSet<>();
         dayAppointments.addAll(appointments);
         this.scale = getResources().getDisplayMetrics().density;
-
+        this.setOnClickListener(v -> {
+            Activity activity = ActivityHelper.getActivity();
+            if (activity != null && !TimetableManager.getInstance().isRunning()) {
+                StringBuilder sb = new StringBuilder("");
+                for (BackportAppointment ap : dayAppointments) {
+                    Log.i("DEBUG", "" + ap);
+                    sb.append(ap.getStartTime())
+                            .append("\n")
+                            .append(ap.getTitle())
+                            .append("\n")
+                            .append(ap.getInfo())
+                            .append("\n")
+                            .append(ap.getEndTime())
+                            .append("\n\n");
+                }
+                Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
+                detailsIntent.putExtra("day", "" + detailsDate);
+                detailsIntent.putExtra("agenda", sb.toString());
+                activity.startActivity(detailsIntent);
+            } else {
+                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
+            }
+        });
         generateRectangles();
         Log.i("1337", "shiftX_max=" + shiftX_max);
     }
@@ -111,19 +128,22 @@ public class WeekdayView extends View {
         for (RectF rf : eventRectangles.values()) {
             rf.set(rf.left, (int) (rf.top * parentLayout.getMeasuredHeight()), rf.right, (int) (rf.bottom * parentLayout.getMeasuredHeight()));
         }
+        fit = true;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
+        paint.reset();
+        textPaint.reset();
         drawGrid(canvas);
-        fitRectsToParent();
+        if (!fit) fitRectsToParent();
         for (BackportAppointment a : eventRectangles.keySet()) {
             RectF rect = eventRectangles.get(a);
             Log.i("1337", a.getStartTime() + "-" + a.getEndTime() + " = " + eventRectangles.get(a).toShortString());
 
             textPaint.setColor(getResources().getColor(R.color.colorPrimary));
             // Draw the appointment rectangle
-            canvas.drawRoundRect(rect, dp(7), dp(7), textPaint);
+            canvas.drawRoundRect(new RectF(rect), dp(7), dp(7), textPaint);
 
             textPaint.setColor(Color.WHITE);
             textPaint.setTextSize(dp(14));
@@ -161,14 +181,12 @@ public class WeekdayView extends View {
         Log.i("1337", "= = = = = = = = =");
     }
 
+
+
     // For auto layout: standard appointment width + margin (if is friday also end margin)
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(dp((2 * X_OFFSET + X_WIDTH) * (shiftX_max + 1) + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
-    }
-
-    private int transpose(int minValue) {
-        return (minValue - min) * parentLayout.getMeasuredHeight() / (max - min);
     }
 
     private int dp(int px) {
@@ -179,7 +197,6 @@ public class WeekdayView extends View {
         paint.setColor(Color.parseColor("#E0E0E0"));
 
         final float height = parentLayout.getMeasuredHeight();
-        final float width = parentLayout.getMeasuredWidth();
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for (int i = 0; i * k < height; i++) {
             paint.setStrokeWidth(dp(((i % 2 == 0) == (min % 60 == 0)) ? 2 : 1));

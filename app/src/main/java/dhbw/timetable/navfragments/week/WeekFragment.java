@@ -184,7 +184,6 @@ public class WeekFragment extends Fragment {
         String[] dayNames = { "Mo", "Tu", "We", "Th", "Fr" };
 
         WeekdayView dayElement;
-        TimelessDate tempDay = (TimelessDate) weekToDisplay.clone();
         for (int i = 0; i < 5; i++) {
             LinearLayout dayWrapper = new LinearLayout(getContext());
             dayWrapper.setOrientation(LinearLayout.VERTICAL);
