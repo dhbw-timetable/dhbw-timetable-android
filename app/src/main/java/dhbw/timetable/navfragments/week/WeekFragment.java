@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -119,7 +120,8 @@ public class WeekFragment extends Fragment {
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
-                }, (ErrorCallback) string -> ErrorDialog.newInstance("Error", "Unable to load specifiy week. This week is not in your sync range. There is no data for it.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"), weekToDisplay);
+                }, string -> ErrorDialog.newInstance("Error", "Unable to load " +
+                        "specifiy week. This week is not in your sync range. There is no data for it.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"), weekToDisplay);
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy.");
                 Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
@@ -133,7 +135,7 @@ public class WeekFragment extends Fragment {
      * match the loaded globals
      */
     public boolean applyGlobalContent(boolean firstTry, boolean special, final View view, final Activity activity) {
-        LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
+        LinearLayout body = (LinearLayout) view.findViewById(R.id.weekday_parent);
         RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
 
         // Prepare appointment data
@@ -145,7 +147,8 @@ public class WeekFragment extends Fragment {
         actTitle.setText(formattedDate);
         actTitle.setOnClickListener(v -> pickWeek(view, activity));
 
-        ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
+        ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(
+                day, TimetableManager.getInstance().getGlobalsAsList());
         Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
         if (weekAppointments.size() == 0 && firstTry) {
             return false;
@@ -153,7 +156,8 @@ public class WeekFragment extends Fragment {
             body.removeAllViews();
             times.removeAllViews();
             if (special) {
-                InfoDialog.newInstance("Info", "No appointments found. Sync range to low or simply no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
+                InfoDialog.newInstance("Info","No appointments found. Sync range to low or simply" +
+                        " no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
             }
             return true;
         }
@@ -171,12 +175,17 @@ public class WeekFragment extends Fragment {
         SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
         sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
         times.addView(sideTimesView);
+
         // Initialize body content
         body.removeAllViews();
+
+        String[] dayNames = { "Mo", "Tu", "We", "Th", "Fr" };
+
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
-                    DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
+                    DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4,
+                    new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()), dayNames[i]);
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
             body.addView(dayElement);
 

@@ -8,15 +8,19 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import dhbw.timetable.ActivityHelper;
@@ -34,15 +38,17 @@ public class WeekdayView extends View {
     private final static int X_OFFSET = 60;
     private final static int X_WIDTH = 30; // Minutes
 
+    private HashMap<BackportAppointment, RectF> eventRectangles = new HashMap<>();
     private Paint paint = new Paint();
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private View parentLayout;
+    private LinearLayout dayContainer;
     private LinkedHashSet<BackportAppointment> dayAppointments;
     private float scale;
-    private int min, max;
+    private int min, max, shiftX_max = 0;
     private boolean isFriday;
 
-    public WeekdayView(int min, int max, final View parentLayout, final ArrayList<BackportAppointment> appointments, boolean isFriday, final String detailsDate) {
+    public WeekdayView(int min, int max, final View parentLayout, final ArrayList<BackportAppointment> appointments, boolean isFriday, final String detailsDate, final String dayName) {
         super(parentLayout.getContext());
         this.min = min;
         this.max = max;
@@ -52,93 +58,82 @@ public class WeekdayView extends View {
         dayAppointments.addAll(appointments);
         this.scale = getResources().getDisplayMetrics().density;
 
-        this.setOnClickListener(v -> {
-            Activity activity = ActivityHelper.getActivity();
-            if (activity != null && !TimetableManager.getInstance().isRunning()) {
-                StringBuilder sb = new StringBuilder("");
-                for (BackportAppointment ap : dayAppointments) {
-                    Log.i("DEBUG", "" + ap);
-                    sb.append(ap.getStartTime())
-                            .append("\n")
-                            .append(ap.getTitle())
-                            .append("\n")
-                            .append(ap.getInfo())
-                            .append("\n")
-                            .append(ap.getEndTime())
-                            .append("\n\n");
-                }
-
-
-                Intent detailsIntent = new Intent(activity.getApplicationContext(), DayDetailsActivity.class);
-                detailsIntent.putExtra("day", "" + detailsDate);
-                detailsIntent.putExtra("agenda", sb.toString());
-                activity.startActivity(detailsIntent);
-            } else {
-                Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        generateRectangles();
+        Log.i("1337", "shiftX_max=" + shiftX_max);
     }
 
-    // TODO: Extract memory allocations where possible
-    @Override
-    public void onDraw(Canvas canvas) {
-        drawGrid(canvas);
+    private RectF layoutRectangle(final BackportAppointment a) {
+        float startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
+                + a.getStartDate().get(Calendar.MINUTE);
+        float endOnMin = a.getEndDate().get(Calendar.HOUR_OF_DAY) * 60
+                + a.getEndDate().get(Calendar.MINUTE);
+        float x1, x2, y1, y2, appointmentWidth;
 
+        appointmentWidth = dp((int) (X_OFFSET * 1.75) + X_WIDTH);
+
+        x1 = dp(X_OFFSET / 4);
+        y1 = (startOnMin - min) / (max - min);
+        x2 = x1 + appointmentWidth;
+        y2 = (endOnMin - min) / (max - min);
+
+        return new RectF(x1, y1, x2, y2);
+    }
+
+    private void generateRectangles() {
         for (BackportAppointment a : dayAppointments) {
-            textPaint.setColor(getResources().getColor(R.color.colorPrimary));
-            int startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
-                    + a.getStartDate().get(Calendar.MINUTE);
-            int endOnMin = a.getEndDate().get(Calendar.HOUR_OF_DAY) * 60
-                    + a.getEndDate().get(Calendar.MINUTE);
-            int x1, x2, y1, y2, appointmentWidth;
+            // Default, left aligned (not shifted) rectangle
+            RectF a_rect = layoutRectangle(a);
 
-            appointmentWidth = dp((int) (X_OFFSET * 1.75) + X_WIDTH);
+            // Check for each rects if intersection is present
+            boolean check_intersect = true;
+            int i = 0;
+            start_intersection_check:
+            while (check_intersect) {
+                for (RectF r : eventRectangles.values()) {
+                    if (r.contains(a_rect) || RectF.intersects(r, a_rect)) {
+                        if (++i > shiftX_max) shiftX_max = i;
+                        // shift one unit to the right and start again
+                        a_rect.offset(dp(2 * X_OFFSET + X_WIDTH), 0);
+                        continue start_intersection_check;
+                    } // else check next
+                }
 
-            x1 = dp(X_OFFSET / 4);
-            y1 = ((startOnMin - min) * parentLayout.getMeasuredHeight()) / (max - min);
-            x2 = x1 + appointmentWidth;
-            y2 = ((endOnMin - min) * parentLayout.getMeasuredHeight()) / (max - min);
+                // finish
+                check_intersect = false;
+            }
 
-
-            // Draw the appointment rectangle
-            canvas.drawRoundRect(new RectF(new Rect(x1, y1, x2, y2)),
-                    dp(7), dp(7), textPaint);
-
-            // Draw the course title
-            textPaint.setColor(Color.WHITE);
-            textPaint.setTextSize(dp(14));
-            Typeface currentTypeFace = textPaint.getTypeface();
-            Typeface bold = Typeface.create(currentTypeFace, Typeface.BOLD);
-            textPaint.setTypeface(bold);
-            StaticLayout textLayout = new StaticLayout(
-                    a.getTitle(),
-                    textPaint,
-                    appointmentWidth - 32,
-                    Layout.Alignment.ALIGN_CENTER,
-                    1.0f,
-                    0.0f,
-                    false);
-            canvas.save();
-            canvas.translate(x1 + 16,
-                    transpose(startOnMin + ((endOnMin - startOnMin) / 2))
-                            - (textLayout.getHeight() / 2));
-            textLayout.draw(canvas);
-            canvas.restore();
+            eventRectangles.put(a, a_rect);
         }
     }
 
-    // For auto layout
+    private void fitRectsToParent() {
+        for (RectF rf : eventRectangles.values()) {
+            rf.set(rf.left, (int) (rf.top * parentLayout.getMeasuredHeight()), rf.right, (int) (rf.bottom * parentLayout.getMeasuredHeight()));
+        }
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        drawGrid(canvas);
+        fitRectsToParent();
+        for (BackportAppointment a : eventRectangles.keySet()) {
+            Log.i("1337", a.getStartTime() + "-" + a.getEndTime() + " = " + eventRectangles.get(a).toShortString());
+
+            textPaint.setColor(getResources().getColor(R.color.colorPrimary));
+            // Draw the appointment rectangle
+            canvas.drawRoundRect(eventRectangles.get(a), dp(7), dp(7), textPaint);
+        }
+        Log.i("1337", "= = = = = = = = =");
+    }
+
+    // For auto layout: standard appointment width + margin (if is friday also end margin)
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(dp(2 * X_OFFSET + X_WIDTH + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
+        setMeasuredDimension(dp((2 * X_OFFSET + X_WIDTH) * (shiftX_max + 1) + (isFriday ? X_OFFSET / 4 : 0)), parentLayout.getMeasuredHeight());
     }
 
     private int dp(int px) {
         return (int) (px * scale + 0.5f);
-    }
-
-    private int transpose(int minValue) {
-        return (minValue - min) * parentLayout.getMeasuredHeight() / (max - min);
     }
 
     private void drawGrid(Canvas canvas) {
@@ -149,7 +144,7 @@ public class WeekdayView extends View {
         final float k = (Y_GRID_SPACE * height) / (max - min);
         for (int i = 0; i * k < height; i++) {
             paint.setStrokeWidth(dp(((i % 2 == 0) == (min % 60 == 0)) ? 2 : 1));
-            canvas.drawLine(0, i * k, (width / 5) + (isFriday ? X_OFFSET : 0), i * k, paint);
+            canvas.drawLine(0, i * k, getMeasuredWidth(), i * k, paint);
         }
     }
 }
