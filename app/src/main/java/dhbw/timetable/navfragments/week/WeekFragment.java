@@ -167,9 +167,6 @@ public class WeekFragment extends Fragment {
 
         Integer[] borders = DateUtilities.Backport.GetBorders(weekAppointments);
 
-        Log.i("1337", "borders[0]" + borders[0]);
-        Log.i("1337", "borders[1]" + borders[1]);
-
 
         int fExtensionFirst, fExtensionSecond, rest;
         if (borders[0] >= 30) {
