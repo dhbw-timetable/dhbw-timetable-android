@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -11,6 +12,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +31,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.dialogs.InfoDialog;
@@ -112,14 +114,15 @@ public class WeekFragment extends Fragment {
             }, string -> ErrorDialog.newInstance("Warning", "Unable to update timetable data. The data may be not up to date.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"));
         } else {
             if (!TimetableManager.getInstance().isRunning()) {
-                TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), (Runnable) () -> {
+                TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), () -> {
                     try {
                         applyGlobalContent(false, true, view, activity);
                         Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
-                }, (ErrorCallback) string -> ErrorDialog.newInstance("Error", "Unable to load specifiy week. This week is not in your sync range. There is no data for it.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"), weekToDisplay);
+                }, string -> ErrorDialog.newInstance("Error", "Unable to load " +
+                        "specifiy week. This week is not in your sync range. There is no data for it.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"), weekToDisplay);
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy.");
                 Toast.makeText(activity, "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();
@@ -133,19 +136,20 @@ public class WeekFragment extends Fragment {
      * match the loaded globals
      */
     public boolean applyGlobalContent(boolean firstTry, boolean special, final View view, final Activity activity) {
-        LinearLayout body = (LinearLayout) view.findViewById(R.id.week_layout_body);
-        RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
+        LinearLayout body = view.findViewById(R.id.weekday_parent);
+        RelativeLayout times = view.findViewById(R.id.week_layout_times);
 
         // Prepare appointment data
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateUtilities.Backport.Normalize(day);
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         // activity.setTitle(formattedDate);
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
-        actTitle.setText(formattedDate);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(day.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(view, activity));
 
-        ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(day, TimetableManager.getInstance().getGlobalsAsList());
+        ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(
+                day, TimetableManager.getInstance().getGlobalsAsList());
         Log.d("TTM", weekAppointments.size() + " week appointments for: " + formattedDate);
         if (weekAppointments.size() == 0 && firstTry) {
             return false;
@@ -153,7 +157,8 @@ public class WeekFragment extends Fragment {
             body.removeAllViews();
             times.removeAllViews();
             if (special) {
-                InfoDialog.newInstance("Info", "No appointments found. Sync range to low or simply no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
+                InfoDialog.newInstance("Info","No appointments found. Sync range to low or simply" +
+                        " no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
             }
             return true;
         }
@@ -162,27 +167,73 @@ public class WeekFragment extends Fragment {
 
         Integer[] borders = DateUtilities.Backport.GetBorders(weekAppointments);
 
-        // If margin is possible
-        int fExtensionFirst = borders[0] >= 30 ? borders[0] - 30 : borders[0];
-        int fExtensionSecond = borders[1] <= 1410 ? borders[1] + 30 : borders[1];
+        Log.i("1337", "borders[0]" + borders[0]);
+        Log.i("1337", "borders[1]" + borders[1]);
+
+
+        int fExtensionFirst, fExtensionSecond, rest;
+        if (borders[0] >= 30) {
+            // If week start is full hour
+            rest = borders[0] % 60;
+            if (rest == 0) {
+                fExtensionFirst = borders[0];
+            } else { // else take the next full hour before
+                fExtensionFirst = borders[0] - rest;
+            }
+        } else {
+            fExtensionFirst = borders[0];
+        }
+
+        fExtensionSecond = borders[1] <= 1410 ? borders[1] + 60 : borders[1];
 
         // Initialize side time view
         times.removeAllViews();
         SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
-        sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
+        sideTimesView.setBackgroundColor(Color.parseColor("#FAFAFA"));
         times.addView(sideTimesView);
+
         // Initialize body content
         body.removeAllViews();
+
+        String[] dayNames = { "Mo", "Tu", "We", "Th", "Fr" };
+
         WeekdayView dayElement;
         for (int i = 0; i < 5; i++) {
+            LinearLayout dayWrapper = new LinearLayout(getContext());
+            dayWrapper.setOrientation(LinearLayout.VERTICAL);
+
+            // Head
+            TextView dayNameView = new TextView(getContext());
+            dayNameView.setText(new SimpleDateFormat("EEE dd.", Locale.GERMANY).format(day.getTime()));
+            dayNameView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            dayNameView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            dayNameView.setTypeface(null, Typeface.BOLD);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+            dayNameView.setLayoutParams(layoutParams);
+
+            // Body
             dayElement = new WeekdayView(fExtensionFirst, fExtensionSecond, body,
-                    DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4, new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()));
+                    DateUtilities.Backport.GetAppointmentsOfDay(day, weekAppointments), i == 4,
+                    new SimpleDateFormat("EE dd.MM.yyyy", Locale.GERMANY).format(day.getTime()), dayNames[i]);
             dayElement.setBackgroundColor(Color.parseColor("#FAFAFA"));
-            body.addView(dayElement);
+
+            // Into wrapper
+            dayWrapper.addView(dayNameView);
+            dayWrapper.addView(dayElement);
+
+            // Into parent
+            body.addView(dayWrapper);
 
             DateUtilities.Backport.AddDays(day, 1);
         }
         return true;
+    }
+
+
+    private int dp(int px) {
+        return (int) (px * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     @Override
@@ -195,7 +246,7 @@ public class WeekFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final Activity activity = getActivity();
-        AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = activity.findViewById(R.id.appbar);
 
         // Handle the tabs from navigation fragment
         if (appBarLayout.getChildCount() != 1) appBarLayout.removeViewAt(1);
@@ -210,8 +261,8 @@ public class WeekFragment extends Fragment {
         }
         DateUtilities.Backport.Normalize(weekToDisplay);
         // activity.setTitle();
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
-        actTitle.setText(new SimpleDateFormat("EEEE dd.MM.yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
+        actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(rootView, activity));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), () -> {
             Log.i("TTM", "Successfully loaded offline globals for week fragment.");

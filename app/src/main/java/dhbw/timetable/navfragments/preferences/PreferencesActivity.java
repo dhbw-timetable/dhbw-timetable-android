@@ -71,42 +71,30 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             final EditTextPreference syncRangeFuture = (EditTextPreference) findPreference("sync_range_future");
             final EditTextPreference syncRangePast = (EditTextPreference) findPreference("sync_range_past");
 
-            timetablesButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent i = new Intent(getActivity(), ManageTimetablesActivity.class);
-                    startActivity(i);
-                    getActivity().overridePendingTransition(0, 0);
-                    return true;
-                }
+            timetablesButton.setOnPreferenceClickListener(preference -> {
+                Intent i = new Intent(getActivity(), ManageTimetablesActivity.class);
+                startActivity(i);
+                getActivity().overridePendingTransition(0, 0);
+                return true;
             });
 
-            infoButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich, Malte Bartels (c) 2017\n\nhttp://ec.europa.eu/justice/data-protection/article-29/documentation/opinion-recommendation/files/2013/wp202_en.pdf").show(getFragmentManager(), "info");
-                    return true;
-                }
+            infoButton.setOnPreferenceClickListener(preference -> {
+                InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich, Malte Bartels (c) 2017\n\nhttp://ec.europa.eu/justice/data-protection/article-29/documentation/opinion-recommendation/files/2013/wp202_en.pdf").show(getFragmentManager(), "info");
+                return true;
             });
 
             syncRangeFuture.setSummary(Integer.parseInt(syncRangeFuture.getText()) + " weeks");
-            syncRangeFuture.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    syncRangeFuture.setSummary(newValue + " weeks");
-                    onSyncRangeChange();
-                    return true;
-                }
+            syncRangeFuture.setOnPreferenceChangeListener((preference, newValue) -> {
+                syncRangeFuture.setSummary(newValue + " weeks");
+                onSyncRangeChange();
+                return true;
             });
 
             syncRangePast.setSummary(Integer.parseInt(syncRangePast.getText()) + " weeks");
-            syncRangePast.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    syncRangePast.setSummary(newValue + " weeks");
-                    onSyncRangeChange();
-                    return true;
-                }
+            syncRangePast.setOnPreferenceChangeListener((preference, newValue) -> {
+                syncRangePast.setSummary(newValue + " weeks");
+                onSyncRangeChange();
+                return true;
             });
 
             setHasOptionsMenu(true);

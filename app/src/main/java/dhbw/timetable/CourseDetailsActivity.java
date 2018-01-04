@@ -27,7 +27,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         this.info = getIntent().getStringExtra("info");
 
         TextView timeView = (TextView) findViewById(R.id.day_details_time);
-        timeView.setText(startTime + " - " + endTime);
+        timeView.setText(String.format("%s - %s", startTime, endTime));
 
         TextView titleView = (TextView) findViewById(R.id.day_details_course);
         titleView.setText(title);
@@ -49,7 +49,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /** Enable the back button */
+        /* Enable the back button */
         if (id == android.R.id.home) {
             finish();
             return true;

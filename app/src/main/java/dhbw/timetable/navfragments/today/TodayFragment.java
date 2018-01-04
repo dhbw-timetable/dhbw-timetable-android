@@ -58,7 +58,7 @@ public class TodayFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //getActivity().setTitle("Today");
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText("Today");
         actTitle.setOnClickListener(null);
         Log.d("TODAY", "onViewCreated");
@@ -67,14 +67,14 @@ public class TodayFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = getActivity().findViewById(R.id.appbar);
 
         if (appBarLayout.getChildCount() != 1) {
             appBarLayout.removeViewAt(1);
         }
 
         final View view = inflater.inflate(R.layout.content_today, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclingAgenda);
+        recyclerView = view.findViewById(R.id.recyclingAgenda);
 
         aAdapter = new AgendaAppointmentAdapter(agendaAppointmentSet);
         RecyclerView.LayoutManager aLayoutManager = new LinearLayoutManager(view.getContext()) {
@@ -100,14 +100,11 @@ public class TodayFragment extends Fragment {
             ArrayList<BackportAppointment> appointments = DateUtilities.Backport.GetAppointmentsOfDay(today, TimetableManager.getInstance().getGlobals().get(week));
             if (appointments.size() == 0) {
                 Log.w("TODAY", "Warning: No appointments found for day.");
-                TimetableManager.getInstance().updateGlobals(TodayFragment.this.getActivity().getApplication(), new Runnable() {
-                    @Override
-                    public void run() {
-                        if (view != null) {
-                            applyGlobalContent(view);
-                        } else {
-                            Log.w("TODAY", "WARNING: Today tried to start without view. (Too early)");
-                        }
+                TimetableManager.getInstance().updateGlobals(TodayFragment.this.getActivity().getApplication(), () -> {
+                    if (view != null) {
+                        applyGlobalContent(view);
+                    } else {
+                        Log.w("TODAY", "WARNING: Today tried to start without view. (Too early)");
                     }
                 }, string -> ErrorDialog.newInstance("Error", "Sync lag. You have no internet connection and your offline data is not up to date.", string));
             } else {
@@ -151,13 +148,8 @@ public class TodayFragment extends Fragment {
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
-                }, new ErrorCallback() {
-                    @Override
-                    public void onError(String string) {
-                        ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
-                                .show(TodayFragment.this.getActivity().getFragmentManager(), "TODAYDLERR");
-                    }
-                });
+                }, string -> ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
+                        .show(TodayFragment.this.getActivity().getFragmentManager(), "TODAYDLERR"));
                 return true;
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy");
@@ -187,7 +179,7 @@ public class TodayFragment extends Fragment {
             }
         }
         int size = agendaAppointmentSet.size();
-        TextView placeholder = (TextView) view.findViewById(R.id.agendaEmptyPlaceholder);
+        TextView placeholder = view.findViewById(R.id.agendaEmptyPlaceholder);
         if (size > 0) {
             placeholder.setText("");
             LinkedHashSet<AgendaAppointment> appointmentsWithBreaks = new LinkedHashSet<>();
@@ -222,8 +214,8 @@ public class TodayFragment extends Fragment {
         DateUtilities.Backport.AddDays(tomorrow, 1);
         LinkedHashSet<BackportAppointment> tomorrowAppointments = DateUtilities.Backport.GetAppointmentsOfDayAsSet(tomorrow,
                 TimetableManager.getInstance().getGlobalsAsSet());
-        TextView beginView = (TextView) view.findViewById(R.id.beginTime);
-        TextView tomorrowSummaryView = (TextView) view.findViewById(R.id.tomorrowSummary);
+        TextView beginView = view.findViewById(R.id.beginTime);
+        TextView tomorrowSummaryView = view.findViewById(R.id.tomorrowSummary);
         if (tomorrowAppointments.size() > 0) {
             final SharedPreferences sharedPref = getActivity().getSharedPreferences(
                     getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -240,7 +232,7 @@ public class TodayFragment extends Fragment {
                 alarm = "None";
             }
 
-            beginView.setText("Alarm: " + alarm + "\n" + "Begin: " + DateUtilities.GERMAN_STD_STIMEFORMAT.format(startDate.getTime()));
+            beginView.setText(String.format("Alarm: %s\nBegin: %s", alarm, DateUtilities.GERMAN_STD_STIMEFORMAT.format(startDate.getTime())));
             StringBuilder sb = new StringBuilder();
             for (BackportAppointment a : tomorrowAppointments)
                 sb.append(a.getTitle()).append(",\n");
@@ -254,7 +246,7 @@ public class TodayFragment extends Fragment {
     }
 
     private void applyWeekSummary(final View view) {
-        TextView weekHeadline = (TextView) view.findViewById(R.id.weekHeadline);
+        TextView weekHeadline = view.findViewById(R.id.weekHeadline);
         TimelessDate day = new TimelessDate();
 
         int iDay = day.get(Calendar.DAY_OF_WEEK);
@@ -314,7 +306,7 @@ public class TodayFragment extends Fragment {
 
             DateUtilities.Backport.AddDays(day, 1);
         }
-        GridLayout gl = (GridLayout) view.findViewById(R.id.weekGrid);
+        GridLayout gl = view.findViewById(R.id.weekGrid);
         gl.removeAllViews();
         Integer[] borders = DateUtilities.Backport.GetBorders(weekAppointments);
         TodaySummaryRect ra = new TodaySummaryRect(borders[0], borders[1], gl, wData);
@@ -322,7 +314,7 @@ public class TodayFragment extends Fragment {
         ra.setOnClickListener(v -> {
             if (!TimetableManager.getInstance().isRunning()) {
                 ((MainActivity) getActivity()).displayFragment(R.id.nav_week);
-                NavigationView navigationView = (NavigationView) TodayFragment.this.getActivity().findViewById(R.id.nav_view);
+                NavigationView navigationView = TodayFragment.this.getActivity().findViewById(R.id.nav_view);
                 navigationView.setCheckedItem(R.id.nav_week);
             } else {
                 Toast.makeText(getActivity(), "I'm currently busy, sorry!", Toast.LENGTH_SHORT).show();

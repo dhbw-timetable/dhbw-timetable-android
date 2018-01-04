@@ -29,8 +29,8 @@ class AgendaAppointmentAdapter extends RecyclerView.Adapter<AgendaAppointmentAda
 
         MyViewHolder(View view) {
             super(view);
-            time = (TextView) view.findViewById(R.id.courseTime);
-            title = (TextView) view.findViewById(R.id.courseTitle);
+            time = view.findViewById(R.id.courseTime);
+            title = view.findViewById(R.id.courseTitle);
         }
     }
 
