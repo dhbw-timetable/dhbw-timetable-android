@@ -2,6 +2,7 @@ package dhbw.timetable.views;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -80,6 +81,16 @@ public class WeekdayView extends View {
         generateRectangles();
     }
 
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Recalculate rectangle positions on device rotation
+        eventRectangles.clear();
+        shiftX_max = 0;
+        fit = false;
+        generateRectangles();
+    }
+
     private RectF layoutRectangle(final BackportAppointment a) {
         float startOnMin = a.getStartDate().get(Calendar.HOUR_OF_DAY) * 60
                 + a.getStartDate().get(Calendar.MINUTE);
@@ -154,15 +165,19 @@ public class WeekdayView extends View {
 
             canvas.drawText(a.getStartTime() + " - " + a.getEndTime(), rect.left + 16, rect.top + dp(16), textPaint);
 
+            if (a.getTitle().equals("Klausur")) {
+                Log.i("1337", "" + (rect.bottom - rect.top));
+            }
+
             // Draw info
-            if (rect.bottom - rect.top > 100) {
+            if (rect.bottom - rect.top > 180) {
                 canvas.drawText(TextUtils.ellipsize(a.getInfo(), textPaint,
                         dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END).toString(),
                         rect.left + 16, rect.bottom - 16, textPaint);
             }
 
             // Draw course title
-            if (rect.bottom - rect.top > 32) {
+            if (rect.bottom - rect.top > 60) {
                 StaticLayout courseTitleLayout = new StaticLayout(
                         TextUtils.ellipsize(a.getTitle().trim(), textPaint, dp((int) (X_OFFSET * 1.75) + X_WIDTH) - 32, TextUtils.TruncateAt.END),
                         textPaint,
