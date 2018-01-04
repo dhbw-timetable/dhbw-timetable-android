@@ -101,7 +101,11 @@ public final class AlarmSupervisor {
                 mMediaPlayer.setDataSource(context, sound);
                 final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                 beforeRingerMode = audioManager.getRingerMode();
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                try {
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                } catch(SecurityException se) {
+                    se.printStackTrace();
+                }
                 if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                     mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                     mMediaPlayer.prepare();
@@ -117,7 +121,11 @@ public final class AlarmSupervisor {
     void stopRingtone(Context context) {
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
-            ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(beforeRingerMode);
+            try {
+                ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(beforeRingerMode);
+            } catch(SecurityException se) {
+                se.printStackTrace();
+            }
         }
     }
 
