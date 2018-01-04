@@ -77,7 +77,6 @@ public class WeekdayView extends View {
             }
         });
         generateRectangles();
-        Log.i("1337", "shiftX_max=" + shiftX_max);
     }
 
     private RectF layoutRectangle(final BackportAppointment a) {
@@ -139,7 +138,6 @@ public class WeekdayView extends View {
         if (!fit) fitRectsToParent();
         for (BackportAppointment a : eventRectangles.keySet()) {
             RectF rect = eventRectangles.get(a);
-            Log.i("1337", a.getStartTime() + "-" + a.getEndTime() + " = " + eventRectangles.get(a).toShortString());
 
             textPaint.setColor(getResources().getColor(R.color.colorPrimary));
             // Draw the appointment rectangle
@@ -183,7 +181,6 @@ public class WeekdayView extends View {
             // Reset
             canvas.restore();
         }
-        Log.i("1337", "= = = = = = = = =");
     }
 
 
