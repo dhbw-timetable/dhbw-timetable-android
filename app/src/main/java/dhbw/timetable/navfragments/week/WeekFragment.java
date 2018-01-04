@@ -168,14 +168,29 @@ public class WeekFragment extends Fragment {
 
         Integer[] borders = DateUtilities.Backport.GetBorders(weekAppointments);
 
-        // If margin is possible
-        int fExtensionFirst = borders[0] >= 30 ? borders[0] - 30 : borders[0];
-        int fExtensionSecond = borders[1] <= 1410 ? borders[1] + 30 : borders[1];
+        Log.i("1337", "borders[0]" + borders[0]);
+        Log.i("1337", "borders[1]" + borders[1]);
+
+
+        int fExtensionFirst, fExtensionSecond, rest;
+        if (borders[0] >= 30) {
+            // If week start is full hour
+            rest = borders[0] % 60;
+            if (rest == 0) {
+                fExtensionFirst = borders[0];
+            } else { // else take the next full hour before
+                fExtensionFirst = borders[0] - rest;
+            }
+        } else {
+            fExtensionFirst = borders[0];
+        }
+
+        fExtensionSecond = borders[1] <= 1410 ? borders[1] + 60 : borders[1];
 
         // Initialize side time view
         times.removeAllViews();
         SideTimesView sideTimesView = new SideTimesView(fExtensionFirst, fExtensionSecond, times, body);
-        sideTimesView.setBackgroundColor(Color.parseColor("#F0F0F0"));
+        sideTimesView.setBackgroundColor(Color.parseColor("#FAFAFA"));
         times.addView(sideTimesView);
 
         // Initialize body content
