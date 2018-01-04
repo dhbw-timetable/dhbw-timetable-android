@@ -32,10 +32,13 @@ public class TimetableSyncService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+        Log.i("SYNC", "onStartCommand(intent=" + intent + ", getAction()=" + (intent != null ? intent.getAction() : "NULL"));
         // Do not trust android
-        if (intent != null && intent.getAction() != null) {
-            Log.w("SYNC", "Android did not pass intent to background service");
+        if (intent != null) {
             startTimer(intent.getIntExtra("freq", -1));
+        } else {
+            Log.w("SYNC", "Android did not pass intent to background service");
         }
         return START_STICKY;
     }
@@ -60,7 +63,7 @@ public class TimetableSyncService extends Service {
 
         // Schedule the timer, to wake up every x MILLI seconds
         if (freq > -1) {
-            Log.i("SYNC", "Background sync started. Sync every " + freq + "ms.");
+            Log.i("SYNC", "Background sync successfully scheduled. Sync now every " + freq + "ms.");
             timer.schedule(timerTask, 1000, freq);
         }
     }
