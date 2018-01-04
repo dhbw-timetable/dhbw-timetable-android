@@ -1,5 +1,6 @@
 package dhbw.timetable.navfragments.notifications.alarm;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +11,10 @@ import android.view.WindowManager;
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmReceiver extends BroadcastReceiver {
+    @SuppressLint("WrongConstant")
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent != null) Log.i("ALARM-REC", "Broadcasted action: " + intent.getAction());
         Log.i("ALARM-REC", "Firing alarm!");
         if (AlarmSupervisor.getInstance().isShowing()) {
             Log.w("ALARM-REC", "Already have an alarm activity showing! Request denied.");

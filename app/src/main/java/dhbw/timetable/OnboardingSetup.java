@@ -26,12 +26,9 @@ public class OnboardingSetup extends AppCompatActivity {
 
         Button aBtn = (Button) findViewById(R.id.onboard_addTimetable);
 
-        aBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(OnboardingSetup.this, NewTimetableActivity.class);
-                startActivityForResult(i, 2);
-            }
+        aBtn.setOnClickListener(view -> {
+            Intent i = new Intent(OnboardingSetup.this, NewTimetableActivity.class);
+            startActivityForResult(i, 2);
         });
     }
 
@@ -43,18 +40,11 @@ public class OnboardingSetup extends AppCompatActivity {
             returnIntent.putExtra("onboardingSuccess", !result.isEmpty());
             setResult(Activity.RESULT_OK, returnIntent);
 
-            TimetableManager.getInstance().updateGlobals(this.getApplication(), new Runnable() {
-                @Override
-                public void run() {
-                    Log.i("ONBOARD", "Onboarding timetable loaded.");
-                    finish();
-                }
-            }, new ErrorCallback() {
-                @Override
-                public void onError(String string) {
-                    ErrorDialog.newInstance("ERRROR", "Unable to load initial timetable", string).show(OnboardingSetup.this.getFragmentManager(), "ONBOARDERR");
-                }
-            });
+            TimetableManager.getInstance().updateGlobals(this.getApplication(), () -> {
+                Log.i("ONBOARD", "Onboarding timetable loaded.");
+                finish();
+            }, string -> ErrorDialog.newInstance("ERRROR", "Unable to load initial timetable",string)
+                    .show(OnboardingSetup.this.getFragmentManager(), "ONBOARDERR"));
             setContentView(R.layout.loading);
         }
     }

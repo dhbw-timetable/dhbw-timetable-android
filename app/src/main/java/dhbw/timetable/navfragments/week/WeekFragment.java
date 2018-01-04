@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,7 +31,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.ErrorDialog;
 import dhbw.timetable.dialogs.InfoDialog;
@@ -115,7 +114,7 @@ public class WeekFragment extends Fragment {
             }, string -> ErrorDialog.newInstance("Warning", "Unable to update timetable data. The data may be not up to date.", string).show(WeekFragment.this.getActivity().getFragmentManager(), "WEEKDLERR"));
         } else {
             if (!TimetableManager.getInstance().isRunning()) {
-                TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), (Runnable) () -> {
+                TimetableManager.getInstance().reorderSpecialGlobals(activity.getApplication(), () -> {
                     try {
                         applyGlobalContent(false, true, view, activity);
                         Snackbar.make(view, "Updated special date!", Snackbar.LENGTH_SHORT).show();
@@ -137,15 +136,15 @@ public class WeekFragment extends Fragment {
      * match the loaded globals
      */
     public boolean applyGlobalContent(boolean firstTry, boolean special, final View view, final Activity activity) {
-        LinearLayout body = (LinearLayout) view.findViewById(R.id.weekday_parent);
-        RelativeLayout times = (RelativeLayout) view.findViewById(R.id.week_layout_times);
+        LinearLayout body = view.findViewById(R.id.weekday_parent);
+        RelativeLayout times = view.findViewById(R.id.week_layout_times);
 
         // Prepare appointment data
         TimelessDate day = (TimelessDate) weekToDisplay.clone();
         DateUtilities.Backport.Normalize(day);
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         // activity.setTitle(formattedDate);
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(day.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(view, activity));
 
@@ -207,7 +206,7 @@ public class WeekFragment extends Fragment {
             TextView dayNameView = new TextView(getContext());
             dayNameView.setText(new SimpleDateFormat("EEE dd.", Locale.GERMANY).format(day.getTime()));
             dayNameView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            dayNameView.setTextSize(dp(9));
+            dayNameView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
             dayNameView.setTypeface(null, Typeface.BOLD);
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -247,7 +246,7 @@ public class WeekFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final Activity activity = getActivity();
-        AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = activity.findViewById(R.id.appbar);
 
         // Handle the tabs from navigation fragment
         if (appBarLayout.getChildCount() != 1) appBarLayout.removeViewAt(1);
@@ -262,7 +261,7 @@ public class WeekFragment extends Fragment {
         }
         DateUtilities.Backport.Normalize(weekToDisplay);
         // activity.setTitle();
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(rootView, activity));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), () -> {

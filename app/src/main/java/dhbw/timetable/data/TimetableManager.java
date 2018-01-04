@@ -206,7 +206,9 @@ public final class TimetableManager {
             NotificationManager mNotificationManager = (NotificationManager)
                     curr.getSystemService(Context.NOTIFICATION_SERVICE);
             // mId allows you to update the notification later on.
-            mNotificationManager.notify(1337, mBuilder.build());
+            if (mNotificationManager != null) {
+                mNotificationManager.notify(1337, mBuilder.build());
+            }
         }
     }
 
@@ -240,7 +242,9 @@ public final class TimetableManager {
 
     public ArrayList<BackportAppointment> getGlobalsAsList() {
         ArrayList<BackportAppointment> weeks = new ArrayList<>();
-        globalTimetables.values().forEach(weeks::addAll);
+        for (ArrayList<BackportAppointment> c : globalTimetables.values()) {
+            weeks.addAll(c);
+        }
         return weeks;
     }
 
@@ -251,7 +255,7 @@ public final class TimetableManager {
     }
 
     private ArrayList<BackportAppointment> getLocalsAsList() {
-        ArrayList<BackportAppointment> weeks = new ArrayList<BackportAppointment>();
+        ArrayList<BackportAppointment> weeks = new ArrayList<>();
         for (ArrayList<BackportAppointment> week : localTimetables.values()) weeks.addAll(week);
         return weeks;
     }
@@ -456,10 +460,7 @@ public final class TimetableManager {
         if (!secureFile(application)) {
             Log.i("TTM", "No offline globals were found, checking online.");
             if (!TimetableManager.getInstance().isBusy()) {
-                updateGlobals(application, updater, new ErrorCallback() {
-                    @Override
-                    public void onError(String string) {
-                    }
+                updateGlobals(application, updater, string -> {
                 });
             } else {
                 Log.i("ASYNC", "Tried to sync while manager was busy");
@@ -524,7 +525,7 @@ public final class TimetableManager {
         TimelessDate week = new TimelessDate(date);
         DateUtilities.Backport.Normalize(week);
 
-        if (!globals.containsKey(week)) globals.put(week, new ArrayList<BackportAppointment>());
+        if (!globals.containsKey(week)) globals.put(week, new ArrayList<>());
         globals.get(week).add(a);
     }
 

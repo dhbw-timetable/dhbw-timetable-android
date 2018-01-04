@@ -34,9 +34,14 @@ public class EditTimetableActivity extends AppCompatActivity {
         nameView = (TextView) findViewById(R.id.edit_timetable_name);
         urlView = (TextView) findViewById(R.id.edit_timetable_url);
 
-        // Load this timetable
-        nameView.setText(getIntent().getExtras().getString("name"));
-        urlView.setText(getIntent().getExtras().getString("url"));
+        if (getIntent() != null) {
+            Bundle tempBundle = getIntent().getExtras();
+            // Load this timetable
+            if (tempBundle != null) {
+                nameView.setText(tempBundle.getString("name"));
+                urlView.setText(tempBundle.getString("url"));
+            }
+        }
 
         urlView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -59,9 +64,7 @@ public class EditTimetableActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
         nameBefore = nameView.getText().toString();
     }
@@ -70,7 +73,7 @@ public class EditTimetableActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /** Enable the back button */
+        // Enable the back button
         if (id == android.R.id.home) {
             finish();
             overridePendingTransition(0, 0);

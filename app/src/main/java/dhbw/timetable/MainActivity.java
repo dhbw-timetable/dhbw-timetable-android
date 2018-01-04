@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return displayFragment(item.getItemId());
     }
 
@@ -190,13 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                //Log.i ("isMyServiceRunning?", true + "");
-                return true;
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) return true;
             }
         }
-        //Log.i ("isMyServiceRunning?", false + "");
         return false;
     }
 }

@@ -10,7 +10,6 @@ import android.util.Log;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 
 public class TimetableSyncService extends Service {

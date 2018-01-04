@@ -2,7 +2,6 @@ package dhbw.timetable.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -46,28 +45,17 @@ public class ErrorDialog extends InfoDialog {
         final AlertDialog d = builder.setTitle(title)
                 .setMessage(message)
                 .setNegativeButton("MORE", null)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .create();
 
-        d.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                final Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
-                View.OnClickListener onMore = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final AlertDialog alertDialog = ((AlertDialog) dialog);
-                        alertDialog.setMessage(ErrorDialog.this.message + "\n\n" + ErrorDialog.this.moreMSG);
-                        button.setVisibility(View.GONE);
-                    }
-                };
-                button.setOnClickListener(onMore);
-            }
+        d.setOnShowListener(dialog -> {
+            final Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+            View.OnClickListener onMore = view -> {
+                final AlertDialog alertDialog = ((AlertDialog) dialog);
+                alertDialog.setMessage(ErrorDialog.this.message + "\n\n" + ErrorDialog.this.moreMSG);
+                button.setVisibility(View.GONE);
+            };
+            button.setOnClickListener(onMore);
         });
 
 

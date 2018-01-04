@@ -51,15 +51,10 @@ public final class AlarmSupervisor {
     private boolean rescheduling;
     private int beforeRingerMode;
 
-    private AlarmSupervisor() {
-    }
+    private AlarmSupervisor() {}
 
     public static AlarmSupervisor getInstance() {
         return INSTANCE;
-    }
-
-    public void initialize() {
-        mMediaPlayer = new MediaPlayer();
     }
 
     void startVibrator(Context context) {
@@ -77,10 +72,12 @@ public final class AlarmSupervisor {
 
         switch (patternIndex) {
             case 0:
-                return;
+                break;
             case 1:
             case 2:
-                vibrator.vibrate(patterns[patternIndex - 1], 0);
+                if (vibrator != null) {
+                    vibrator.vibrate(patterns[patternIndex - 1], 0);
+                }
                 break;
         }
     }
@@ -88,7 +85,13 @@ public final class AlarmSupervisor {
     void stopVibrator(Context context) {
         Log.d("VIB", "Stopping vibration...");
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.cancel();
+        if (vibrator != null) {
+            vibrator.cancel();
+        }
+    }
+
+    public void initialize() {
+        mMediaPlayer = new MediaPlayer();
     }
 
     void playRingtone(Context context) {
@@ -100,16 +103,18 @@ public final class AlarmSupervisor {
                 Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 mMediaPlayer.setDataSource(context, sound);
                 final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                beforeRingerMode = audioManager.getRingerMode();
-                try {
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                } catch(SecurityException se) {
-                    se.printStackTrace();
-                }
-                if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
-                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                    mMediaPlayer.prepare();
-                    mMediaPlayer.start();
+                if (audioManager != null) {
+                    beforeRingerMode = audioManager.getRingerMode();
+                    try {
+                        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    } catch(SecurityException se) {
+                        se.printStackTrace();
+                    }
+                    if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
+                        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                        mMediaPlayer.prepare();
+                        mMediaPlayer.start();
+                    }
                 }
             } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
@@ -122,7 +127,10 @@ public final class AlarmSupervisor {
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
             try {
-                ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(beforeRingerMode);
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                if (am != null) {
+                    am.setRingerMode(beforeRingerMode);
+                }
             } catch(SecurityException se) {
                 se.printStackTrace();
             }
@@ -253,16 +261,18 @@ public final class AlarmSupervisor {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         try {
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                manager.setAlarmClock(new AlarmManager.AlarmClockInfo(date.getTimeInMillis(), p), p);
-            } else {
-                manager.setWindow(AlarmManager.RTC_WAKEUP,
-                        date.getTimeInMillis(),
-                        1,
-                        p);
-            }
+            if (manager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    manager.setAlarmClock(new AlarmManager.AlarmClockInfo(date.getTimeInMillis(), p), p);
+                } else {
+                    manager.setWindow(AlarmManager.RTC_WAKEUP,
+                            date.getTimeInMillis(),
+                            1,
+                            p);
+                }
 
-            serializeAlarm(context, notificationId);
+                serializeAlarm(context, notificationId);
+            }
         } catch (SecurityException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -285,7 +295,10 @@ public final class AlarmSupervisor {
         Log.d("ALARM", "Canceling " + notificationId);
         PendingIntent p = getAlarm(context, notificationId);
         if (p != null) {
-            ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(p);
+            AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (m != null) {
+                m.cancel(p);
+            }
         } else {
             Log.w("ALARM", "Could not find alarm " + notificationId + "!");
         }
@@ -356,7 +369,9 @@ public final class AlarmSupervisor {
 
     private static void saveIdsInPreferences(Context context, List<Integer> lstIds) {
         JSONArray jsonArray = new JSONArray();
-        lstIds.forEach(jsonArray::put);
+        for (Integer lstId : lstIds) {
+            jsonArray.put(lstId);
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(sTagAlarms, jsonArray.toString());

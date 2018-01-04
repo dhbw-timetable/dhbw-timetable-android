@@ -34,7 +34,7 @@ public class NotificationsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // getActivity().setTitle("Notifications");
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText("Notifications");
         actTitle.setOnClickListener(null);
     }
@@ -43,12 +43,12 @@ public class NotificationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.content_notifications, container, false);
 
-        AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = getActivity().findViewById(R.id.appbar);
 
         if (appBarLayout.getChildCount() == 1) {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
 
-            mViewPager = (ViewPager) rootView.findViewById(R.id.tab_container);
+            mViewPager = rootView.findViewById(R.id.tab_container);
             mViewPager.setAdapter(mSectionsPagerAdapter);
 
             mTabLayout = new TabLayout(getActivity());
@@ -72,7 +72,7 @@ public class NotificationsFragment extends Fragment {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

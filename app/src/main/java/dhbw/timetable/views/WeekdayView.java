@@ -12,6 +12,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
 
@@ -144,14 +145,14 @@ public class WeekdayView extends View {
             canvas.drawRoundRect(new RectF(rect), dp(7), dp(7), textPaint);
 
             textPaint.setColor(Color.WHITE);
-            textPaint.setTextSize(dp(14));
+            textPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, getResources().getDisplayMetrics()));
 
             // Draw the course time
             canvas.save();
             Typeface currentTypeFace1 = textPaint.getTypeface();
             textPaint.setTypeface(Typeface.create(currentTypeFace1, Typeface.NORMAL));
 
-            canvas.drawText(a.getStartTime() + " - " + a.getEndTime(), rect.left + 16, rect.top + 32, textPaint);
+            canvas.drawText(a.getStartTime() + " - " + a.getEndTime(), rect.left + 16, rect.top + dp(16), textPaint);
 
             // Draw info
             if (rect.bottom - rect.top > 100) {

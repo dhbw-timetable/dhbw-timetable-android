@@ -59,7 +59,7 @@ public class AlarmActivity extends AppCompatActivity {
             }
 
             TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
-            alarmTextInfo.setText(title + " at " + time);
+            alarmTextInfo.setText(String.format("%s at %s", title, time));
 
 
         } else {
