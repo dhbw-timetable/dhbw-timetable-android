@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <View
         android:layout_width="match_parent"
         android:layout_height="8dp"
-        android:background="@drawable/shadow"/>
+        android:background="@drawable/shadow" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="15dp">
+
         <TextView
             android:id="@+id/introTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello student!"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
         <TextView
             android:id="@+id/intro"
             android:layout_width="wrap_content"
@@ -26,6 +29,7 @@
             android:paddingTop="20dp"
             android:text="We love to see you using our app and would like to introduce you to it."
             android:textAlignment="center" />
+
         <TextView
             android:id="@+id/introInfo1"
             android:layout_width="wrap_content"
@@ -33,6 +37,7 @@
             android:paddingTop="20dp"
             android:text="Before using the app, you have to set your timetable you get from the university."
             android:textAlignment="center" />
+
         <Button
             android:id="@+id/onboard_addTimetable"
             style="@style/Widget.AppCompat.Button.Colored"

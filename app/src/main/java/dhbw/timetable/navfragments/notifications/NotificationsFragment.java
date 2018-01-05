@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,27 +27,28 @@ public class NotificationsFragment extends Fragment {
     private TabLayout mTabLayout = null;
 
     // Mandatory Constructor
-    public NotificationsFragment() {}
+    public NotificationsFragment() {
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // getActivity().setTitle("Notifications");
-        TextView actTitle = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
         actTitle.setText("Notifications");
         actTitle.setOnClickListener(null);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.content_notifications,container, false);
+        View rootView = inflater.inflate(R.layout.content_notifications, container, false);
 
-        AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = getActivity().findViewById(R.id.appbar);
 
-        if(appBarLayout.getChildCount() == 1) {
+        if (appBarLayout.getChildCount() == 1) {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
 
-            mViewPager = (ViewPager) rootView.findViewById(R.id.tab_container);
+            mViewPager = rootView.findViewById(R.id.tab_container);
             mViewPager.setAdapter(mSectionsPagerAdapter);
 
             mTabLayout = new TabLayout(getActivity());
@@ -66,16 +66,13 @@ public class NotificationsFragment extends Fragment {
     }
 
 
-
-
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

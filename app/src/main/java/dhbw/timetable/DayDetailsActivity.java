@@ -44,7 +44,7 @@ public class DayDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        /** Enable the back button */
+        /* Enable the back button */
         if (id == android.R.id.home) {
             finish();
             return true;

@@ -7,5 +7,4 @@
     android:id="@+id/content_main"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="dhbw.timetable.MainActivity"
-    tools:showIn="@layout/app_bar_main">
-</android.support.constraint.ConstraintLayout>
+    tools:showIn="@layout/app_bar_main"></android.support.constraint.ConstraintLayout>

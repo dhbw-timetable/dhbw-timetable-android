@@ -10,11 +10,11 @@ import android.util.Log;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import dhbw.timetable.data.ErrorCallback;
 import dhbw.timetable.data.TimetableManager;
 
 public class TimetableSyncService extends Service {
 
+    // NEEDED
     private static TimetableSyncService INSTANCE;
 
     private Timer timer;
@@ -32,9 +32,17 @@ public class TimetableSyncService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        startTimer(intent.getIntExtra("freq", -1));
+
+        Log.i("SYNC", "onStartCommand(intent=" + intent + ", getAction()=" + (intent != null ? intent.getAction() : "NULL"));
+        // Do not trust android
+        if (intent != null) {
+            startTimer(intent.getIntExtra("freq", -1));
+        } else {
+            Log.w("SYNC", "Android did not pass intent to background service");
+        }
         return START_STICKY;
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -55,7 +63,7 @@ public class TimetableSyncService extends Service {
 
         // Schedule the timer, to wake up every x MILLI seconds
         if (freq > -1) {
-            Log.i("SYNC", "Background sync started. Sync every " + freq + "ms.");
+            Log.i("SYNC", "Background sync successfully scheduled. Sync now every " + freq + "ms.");
             timer.schedule(timerTask, 1000, freq);
         }
     }
@@ -75,20 +83,12 @@ public class TimetableSyncService extends Service {
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-                if(!TimetableManager.getInstance().isBusy()) {
-                    TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i("SYNC", "Background sync finished.");
-                            // TODO Refresh activities ?
-                            // Check onChange preference and possibly fire notifications done
-                        }
-                    }, new ErrorCallback() {
-                        @Override
-                        public void onError(String string) {
-                            Log.e("SYNC", "Background sync FAILED: " + string);
-                        }
-                    });
+                if (!TimetableManager.getInstance().isBusy()) {
+                    TimetableManager.getInstance().updateGlobals(TimetableSyncService.this.getApplication(), () -> {
+                        Log.i("SYNC", "Background sync finished.");
+                        // TODO Refresh activities ?
+                        // Check onChange preference and possibly fire notifications done
+                    }, string -> Log.e("SYNC", "Background sync FAILED: " + string));
                     Log.i("SYNC", "Background sync now running");
                 } else {
                     Log.w("SYNC", "Tried asynchronous sync");

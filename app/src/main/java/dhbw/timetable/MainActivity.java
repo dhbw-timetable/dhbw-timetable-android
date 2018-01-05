@@ -7,9 +7,10 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("");
-        AlarmSupervisor.getInstance().initialize(this.getApplicationContext());
+        AlarmSupervisor.getInstance().initialize();
         setContentView(R.layout.activity_main);
 
         // Onboarding check
@@ -117,15 +118,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return displayFragment(item.getItemId());
     }
 
     void applyGlobalContent() {
-        if(currFragment instanceof WeekFragment) {
+        if (currFragment instanceof WeekFragment) {
             WeekFragment frag = ((WeekFragment) currFragment);
             frag.applyGlobalContent(false, false, frag.getView(), this);
-        } else if(currFragment instanceof TodayFragment) {
+        } else if (currFragment instanceof TodayFragment) {
             TodayFragment frag = ((TodayFragment) currFragment);
             frag.applyGlobalContent(frag.getView());
         }
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mServiceIntent = new Intent(this, mService.getClass());
         String syncFreq = PreferenceManager.
                 getDefaultSharedPreferences(this).getString("sync_frequency_list", "-1");
-        if(!syncFreq.equals("-1")) {
+        if (!syncFreq.equals("-1")) {
             int msFreq = (int) (Double.parseDouble(syncFreq) * 360000);
             mServiceIntent.putExtra("freq", msFreq);
             if (!isMyServiceRunning(mService.getClass())) {
@@ -190,13 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                //Log.i ("isMyServiceRunning?", true + "");
-                return true;
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) return true;
             }
         }
-        //Log.i ("isMyServiceRunning?", false + "");
         return false;
     }
 }

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/weekSummaryContainer">
@@ -25,8 +23,6 @@
         android:layout_alignBaseline="@+id/diStart"
         android:layout_alignBottom="@+id/diStart"
         android:layout_toStartOf="@+id/diStart"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -36,8 +32,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/weekHeadline"
         android:layout_toStartOf="@+id/miStart"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -47,8 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/weekHeadline"
         android:layout_centerHorizontal="true"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -59,8 +51,6 @@
         android:layout_alignBaseline="@+id/miStart"
         android:layout_alignBottom="@+id/miStart"
         android:layout_toEndOf="@+id/miStart"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -71,8 +61,6 @@
         android:layout_alignBaseline="@+id/doStart"
         android:layout_alignBottom="@+id/doStart"
         android:layout_toEndOf="@+id/doStart"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -83,8 +71,6 @@
         android:layout_alignStart="@+id/moStart"
         android:layout_below="@+id/moStart"
         android:layout_marginTop="100dp"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -95,8 +81,6 @@
         android:layout_alignBaseline="@+id/moEnd"
         android:layout_alignBottom="@+id/moEnd"
         android:layout_toEndOf="@+id/moEnd"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -106,8 +90,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/diEnd"
         android:layout_toEndOf="@+id/diEnd"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -118,8 +100,6 @@
         android:layout_alignBaseline="@+id/miEnd"
         android:layout_alignBottom="@+id/miEnd"
         android:layout_toEndOf="@+id/miEnd"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 
@@ -129,8 +109,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/weekGrid"
         android:layout_toEndOf="@+id/doEnd"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
         android:textAlignment="center"
         android:textSize="12dp" />
 

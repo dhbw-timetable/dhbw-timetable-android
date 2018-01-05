@@ -12,15 +12,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import dhbw.timetable.R;
-import dhbw.timetable.data.Appointment;
-import dhbw.timetable.data.TimelessDate;
+import dhbw.timetable.rapla.data.event.BackportAppointment;
+import dhbw.timetable.rapla.data.time.TimelessDate;
 
 /**
  * Created by Hendrik Ulbrich (C) 2017
  */
 public class AlarmActivity extends AppCompatActivity {
-    private boolean destroy = false; // false means snoozeAlarm
-    private String course, time;
+    private boolean destroy = false; // false means snooze the alarm
+    private String title, time;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,46 +31,51 @@ public class AlarmActivity extends AppCompatActivity {
         Button snoozeBtn = (Button) findViewById(R.id.snoozeButton);
         Button stopBtn = (Button) findViewById(R.id.alarmStopButton);
 
-        snoozeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                destroy = false;
-                finish();
-            }
+        snoozeBtn.setOnClickListener(v -> {
+            destroy = false;
+            finish();
         });
 
-        stopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                destroy = true;
-                finish();
-            }
-        });
+        View.OnClickListener stopAlarm = v -> {
+            destroy = true;
+            finish();
+        };
+
+        stopBtn.setOnClickListener(stopAlarm);
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-        Appointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment();
-        if(appointment != null) {
-            course = appointment.getCourse();
+        BackportAppointment appointment = AlarmSupervisor.getInstance().getCurrentAppointment(getApplication());
+        if (appointment != null) {
+            title = appointment.getTitle();
             time = appointment.getStartTime();
 
+            // If appointment is already over for five minutes, stop alarm
+            if (appointment.getStartDate().getTimeInMillis() < System.currentTimeMillis() - (1000 * 60 * 5)) {
+                Log.w("ALARM", "Missed an alarm for appointment " + title + " at " + time);
+                stopAlarm.onClick(null);
+            }
+
             TextView alarmTextInfo = (TextView) findViewById(R.id.alarmTextInfo);
-            alarmTextInfo.setText(course + " at " + time);
+            alarmTextInfo.setText(String.format("%s at %s", title, time));
+
+
         } else {
             Log.w("ALARM", "Tried launching alarm activity without appointment! :((");
-            destroy = true;
-            finish();
+            stopAlarm.onClick(null);
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-            Log.i("ALARM-ACT", "Starting alarm activity!");
-            AlarmSupervisor.getInstance().playRingtone(this.getApplicationContext());
-            AlarmSupervisor.getInstance().startVibrator(this.getApplicationContext());
+        Log.i("ALARM-ACT", "Starting alarm activity!");
+        if (!destroy) {
+            AlarmSupervisor.getInstance().playRingtone(getApplicationContext());
+            AlarmSupervisor.getInstance().startVibrator(getApplicationContext());
+        }
     }
 
     @Override
@@ -92,12 +97,12 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AlarmSupervisor.getInstance().stopRingtone();
-        AlarmSupervisor.getInstance().stopVibrator(this.getApplicationContext());
+        AlarmSupervisor.getInstance().stopRingtone(getApplicationContext());
+        AlarmSupervisor.getInstance().stopVibrator(getApplicationContext());
         if (destroy) {
-            AlarmSupervisor.getInstance().cancelAlarm(this.getApplicationContext(), new TimelessDate().hashCode());
+            AlarmSupervisor.getInstance().cancelAlarm(getApplicationContext(), new TimelessDate().hashCode());
         } else {
-            AlarmSupervisor.getInstance().snoozeAlarm(this.getApplicationContext());
+            AlarmSupervisor.getInstance().snoozeAlarm(getApplicationContext());
         }
         Log.i("ALARM", "Destroyed activity");
     }

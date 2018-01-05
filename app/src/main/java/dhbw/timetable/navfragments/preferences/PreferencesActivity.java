@@ -2,30 +2,18 @@ package dhbw.timetable.navfragments.preferences;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import dhbw.timetable.LoadingActivity;
-import dhbw.timetable.OnboardingSetup;
 import dhbw.timetable.R;
-import dhbw.timetable.data.TimetableManager;
 import dhbw.timetable.dialogs.InfoDialog;
-import dhbw.timetable.dialogs.YNDialog;
 import dhbw.timetable.navfragments.preferences.timetables.ManageTimetablesActivity;
 
 /**
@@ -83,42 +71,30 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             final EditTextPreference syncRangeFuture = (EditTextPreference) findPreference("sync_range_future");
             final EditTextPreference syncRangePast = (EditTextPreference) findPreference("sync_range_past");
 
-            timetablesButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent i = new Intent(getActivity(), ManageTimetablesActivity.class);
-                    startActivity(i);
-                    getActivity().overridePendingTransition(0, 0);
-                    return true;
-                }
+            timetablesButton.setOnPreferenceClickListener(preference -> {
+                Intent i = new Intent(getActivity(), ManageTimetablesActivity.class);
+                startActivity(i);
+                getActivity().overridePendingTransition(0, 0);
+                return true;
             });
 
-            infoButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich, Malte Bartels (c) 2017\n\nhttp://ec.europa.eu/justice/data-protection/article-29/documentation/opinion-recommendation/files/2013/wp202_en.pdf").show(getFragmentManager(), "info");
-                    return true;
-                }
+            infoButton.setOnPreferenceClickListener(preference -> {
+                InfoDialog.newInstance("About DHBW Timetable", "This app is a project from students of the DHBW Stuttgart.\n\nIt's deployed with\n\nNO WARRANTY\n\nfor correctness or availability.\n\nHendrik Ulbrich, Malte Bartels (c) 2017\n\nhttp://ec.europa.eu/justice/data-protection/article-29/documentation/opinion-recommendation/files/2013/wp202_en.pdf").show(getFragmentManager(), "info");
+                return true;
             });
 
             syncRangeFuture.setSummary(Integer.parseInt(syncRangeFuture.getText()) + " weeks");
-            syncRangeFuture.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    syncRangeFuture.setSummary(newValue + " weeks");
-                    onSyncRangeChange();
-                    return true;
-                }
+            syncRangeFuture.setOnPreferenceChangeListener((preference, newValue) -> {
+                syncRangeFuture.setSummary(newValue + " weeks");
+                onSyncRangeChange();
+                return true;
             });
 
             syncRangePast.setSummary(Integer.parseInt(syncRangePast.getText()) + " weeks");
-            syncRangePast.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    syncRangePast.setSummary(newValue + " weeks");
-                    onSyncRangeChange();
-                    return true;
-                }
+            syncRangePast.setOnPreferenceChangeListener((preference, newValue) -> {
+                syncRangePast.setSummary(newValue + " weeks");
+                onSyncRangeChange();
+                return true;
             });
 
             setHasOptionsMenu(true);
@@ -126,7 +102,7 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
 
         private void onSyncRangeChange() {
             Application application = this.getActivity().getApplication();
-            if(application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
+            if (application.deleteFile(application.getResources().getString(R.string.TIMETABLES_FILE))) {
                 Log.i("FILE", "Successfully deleted timetables file.");
                 deletedTimetables = true;
             } else {
@@ -134,13 +110,15 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             }
         }
 
-        /** Enable the back button */
+        /**
+         * Enable the back button
+         */
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 final Activity activity = this.getActivity();
-                if(deletedTimetables) {
+                if (deletedTimetables) {
                     Intent i = new Intent(activity, LoadingActivity.class);
                     activity.startActivity(i);
                 }
