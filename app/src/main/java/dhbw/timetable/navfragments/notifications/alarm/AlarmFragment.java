@@ -13,8 +13,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +82,10 @@ public class AlarmFragment extends Fragment {
             final Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             ListDialog.newInstance("Select a tone", (dialog, which) -> {
                 if (which >= 0) {
+                    if (!permissionCheck()) {
+                        Log.w("ALARM", "Permissions invalid. Can not safely play sounds!");
+                        return;
+                    }
                     ListView lw = ((AlertDialog) dialog).getListView();
                     String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
@@ -91,12 +97,25 @@ public class AlarmFragment extends Fragment {
                         mMediaPlayer.setDataSource(AlarmFragment.this.getActivity(), sound);
                         final AudioManager audioManager = (AudioManager) AlarmFragment.this.getActivity().getSystemService(Context.AUDIO_SERVICE);
                         if (audioManager != null) {
-                            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                            Log.d("ALARM", "Playing sound now...");
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                                if (mNotificationManager != null) {
+                                    mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+                                } else {
+                                    Log.w("ALARM", "Can't access system service NotificationManager");
+                                }
+                            } else {
+                                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                            }
+                            Log.d("ALARM", "Set ringer mode to normal.");
                             if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                                 mMediaPlayer.prepare();
                                 mMediaPlayer.start();
                             }
+                        } else {
+                            Log.w("ALARM" ,"Can't get system service AudioManager");
                         }
                     } catch (IOException | IllegalStateException e) {
                         e.printStackTrace();
@@ -212,14 +231,27 @@ public class AlarmFragment extends Fragment {
     }
 
     private boolean permissionCheck() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.d("ALARM", "Checking permissions for alarm...");
             NotificationManager notificationManager = (NotificationManager)
                     getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null && !notificationManager.isNotificationPolicyAccessGranted()) {
+                Log.d("ALARM", "Notifications permissions not set. Requesting...");
                 Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                 startActivity(intent);
                 return false;
             }
+            if (!Settings.System.canWrite(getContext())) {
+                Log.d("ALARM", "Write permissions not set. Requesting...");
+                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return false;
+            }
+            Log.d("ALARM", "All permissions granted.");
+        } else {
+            Log.d("ALARM", "Permissions check not needed!");
         }
         return true;
     }

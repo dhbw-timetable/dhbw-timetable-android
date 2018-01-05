@@ -3,6 +3,7 @@ package dhbw.timetable.navfragments.notifications.alarm;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -50,6 +51,7 @@ public final class AlarmSupervisor {
     private MediaPlayer mMediaPlayer;
     private boolean rescheduling;
     private int beforeRingerMode;
+    private int interruptionFilterBefore;
 
     private AlarmSupervisor() {}
 
@@ -110,6 +112,15 @@ public final class AlarmSupervisor {
                     } catch(SecurityException se) {
                         se.printStackTrace();
                     }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        if (mNotificationManager != null) {
+                            interruptionFilterBefore = mNotificationManager.getCurrentInterruptionFilter();
+                            mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+                        } else {
+                            Log.w("ALARM", "Can't access system service NotificationManager");
+                        }
+                    }
                     if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) > 0) {
                         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                         mMediaPlayer.prepare();
@@ -126,15 +137,24 @@ public final class AlarmSupervisor {
     void stopRingtone(Context context) {
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
-            AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            if (am != null) {
-                try {
+            try {
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                if (am != null) {
                     am.setRingerMode(beforeRingerMode);
-                } catch(SecurityException se) {
-                    se.printStackTrace();
+                } else {
+                    Log.w("ALARM", "Can't access system service AudioManager");
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (mNotificationManager != null) {
+                        mNotificationManager.setInterruptionFilter(interruptionFilterBefore);
+                    } else {
+                        Log.w("ALARM", "Can't access system service NotificationManager");
+                    }
+                }
+            } catch(SecurityException se) {
+                se.printStackTrace();
             }
-
         }
     }
 
