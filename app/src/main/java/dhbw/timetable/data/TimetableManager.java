@@ -77,13 +77,12 @@ public final class TimetableManager {
     }
 
     private boolean areAppointmentsEqual(ArrayList<BackportAppointment> l1, ArrayList<BackportAppointment> l2) {
-        if (l1.size() == l2.size()) {
-            BackportAppointment a1, a2;
-            for (int i = 0; i < l1.size(); i++) {
-                a1 = l1.get(i);
-                a2 = l2.get(i);
-                if (!a1.equals(a2)) return false;
-            }
+        if (l1.size() != l2.size()) return false;
+        BackportAppointment a1, a2;
+        for (int i = 0; i < l1.size(); i++) {
+            a1 = l1.get(i);
+            a2 = l2.get(i);
+            if (!a1.toString().equals(a2.toString())) return false;
         }
         return true;
     }
