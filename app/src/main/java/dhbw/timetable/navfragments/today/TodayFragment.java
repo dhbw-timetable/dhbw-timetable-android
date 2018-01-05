@@ -148,8 +148,11 @@ public class TodayFragment extends Fragment {
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
-                }, string -> ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
-                        .show(TodayFragment.this.getActivity().getFragmentManager(), "TODAYDLERR"));
+                }, string -> {
+                    if (TodayFragment.this.getActivity().getFragmentManager() != null)
+                        ErrorDialog.newInstance("Error", "Unable to update timetable data", string)
+                            .show(TodayFragment.this.getActivity().getFragmentManager(), "TODAYDLERR");
+                });
                 return true;
             } else {
                 Log.w("ASYNC", "Tried to sync while manager was busy");
