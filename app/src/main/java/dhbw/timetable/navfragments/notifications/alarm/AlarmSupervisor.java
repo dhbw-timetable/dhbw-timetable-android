@@ -126,14 +126,15 @@ public final class AlarmSupervisor {
     void stopRingtone(Context context) {
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
-            try {
-                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                if (am != null) {
+            AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            if (am != null) {
+                try {
                     am.setRingerMode(beforeRingerMode);
+                } catch(SecurityException se) {
+                    se.printStackTrace();
                 }
-            } catch(SecurityException se) {
-                se.printStackTrace();
             }
+
         }
     }
 
