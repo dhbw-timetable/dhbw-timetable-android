@@ -151,8 +151,8 @@ public class AlarmFragment extends Fragment {
                 String checkedItem = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
                 // Start without a delay
-                // Vibrate for 100 milliseconds
-                // Sleep for 1000 milliseconds
+                // Vibrate for 1000 milliseconds
+                // Sleep for 100 milliseconds
                 long[] pattern1 = {0, 1000, 100, 1000, 100, 1000, 100, 1000, 100};
 
                 // Alternative pattern
