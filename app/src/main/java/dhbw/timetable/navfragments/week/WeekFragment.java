@@ -136,6 +136,9 @@ public class WeekFragment extends Fragment {
      * match the loaded globals
      */
     public boolean applyGlobalContent(boolean firstTry, boolean special, final View view, final Activity activity) {
+        Activity secActitvity = getActivity();
+        secActitvity = secActitvity != null ? secActitvity : activity;
+
         LinearLayout body = view.findViewById(R.id.weekday_parent);
         RelativeLayout times = view.findViewById(R.id.week_layout_times);
 
@@ -144,9 +147,10 @@ public class WeekFragment extends Fragment {
         DateUtilities.Backport.Normalize(day);
         String formattedDate = new SimpleDateFormat("EE dd.MM.yy", Locale.GERMANY).format(day.getTime());
         // activity.setTitle(formattedDate);
-        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
+
+        TextView actTitle = secActitvity.findViewById(R.id.toolbar_title);
         actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(day.getTime()));
-        actTitle.setOnClickListener(v -> pickWeek(view, activity));
+        actTitle.setOnClickListener(v -> pickWeek(view, getActivity()));
 
         ArrayList<BackportAppointment> weekAppointments = DateUtilities.Backport.GetWeekAppointments(
                 day, TimetableManager.getInstance().getGlobalsAsList());
@@ -158,7 +162,7 @@ public class WeekFragment extends Fragment {
             times.removeAllViews();
             if (special) {
                 InfoDialog.newInstance("Info","No appointments found. Sync range to low or simply" +
-                        " no appointments scheduled!").show(activity.getFragmentManager(), "Empty");
+                        " no appointments scheduled!").show(secActitvity.getFragmentManager(), "Empty");
             }
             return true;
         }
@@ -258,7 +262,7 @@ public class WeekFragment extends Fragment {
         }
         DateUtilities.Backport.Normalize(weekToDisplay);
         // activity.setTitle();
-        TextView actTitle = getActivity().findViewById(R.id.toolbar_title);
+        TextView actTitle = activity.findViewById(R.id.toolbar_title);
         actTitle.setText(new SimpleDateFormat("MMM yyyy", Locale.GERMANY).format(weekToDisplay.getTime()));
         actTitle.setOnClickListener(v -> pickWeek(rootView, activity));
         TimetableManager.getInstance().loadOfflineGlobals(activity.getApplication(), () -> {
