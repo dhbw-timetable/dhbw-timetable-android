@@ -13,7 +13,7 @@
             android:id="@+id/Changes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Changes (Beta)"
+            android:text="Changes"
             android:paddingTop="20dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/colorPrimary" />
