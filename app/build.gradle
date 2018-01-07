@@ -43,3 +43,5 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.github.dhbw-timetable:rapla-parser:0.3.3'
 }
+
+apply plugin: 'com.google.gms.google-services'

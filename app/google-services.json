@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "360102698827",
+    "firebase_url": "https://dhbw-timetable.firebaseio.com",
+    "project_id": "dhbw-timetable",
+    "storage_bucket": "dhbw-timetable.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360102698827:android:36780784dc48a614",
+        "android_client_info": {
+          "package_name": "dhbw.timetable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360102698827-9mibtmqnejq2oqi4hhgokch9ffj0k2rt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dhbw.timetable",
+            "certificate_hash": "44ccf6b39cf44b9f241655e51c533ae934b385a1"
+          }
+        },
+        {
+          "client_id": "360102698827-g9cvko4462fqpq200tskm3udc351t2jf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDva_lqdtHoZYLu4zYpi4MHtvOmjOMB9UY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360102698827-g9cvko4462fqpq200tskm3udc351t2jf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
