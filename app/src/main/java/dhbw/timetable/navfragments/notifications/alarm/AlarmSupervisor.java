@@ -139,14 +139,14 @@ public final class AlarmSupervisor {
             mMediaPlayer.reset();
             try {
                 AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                if (am != null) {
+                if (am != null && beforeRingerMode != 0) {
                     am.setRingerMode(beforeRingerMode);
                 } else {
                     Log.w("ALARM", "Can't access system service AudioManager");
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    if (mNotificationManager != null) {
+                    if (mNotificationManager != null && interruptionFilterBefore != 0) {
                         mNotificationManager.setInterruptionFilter(interruptionFilterBefore);
                     } else {
                         Log.w("ALARM", "Can't access system service NotificationManager");
